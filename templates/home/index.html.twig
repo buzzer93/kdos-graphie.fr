@@ -1,0 +1,225 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Kdos Graphie — Gravure laser artisanale & cadeaux personnalisés{% endblock %}
+
+{% block body %}
+<div class="bg-white text-neutral-800">
+    {# =================== NAVBAR =================== #}
+    <header class="fixed top-0 inset-x-0 z-30 bg-white/90 backdrop-blur border-b border-neutral-200">
+        <nav class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+            <a href="{{ path('app_home') }}" class="flex items-center gap-3 text-neutral-900">
+                <img src="{{ asset('assets/media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-10 w-auto">
+                <span class="font-display text-xl tracking-wide hidden sm:inline">Kdos Graphie</span>
+            </a>
+            <ul class="hidden md:flex items-center gap-8 text-neutral-700 text-sm font-medium">
+                <li><a href="#services" class="hover:text-amber-600 transition">Services</a></li>
+                <li><a href="#produits" class="hover:text-amber-600 transition">Produits</a></li>
+                <li><a href="#contact" class="hover:text-amber-600 transition">Contact</a></li>
+            </ul>
+            <a href="#contact" class="hidden md:inline-block bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition shadow-lg shadow-amber-500/30">
+                Demander un devis
+            </a>
+        </nav>
+    </header>
+
+    {# =================== HERO =================== #}
+    <section class="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-amber-50 via-white to-neutral-50">
+        {# Image de fond en filigrane #}
+        <div class="absolute inset-0">
+            <img src="{{ asset('assets/media/hero-bg.jpg') }}"
+                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1611532736597-de2d4265fba3?auto=format&fit=crop&w=2000&q=80';"
+                 alt=""
+                 class="w-full h-full object-cover opacity-20">
+            <div class="absolute inset-0 bg-gradient-to-b from-white/60 via-white/80 to-white"></div>
+        </div>
+
+        {# Décors ambiance #}
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-amber-200 rounded-full blur-3xl opacity-40"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-200 rounded-full blur-3xl opacity-40"></div>
+
+        <div class="relative max-w-7xl mx-auto px-6 py-32 pt-40 w-full grid md:grid-cols-2 gap-4 lg:gap-8 items-center">
+            {# Colonne gauche : texte + CTA #}
+            <div class="text-center md:text-left order-2 md:order-1">
+                <span class="inline-flex items-center gap-2 bg-white border border-amber-200 text-amber-700 text-xs uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-sm">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                    Artisan graveur laser
+                </span>
+
+                <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mt-6 text-neutral-900">
+                    L'émotion gravée <span class="text-amber-600">dans la matière</span>.
+                </h1>
+                <p class="mt-6 text-lg text-neutral-600 leading-relaxed max-w-xl md:max-w-none mx-auto md:mx-0">
+                    Chaque cadeau devient unique grâce à la précision du laser. Bois, cuir, verre, métal : offrez une pièce personnalisée, conçue à la main dans notre atelier.
+                </p>
+
+                <div class="mt-10 flex flex-wrap gap-4 justify-center md:justify-start">
+                    <a href="#produits" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-7 py-3.5 rounded-full transition shadow-xl shadow-amber-500/30">
+                        Découvrir nos créations
+                    </a>
+                    <a href="#services" class="border border-neutral-300 text-neutral-800 hover:border-amber-500 hover:text-amber-600 font-semibold px-7 py-3.5 rounded-full transition bg-white/70">
+                        Nos services
+                    </a>
+                </div>
+
+                <div class="mt-14 flex items-center justify-center md:justify-start gap-8 text-sm">
+                    <div>
+                        <p class="font-display text-3xl font-bold text-amber-600">+500</p>
+                        <p class="text-neutral-500">Pièces gravées</p>
+                    </div>
+                    <div class="w-px h-10 bg-neutral-300"></div>
+                    <div>
+                        <p class="font-display text-3xl font-bold text-amber-600">100%</p>
+                        <p class="text-neutral-500">Fait main</p>
+                    </div>
+                    <div class="w-px h-10 bg-neutral-300"></div>
+                    <div>
+                        <p class="font-display text-3xl font-bold text-amber-600">48h</p>
+                        <p class="text-neutral-500">Délai express</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Colonne droite : logo mis en avant #}
+            <div class="order-1 md:order-2 flex justify-center md:justify-start">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-amber-300/40 rounded-full blur-3xl"></div>
+                    <img src="{{ asset('assets/media/LOGO Kdos-graphie.svg') }}"
+                         alt="Kdos Graphie"
+                         class="relative h-48 md:h-72 lg:h-80 w-auto">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# =================== SERVICES =================== #}
+    <section id="services" class="py-24 bg-neutral-50 border-t border-neutral-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="max-w-2xl mx-auto text-center mb-16">
+                <p class="uppercase tracking-[0.25em] text-amber-600 text-xs font-semibold">Nos savoir-faire</p>
+                <h2 class="font-display text-4xl md:text-5xl font-bold text-neutral-900 mt-3">
+                    Des services sur mesure
+                </h2>
+                <p class="text-neutral-600 mt-4 leading-relaxed">
+                    De l'objet unique à la commande en série, nous adaptons notre travail à vos envies et à vos matériaux.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% set services = [
+                    { icon: '🎁', titre: 'Cadeaux personnalisés', desc: 'Anniversaires, mariages, naissances — une attention gravée qui dure toute une vie.' },
+                    { icon: '🏷️', titre: 'Gravure sur bois', desc: 'Chêne, hêtre, noyer. Textures naturelles sublimées par une gravure précise et durable.' },
+                    { icon: '🥃', titre: 'Gravure sur verre', desc: 'Verres, carafes, bouteilles : une finition élégante pour vos événements les plus précieux.' },
+                    { icon: '💼', titre: 'Objets professionnels', desc: 'Trophées, cartes de visite, goodies d\'entreprise marqués à votre image.' },
+                    { icon: '🧵', titre: 'Cuir & textile', desc: 'Portefeuilles, carnets, ceintures : la personnalisation haut de gamme du cuir véritable.' },
+                    { icon: '⚡', titre: 'Prototypage rapide', desc: 'Du fichier à l\'objet fini en 48h. Idéal pour vos projets créatifs ou commerciaux.' }
+                ] %}
+
+                {% for s in services %}
+                    <div class="group bg-white p-8 rounded-2xl border border-neutral-200 hover:border-amber-400 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300">
+                        <div class="w-14 h-14 rounded-xl bg-amber-50 group-hover:bg-amber-500 flex items-center justify-center text-2xl transition">
+                            {{ s.icon }}
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-neutral-900 mt-6">{{ s.titre }}</h3>
+                        <p class="text-neutral-600 mt-3 leading-relaxed">{{ s.desc }}</p>
+                        <a href="#contact" class="inline-flex items-center gap-2 mt-5 text-sm font-semibold text-amber-600 group-hover:gap-3 transition-all">
+                            En savoir plus
+                            <span>→</span>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# =================== CAROUSEL PRODUITS =================== #}
+    <section id="produits" class="py-24 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-wrap items-end justify-between gap-6 mb-12">
+                <div>
+                    <p class="uppercase tracking-[0.25em] text-amber-600 text-xs font-semibold">Nos créations</p>
+                    <h2 class="font-display text-4xl md:text-5xl font-bold mt-3 text-neutral-900">Produits phares</h2>
+                </div>
+                <div class="flex gap-3">
+                    <button id="prev-btn" aria-label="Précédent" class="w-12 h-12 rounded-full border border-neutral-300 text-neutral-700 hover:border-amber-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
+                        ←
+                    </button>
+                    <button id="next-btn" aria-label="Suivant" class="w-12 h-12 rounded-full border border-neutral-300 text-neutral-700 hover:border-amber-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
+                        →
+                    </button>
+                </div>
+            </div>
+
+            {% set produits = [
+                { nom: 'Planche à découper', prix: '39', cat: 'Bois', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80' },
+                { nom: 'Verre à whisky gravé', prix: '24', cat: 'Verre', img: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=800&q=80' },
+                { nom: 'Carnet en cuir', prix: '45', cat: 'Cuir', img: 'https://images.unsplash.com/photo-1531346680078-ca1720b51e69?auto=format&fit=crop&w=800&q=80' },
+                { nom: 'Porte-clés personnalisé', prix: '15', cat: 'Bois', img: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=800&q=80' },
+                { nom: 'Médaillon souvenir', prix: '29', cat: 'Métal', img: 'https://images.unsplash.com/photo-1518544801976-3e188ea4b8e4?auto=format&fit=crop&w=800&q=80' },
+                { nom: 'Plaque décorative', prix: '55', cat: 'Bois', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80' },
+                { nom: 'Bracelet gravé', prix: '35', cat: 'Cuir', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=800&q=80' },
+                { nom: 'Coffret vin personnalisé', prix: '69', cat: 'Bois', img: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80' }
+            ] %}
+
+            <div id="carousel" class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 -mx-6 px-6 [&::-webkit-scrollbar]:hidden" style="scrollbar-width:none;">
+                {% for p in produits %}
+                    <article class="snap-start flex-shrink-0 w-72 md:w-80 bg-white rounded-2xl overflow-hidden border border-neutral-200 group cursor-pointer hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1 hover:border-amber-400 transition">
+                        <div class="relative h-72 overflow-hidden">
+                            <img src="{{ p.img }}" alt="{{ p.nom }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                            <span class="absolute top-4 left-4 bg-white/90 backdrop-blur text-neutral-800 text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{{ p.cat }}</span>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-display text-lg font-semibold text-neutral-900">{{ p.nom }}</h3>
+                                <p class="text-amber-600 font-bold">{{ p.prix }}€</p>
+                            </div>
+                            <p class="text-sm text-neutral-500 mt-2">Personnalisation incluse</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# =================== CTA CONTACT =================== #}
+    <section id="contact" class="py-24 bg-gradient-to-br from-amber-500 to-amber-600 text-white">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="font-display text-4xl md:text-5xl font-bold">Un projet en tête ?</h2>
+            <p class="mt-4 text-white/90 text-lg leading-relaxed max-w-2xl mx-auto">
+                Parlez-nous de votre idée, nous vous répondons sous 24h avec un devis personnalisé, gratuit et sans engagement.
+            </p>
+            <div class="mt-10 flex flex-wrap gap-4 justify-center">
+                <a href="mailto:contact@kdos-graphie.fr" class="bg-white hover:bg-neutral-100 text-amber-700 font-semibold px-8 py-4 rounded-full transition shadow-xl">
+                    Nous contacter
+                </a>
+                <a href="tel:+33000000000" class="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/40 font-semibold px-8 py-4 rounded-full transition">
+                    06 00 00 00 00
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# =================== FOOTER =================== #}
+    <footer class="bg-neutral-100 text-neutral-600 py-12 border-t border-neutral-200">
+        <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm">
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('assets/media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-8 w-auto">
+                <span class="font-display text-neutral-900">Kdos Graphie</span>
+            </div>
+            <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser. Tous droits réservés.</p>
+            <a href="{{ path('app_login') }}" class="hover:text-amber-600 transition">Espace admin</a>
+        </div>
+    </footer>
+</div>
+
+<script>
+    (function () {
+        const carousel = document.getElementById('carousel');
+        const prev = document.getElementById('prev-btn');
+        const next = document.getElementById('next-btn');
+        if (!carousel) return;
+        const step = () => Math.min(carousel.clientWidth * 0.8, 340);
+        prev?.addEventListener('click', () => carousel.scrollBy({ left: -step(), behavior: 'smooth' }));
+        next?.addEventListener('click', () => carousel.scrollBy({ left: step(), behavior: 'smooth' }));
+    })();
+</script>
+{% endblock %}
