@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^php bin/console dbal:run-sql \"SHOW TABLES\" -n$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^php bin/console doctrine:migrations:status -n$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
