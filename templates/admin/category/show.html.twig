@@ -1,0 +1,18 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Catégorie {{ category.name }} — Admin{% endblock %}
+{% block page_title %}Détail catégorie{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_admin_category_edit', {id: category.id}) }}" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Modifier</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border border-neutral-200 rounded-xl p-6 space-y-3">
+    <p><span class="text-neutral-500">Nom:</span> <span class="font-medium">{{ category.name }}</span></p>
+    <p><span class="text-neutral-500">Slug:</span> {{ category.slug }}</p>
+    <p><span class="text-neutral-500">Visible:</span> {{ category.isVisible ? 'Oui' : 'Non' }}</p>
+    <p><span class="text-neutral-500">Description:</span></p>
+    <p class="text-neutral-700 whitespace-pre-line">{{ category.description ?: 'Aucune description' }}</p>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier produit — Admin{% endblock %}
+{% block page_title %}Modifier {{ product.name }}{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-4xl bg-white border border-neutral-200 rounded-xl p-6">
+    {{ include('admin/product/_form.html.twig', {form: form, imagePublicPath: imagePublicPath}) }}
+</div>
+{% endblock %}

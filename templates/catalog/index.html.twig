@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue — Kdos Graphie{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-neutral-50 text-neutral-800">
+    <header class="bg-white border-b border-neutral-200">
+        <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between gap-4">
+            <a href="{{ path('app_home') }}" class="flex items-center gap-3">
+                <img src="{{ asset('assets/media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-10 w-auto">
+                <span class="font-display text-xl text-neutral-900">Kdos Graphie</span>
+            </a>
+            <a href="{{ path('app_login') }}" class="text-sm text-neutral-600 hover:text-amber-700">Espace admin</a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
+        <div>
+            <h1 class="font-display text-4xl text-neutral-900">Catalogue</h1>
+            <p class="text-neutral-600 mt-2">{{ total }} produit(s) disponible(s).</p>
+        </div>
+
+        <form method="get" class="bg-white border border-neutral-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <input name="q" value="{{ filters.q }}" placeholder="Rechercher un produit" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
+            <select name="category" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
+                <option value="">Toutes catégories</option>
+                {% for category in categories %}
+                    <option value="{{ category.slug }}" {% if filters.category == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <button class="bg-neutral-900 text-white text-sm font-medium px-4 py-2.5 rounded-lg" type="submit">Filtrer</button>
+            <a href="{{ path('app_catalog_index') }}" class="text-sm text-neutral-600 self-center">Réinitialiser</a>
+        </form>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for product in products %}
+                <article class="bg-white border border-neutral-200 rounded-2xl overflow-hidden hover:border-amber-400 transition">
+                    {% if product.coverImage %}
+                        <img src="{{ asset('/assets/media/products/' ~ product.coverImage) }}" alt="{{ product.name }}" class="w-full h-48 object-cover">
+                    {% endif %}
+                    <div class="p-5 space-y-2">
+                        <p class="text-xs uppercase tracking-wider text-neutral-500">{{ product.category ? product.category.name : 'Sans catégorie' }}</p>
+                        <h2 class="font-display text-2xl text-neutral-900">{{ product.name }}</h2>
+                        <p class="text-neutral-600 text-sm line-clamp-3">{{ product.description ?: 'Description à venir.' }}</p>
+                        <div class="flex items-center justify-between pt-2">
+                            <span class="text-amber-700 font-semibold">{{ (product.price / 100)|number_format(2, ',', ' ') }} €</span>
+                            <a href="{{ path('app_catalog_show', {slug: product.slug}) }}" class="text-sm font-semibold text-neutral-700 hover:text-amber-700">Voir</a>
+                        </div>
+                    </div>
+                </article>
+            {% else %}
+                <p class="text-neutral-500">Aucun produit trouvé.</p>
+            {% endfor %}
+        </div>
+
+        {% if pages > 1 %}
+            <nav class="flex items-center gap-2">
+                {% for i in 1..pages %}
+                    <a href="{{ path('app_catalog_index', app.request.query.all|merge({page: i})) }}"
+                       class="px-3 py-1.5 rounded-lg text-sm {{ i == page ? 'bg-neutral-900 text-white' : 'bg-white border border-neutral-200 text-neutral-700' }}">{{ i }}</a>
+                {% endfor %}
+            </nav>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

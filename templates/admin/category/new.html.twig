@@ -1,0 +1,10 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle catégorie — Admin{% endblock %}
+{% block page_title %}Nouvelle catégorie{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-3xl bg-white border border-neutral-200 rounded-xl p-6">
+    {{ include('admin/category/_form.html.twig', {form: form}) }}
+</div>
+{% endblock %}

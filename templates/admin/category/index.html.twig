@@ -1,0 +1,70 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Catégories — Admin{% endblock %}
+{% block page_title %}Catégories{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_admin_category_new') }}" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Nouvelle catégorie</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <form method="get" class="bg-white border border-neutral-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input name="q" value="{{ filters.q }}" placeholder="Recherche nom/slug" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
+        <select name="visible" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
+            <option value="">Visibilité: tous</option>
+            <option value="1" {% if filters.visible == '1' %}selected{% endif %}>Visible</option>
+            <option value="0" {% if filters.visible == '0' %}selected{% endif %}>Masqué</option>
+        </select>
+        <button class="bg-neutral-900 text-white text-sm font-medium px-4 py-2.5 rounded-lg" type="submit">Filtrer</button>
+        <a href="{{ path('app_admin_category_index') }}" class="text-sm text-neutral-600 self-center">Réinitialiser</a>
+    </form>
+
+    <div class="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead class="bg-neutral-50 text-neutral-500">
+                <tr>
+                    <th class="text-left px-4 py-3">Nom</th>
+                    <th class="text-left px-4 py-3">Slug</th>
+                    <th class="text-left px-4 py-3">Visible</th>
+                    <th class="text-left px-4 py-3">Créée</th>
+                    <th class="text-right px-4 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for category in categories %}
+                <tr class="border-t border-neutral-100">
+                    <td class="px-4 py-3 font-medium text-neutral-900">{{ category.name }}</td>
+                    <td class="px-4 py-3 text-neutral-600">{{ category.slug }}</td>
+                    <td class="px-4 py-3">{{ category.isVisible ? 'Oui' : 'Non' }}</td>
+                    <td class="px-4 py-3 text-neutral-600">{{ category.createdAt|date('d/m/Y') }}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex justify-end items-center gap-3">
+                            <a href="{{ path('app_admin_category_show', {id: category.id}) }}" class="text-neutral-600 hover:text-neutral-900">Voir</a>
+                            <a href="{{ path('app_admin_category_edit', {id: category.id}) }}" class="text-amber-700 hover:text-amber-800">Modifier</a>
+                            <form method="post" action="{{ path('app_admin_category_delete', {id: category.id}) }}" onsubmit="return confirm('Supprimer cette catégorie ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_category_' ~ category.id) }}">
+                                <button class="text-red-600 hover:text-red-700" type="submit">Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="px-4 py-8 text-center text-neutral-500">Aucune catégorie.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pages > 1 %}
+        <nav class="flex items-center gap-2">
+            {% for i in 1..pages %}
+                <a href="{{ path('app_admin_category_index', app.request.query.all|merge({page: i})) }}"
+                   class="px-3 py-1.5 rounded-lg text-sm {{ i == page ? 'bg-neutral-900 text-white' : 'bg-white border border-neutral-200 text-neutral-700' }}">{{ i }}</a>
+            {% endfor %}
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

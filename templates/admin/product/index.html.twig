@@ -1,0 +1,78 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Produits — Admin{% endblock %}
+{% block page_title %}Produits{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_admin_product_new') }}" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Nouveau produit</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <form method="get" class="bg-white border border-neutral-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-5 gap-3">
+        <input name="q" value="{{ filters.q }}" placeholder="Recherche nom/slug" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
+        <select name="visible" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
+            <option value="">Visibilité: tous</option>
+            <option value="1" {% if filters.visible == '1' %}selected{% endif %}>Visible</option>
+            <option value="0" {% if filters.visible == '0' %}selected{% endif %}>Masqué</option>
+        </select>
+        <select name="category" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
+            <option value="">Toutes catégories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if filters.category == (category.id ~ '') %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <button class="bg-neutral-900 text-white text-sm font-medium px-4 py-2.5 rounded-lg" type="submit">Filtrer</button>
+        <a href="{{ path('app_admin_product_index') }}" class="text-sm text-neutral-600 self-center">Réinitialiser</a>
+    </form>
+
+    <div class="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead class="bg-neutral-50 text-neutral-500">
+                <tr>
+                    <th class="text-left px-4 py-3">Produit</th>
+                    <th class="text-left px-4 py-3">Catégorie</th>
+                    <th class="text-left px-4 py-3">Prix</th>
+                    <th class="text-left px-4 py-3">Stock</th>
+                    <th class="text-left px-4 py-3">Visible</th>
+                    <th class="text-right px-4 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr class="border-t border-neutral-100">
+                    <td class="px-4 py-3 font-medium text-neutral-900">{{ product.name }}</td>
+                    <td class="px-4 py-3 text-neutral-600">{{ product.category ? product.category.name : '—' }}</td>
+                    <td class="px-4 py-3 text-neutral-600">{{ (product.price / 100)|number_format(2, ',', ' ') }} €</td>
+                    <td class="px-4 py-3 text-neutral-600">{{ product.stock }}</td>
+                    <td class="px-4 py-3">{{ product.isVisible ? 'Oui' : 'Non' }}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex justify-end items-center gap-3">
+                            <a href="{{ path('app_admin_product_show', {id: product.id}) }}" class="text-neutral-600 hover:text-neutral-900">Voir</a>
+                            <a href="{{ path('app_admin_product_edit', {id: product.id}) }}" class="text-amber-700 hover:text-amber-800">Modifier</a>
+                            <form method="post" action="{{ path('app_admin_product_delete', {id: product.id}) }}" onsubmit="return confirm('Supprimer ce produit ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_product_' ~ product.id) }}">
+                                <button class="text-red-600 hover:text-red-700" type="submit">Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="px-4 py-8 text-center text-neutral-500">Aucun produit.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pages > 1 %}
+        <nav class="flex items-center gap-2">
+            {% for i in 1..pages %}
+                <a href="{{ path('app_admin_product_index', app.request.query.all|merge({page: i})) }}"
+                   class="px-3 py-1.5 rounded-lg text-sm {{ i == page ? 'bg-neutral-900 text-white' : 'bg-white border border-neutral-200 text-neutral-700' }}">{{ i }}</a>
+            {% endfor %}
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

@@ -21,4 +21,5 @@
 
 ###> claude-code ###
 /.claude/
-###< claude-code ###
+# Claude Code local settings
+.claude/settings.local.json

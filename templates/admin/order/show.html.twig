@@ -1,0 +1,49 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Commande {{ order.reference }} — Admin{% endblock %}
+{% block page_title %}Détail commande{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_admin_order_edit', {id: order.id}) }}" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Modifier</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <div class="bg-white border border-neutral-200 rounded-xl p-6 space-y-2">
+        <p><span class="text-neutral-500">Référence:</span> <span class="font-medium">{{ order.reference }}</span></p>
+        <p><span class="text-neutral-500">Client:</span> {{ order.customerName }} ({{ order.customerEmail }})</p>
+        <p><span class="text-neutral-500">Statut:</span> {{ include('admin/order/_status_badge.html.twig', {status: order.status, label: statusLabels[order.status] ?? order.status}) }}</p>
+        <p><span class="text-neutral-500">Total:</span> {{ order.formattedTotal }}</p>
+        <p><span class="text-neutral-500">Date:</span> {{ order.createdAt|date('d/m/Y H:i') }}</p>
+        <p><span class="text-neutral-500">Notes:</span></p>
+        <p class="text-neutral-700 whitespace-pre-line">{{ order.notes ?: 'Aucune note' }}</p>
+    </div>
+
+    <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead class="bg-neutral-50 text-neutral-500">
+                <tr>
+                    <th class="text-left px-4 py-3">Produit</th>
+                    <th class="text-left px-4 py-3">Prix unitaire</th>
+                    <th class="text-left px-4 py-3">Qté</th>
+                    <th class="text-left px-4 py-3">Sous-total</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in order.items %}
+                <tr class="border-t border-neutral-100">
+                    <td class="px-4 py-3">{{ item.productName }}</td>
+                    <td class="px-4 py-3">{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>
+                    <td class="px-4 py-3">{{ item.quantity }}</td>
+                    <td class="px-4 py-3">{{ (item.subtotal / 100)|number_format(2, ',', ' ') }} €</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="px-4 py-8 text-center text-neutral-500">Aucune ligne.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
