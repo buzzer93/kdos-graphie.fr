@@ -30,7 +30,7 @@ class OrderRepository extends ServiceEntityRepository
 
         if ($search !== null && $search !== '') {
             $qb
-                ->andWhere('o.reference LIKE :search OR o.customerEmail LIKE :search OR o.customerName LIKE :search')
+                ->andWhere('o.reference LIKE :search OR o.customerEmail LIKE :search OR o.customerFirstName LIKE :search OR o.customerLastName LIKE :search')
                 ->setParameter('search', '%' . trim($search) . '%');
         }
 
@@ -77,5 +77,15 @@ class OrderRepository extends ServiceEntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    public function getRevenueCentsExcludingRejected(): int
+    {
+        return (int) $this->createQueryBuilder('o')
+            ->select('COALESCE(SUM(o.total), 0)')
+            ->andWhere('o.status NOT IN (:excludedStatuses)')
+            ->setParameter('excludedStatuses', [Order::STATUS_REFUSE, Order::STATUS_ANNULE])
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

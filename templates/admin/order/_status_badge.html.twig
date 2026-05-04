@@ -1,9 +1,10 @@
 {% set color = {
-    'pending': 'bg-neutral-100 text-neutral-700',
-    'confirmed': 'bg-blue-100 text-blue-700',
-    'shipped': 'bg-amber-100 text-amber-700',
-    'delivered': 'bg-green-100 text-green-700',
-    'cancelled': 'bg-red-100 text-red-700'
+    'a_confirmer': 'bg-neutral-100 text-neutral-700',
+    'en_attente_paiement': 'bg-blue-100 text-blue-700',
+    'a_faire': 'bg-amber-100 text-amber-700',
+    'termine': 'bg-green-100 text-green-700',
+    'refuse': 'bg-red-100 text-red-700',
+    'annule': 'bg-rose-100 text-rose-700'
 }[status]|default('bg-neutral-100 text-neutral-700') %}
 
 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ color }}">

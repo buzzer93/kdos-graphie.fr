@@ -66,11 +66,13 @@ final class ProductControllerTest extends AbstractWebTestCase
         self::assertSame('Mug Perso MAJ', $updatedProduct?->getName());
         self::assertSame(1990, $updatedProduct?->getPrice());
 
-        $client->request('POST', '/admin/products/' . $product->getId() . '/delete', [
-            '_token' => $this->csrfToken('delete_product_' . $product->getId()),
-        ]);
+        $crawler = $client->request('GET', '/admin/products/');
+        $deleteForm = $crawler->filter('form[action="/admin/products/' . $product->getId() . '/delete"]')->form();
+        $client->submit($deleteForm);
 
         self::assertResponseRedirects('/admin/products/');
+        $this->getEntityManager()->clear();
+        $productRepository = static::getContainer()->get(ProductRepository::class);
         self::assertNull($productRepository->find($product->getId()));
     }
 }

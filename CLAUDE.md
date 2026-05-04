@@ -37,3 +37,25 @@ Expliquer le plan avant de modifier :
 - espace admin ;
 - migrations de base de données ;
 - déploiement.
+
+### Secrets et fichiers sensibles
+
+- Ne jamais lire `.env.local`, `.env.prod`, `.env.*.local`, `secrets/**`, cles privees, ni dumps de production.
+- Ne jamais copier, journaliser, ni re-afficher une valeur sensible.
+
+Procedure obligatoire quand une configuration est necessaire :
+
+1. Expliquer la variable requise sans demander le secret complet.
+2. Demander a l'utilisateur de renseigner la valeur lui-meme dans son fichier local.
+3. Continuer uniquement avec une valeur fournie explicitement dans le chat ou un placeholder neutre.
+
+## Contrat agent - Processus commande
+
+Source de vérité détaillée : [README - Processus de commande personnalisée](README.md#processus-de-commande-personnalisee-cible-metier).
+
+Règles strictes à respecter par défaut :
+- Statuts cibles : `a_confirmer`, `en_attente_paiement`, `a_faire`, `termine`, `refuse`, `annule`.
+- Toute transition de statut passe par un service métier dédié (pas de changement libre en formulaire admin).
+- Refus : motif obligatoire + notification email client.
+- Paiement : statut validé côté serveur Stripe (webhook/verification), jamais uniquement via retour navigateur.
+- Suppression admin d'une commande `annule`, `refuse` ou `termine` : archivage obligatoire avant suppression définitive.

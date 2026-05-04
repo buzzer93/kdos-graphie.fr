@@ -14,9 +14,12 @@ final class OrderTest extends TestCase
     {
         $order = (new Order())
             ->setReference('ORD-20260504-AAAAAA')
-            ->setStatus(Order::STATUS_PENDING)
-            ->setCustomerName('John Doe')
+            ->setStatus(Order::STATUS_A_CONFIRMER)
+            ->setCustomerFirstName('John')
+            ->setCustomerLastName('Doe')
             ->setCustomerEmail('john@example.test')
+            ->setCustomerPhone('0600000001')
+            ->setShippingAddress("10 rue du Test\n75000 Paris")
             ->setTotal(2599)
             ->setNotes('Note test');
 
@@ -34,11 +37,13 @@ final class OrderTest extends TestCase
         self::assertCount(0, $order->getItems());
         self::assertNull($item->getOrder());
 
+        self::assertSame('John Doe', $order->getCustomerFullName());
         self::assertSame('25,99 €', $order->getFormattedTotal());
-        self::assertArrayHasKey(Order::STATUS_CONFIRMED, Order::getStatusLabels());
-        self::assertArrayHasKey(Order::STATUS_SHIPPED, Order::getStatusLabels());
-        self::assertArrayHasKey(Order::STATUS_DELIVERED, Order::getStatusLabels());
-        self::assertArrayHasKey(Order::STATUS_CANCELLED, Order::getStatusLabels());
+        self::assertArrayHasKey(Order::STATUS_EN_ATTENTE_PAIEMENT, Order::getStatusLabels());
+        self::assertArrayHasKey(Order::STATUS_A_FAIRE, Order::getStatusLabels());
+        self::assertArrayHasKey(Order::STATUS_TERMINE, Order::getStatusLabels());
+        self::assertArrayHasKey(Order::STATUS_REFUSE, Order::getStatusLabels());
+        self::assertArrayHasKey(Order::STATUS_ANNULE, Order::getStatusLabels());
         self::assertInstanceOf(\DateTimeImmutable::class, $order->getCreatedAt());
     }
 }

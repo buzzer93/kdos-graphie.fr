@@ -48,7 +48,9 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $category->setSlug($slugGenerator->generateCategorySlug($category->getSlug()));
+            $slugInput = trim($category->getSlug());
+            $slugSource = $slugInput !== '' ? $slugInput : $category->getName();
+            $category->setSlug($slugGenerator->generateCategorySlug($slugSource));
 
             $entityManager->persist($category);
             $entityManager->flush();
@@ -66,9 +68,7 @@ class CategoryController extends AbstractController
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]
     public function show(Category $category): Response
     {
-        return $this->render('admin/category/show.html.twig', [
-            'category' => $category,
-        ]);
+        return $this->redirectToRoute('app_admin_category_edit', ['id' => $category->getId()]);
     }
 
     #[Route('/{id}/edit', name: 'edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
@@ -78,7 +78,9 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $category->setSlug($slugGenerator->generateCategorySlug($category->getSlug(), $category->getId()));
+            $slugInput = trim($category->getSlug());
+            $slugSource = $slugInput !== '' ? $slugInput : $category->getName();
+            $category->setSlug($slugGenerator->generateCategorySlug($slugSource, $category->getId()));
             $entityManager->flush();
 
             $this->addFlash('success', 'Catégorie mise à jour.');

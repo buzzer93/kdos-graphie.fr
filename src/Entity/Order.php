@@ -14,11 +14,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: '`order`')]
 class Order
 {
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_CONFIRMED = 'confirmed';
-    public const STATUS_SHIPPED = 'shipped';
-    public const STATUS_DELIVERED = 'delivered';
-    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_A_CONFIRMER = 'a_confirmer';
+    public const STATUS_EN_ATTENTE_PAIEMENT = 'en_attente_paiement';
+    public const STATUS_A_FAIRE = 'a_faire';
+    public const STATUS_TERMINE = 'termine';
+    public const STATUS_REFUSE = 'refuse';
+    public const STATUS_ANNULE = 'annule';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -29,13 +30,34 @@ class Order
     private string $reference;
 
     #[ORM\Column(length: 30)]
-    private string $status = self::STATUS_PENDING;
+    private string $status = self::STATUS_A_CONFIRMER;
 
     #[ORM\Column(length: 255)]
-    private string $customerName;
+    private string $customerFirstName;
+
+    #[ORM\Column(length: 255)]
+    private string $customerLastName;
 
     #[ORM\Column(length: 255)]
     private string $customerEmail;
+
+    #[ORM\Column(length: 50)]
+    private string $customerPhone;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private string $shippingAddress;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $additionalInfo = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $decisionReason = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $trackingNumber = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $shippingCarrier = null;
 
     /** Total stored in cents. */
     #[ORM\Column]
@@ -60,16 +82,21 @@ class Order
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->items = new ArrayCollection();
+        $this->customerFirstName = '';
+        $this->customerLastName = '';
+        $this->customerPhone = '';
+        $this->shippingAddress = '';
     }
 
     public static function getStatusLabels(): array
     {
         return [
-            self::STATUS_PENDING   => 'En attente',
-            self::STATUS_CONFIRMED => 'Confirmée',
-            self::STATUS_SHIPPED   => 'Expédiée',
-            self::STATUS_DELIVERED => 'Livrée',
-            self::STATUS_CANCELLED => 'Annulée',
+            self::STATUS_A_CONFIRMER => 'A confirmer',
+            self::STATUS_EN_ATTENTE_PAIEMENT => 'En attente de paiement',
+            self::STATUS_A_FAIRE => 'A faire',
+            self::STATUS_TERMINE => 'Termine',
+            self::STATUS_REFUSE => 'Refuse',
+            self::STATUS_ANNULE => 'Annule',
         ];
     }
 
@@ -107,14 +134,48 @@ class Order
         return $this;
     }
 
+    public function getCustomerFirstName(): string
+    {
+        return $this->customerFirstName;
+    }
+
+    public function setCustomerFirstName(string $customerFirstName): static
+    {
+        $this->customerFirstName = $customerFirstName;
+
+        return $this;
+    }
+
+    public function getCustomerLastName(): string
+    {
+        return $this->customerLastName;
+    }
+
+    public function setCustomerLastName(string $customerLastName): static
+    {
+        $this->customerLastName = $customerLastName;
+
+        return $this;
+    }
+
     public function getCustomerName(): string
     {
-        return $this->customerName;
+        return trim($this->customerFirstName . ' ' . $this->customerLastName);
+    }
+
+    public function getCustomerFullName(): string
+    {
+        return $this->getCustomerName();
     }
 
     public function setCustomerName(string $customerName): static
     {
-        $this->customerName = $customerName;
+        $parts = preg_split('/\s+/', trim($customerName), 2);
+        $firstName = $parts[0] ?? '';
+        $lastName = $parts[1] ?? '';
+
+        $this->customerFirstName = $firstName;
+        $this->customerLastName = $lastName;
 
         return $this;
     }
@@ -127,6 +188,78 @@ class Order
     public function setCustomerEmail(string $customerEmail): static
     {
         $this->customerEmail = $customerEmail;
+
+        return $this;
+    }
+
+    public function getCustomerPhone(): string
+    {
+        return $this->customerPhone;
+    }
+
+    public function setCustomerPhone(string $customerPhone): static
+    {
+        $this->customerPhone = $customerPhone;
+
+        return $this;
+    }
+
+    public function getShippingAddress(): string
+    {
+        return $this->shippingAddress;
+    }
+
+    public function setShippingAddress(string $shippingAddress): static
+    {
+        $this->shippingAddress = $shippingAddress;
+
+        return $this;
+    }
+
+    public function getAdditionalInfo(): ?string
+    {
+        return $this->additionalInfo;
+    }
+
+    public function setAdditionalInfo(?string $additionalInfo): static
+    {
+        $this->additionalInfo = $additionalInfo;
+
+        return $this;
+    }
+
+    public function getDecisionReason(): ?string
+    {
+        return $this->decisionReason;
+    }
+
+    public function setDecisionReason(?string $decisionReason): static
+    {
+        $this->decisionReason = $decisionReason;
+        
+        return $this;
+    }
+
+    public function getTrackingNumber(): ?string
+    {
+        return $this->trackingNumber;
+    }
+
+    public function setTrackingNumber(?string $trackingNumber): static
+    {
+        $this->trackingNumber = $trackingNumber;
+
+        return $this;
+    }
+
+    public function getShippingCarrier(): ?string
+    {
+        return $this->shippingCarrier;
+    }
+
+    public function setShippingCarrier(?string $shippingCarrier): static
+    {
+        $this->shippingCarrier = $shippingCarrier;
 
         return $this;
     }

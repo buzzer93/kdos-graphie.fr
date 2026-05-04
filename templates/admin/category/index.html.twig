@@ -33,15 +33,14 @@
             </thead>
             <tbody>
             {% for category in categories %}
-                <tr class="border-t border-neutral-100">
+                <tr class="border-t border-neutral-100 cursor-pointer hover:bg-neutral-50"
+                    onclick="window.location='{{ path('app_admin_category_edit', {id: category.id}) }}'">
                     <td class="px-4 py-3 font-medium text-neutral-900">{{ category.name }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ category.slug }}</td>
                     <td class="px-4 py-3">{{ category.isVisible ? 'Oui' : 'Non' }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ category.createdAt|date('d/m/Y') }}</td>
                     <td class="px-4 py-3">
-                        <div class="flex justify-end items-center gap-3">
-                            <a href="{{ path('app_admin_category_show', {id: category.id}) }}" class="text-neutral-600 hover:text-neutral-900">Voir</a>
-                            <a href="{{ path('app_admin_category_edit', {id: category.id}) }}" class="text-amber-700 hover:text-amber-800">Modifier</a>
+                        <div class="flex justify-end items-center gap-3" onclick="event.stopPropagation();">
                             <form method="post" action="{{ path('app_admin_category_delete', {id: category.id}) }}" onsubmit="return confirm('Supprimer cette catégorie ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete_category_' ~ category.id) }}">
                                 <button class="text-red-600 hover:text-red-700" type="submit">Supprimer</button>

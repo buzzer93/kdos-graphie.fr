@@ -9,6 +9,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 abstract class AbstractWebTestCase extends WebTestCase
@@ -46,6 +50,14 @@ abstract class AbstractWebTestCase extends WebTestCase
 
     protected function csrfToken(string $tokenId): string
     {
+        $requestStack = static::getContainer()->get(RequestStack::class);
+
+        if ($requestStack->getCurrentRequest() === null) {
+            $request = new Request();
+            $request->setSession(new Session(new MockArraySessionStorage()));
+            $requestStack->push($request);
+        }
+
         $tokenManager = static::getContainer()->get(CsrfTokenManagerInterface::class);
 
         return $tokenManager->getToken($tokenId)->getValue();

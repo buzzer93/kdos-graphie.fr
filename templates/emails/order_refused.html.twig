@@ -1,0 +1,4 @@
+<h1>Commande refusee</h1>
+<p>Bonjour {{ order.customerFullName }},</p>
+<p>Votre commande <strong>{{ order.reference }}</strong> a ete refusee.</p>
+<p>Motif: {{ order.decisionReason ?: 'Non precise' }}</p>

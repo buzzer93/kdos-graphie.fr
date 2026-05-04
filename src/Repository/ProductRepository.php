@@ -132,6 +132,16 @@ class ProductRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 
+    public function countVisible(): int
+    {
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->andWhere('p.isVisible = :isVisible')
+            ->setParameter('isVisible', true)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function findVisibleBySlug(string $slug): ?Product
     {
         return $this->createQueryBuilder('p')

@@ -5,6 +5,6 @@
 
 {% block admin_content %}
 <div class="max-w-5xl bg-white border border-neutral-200 rounded-xl p-6">
-    {{ include('admin/order/_form.html.twig', {form: form}) }}
+    {{ include('admin/order/_form.html.twig', {form: form, statusLabels: statusLabels}) }}
 </div>
 {% endblock %}

@@ -31,6 +31,12 @@ class OrderItem
     #[ORM\Column]
     private int $quantity = 1;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $customizationText = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $customizationFilePath = null;
+
     public function getSubtotal(): int
     {
         return $this->unitPrice * $this->quantity;
@@ -85,6 +91,30 @@ class OrderItem
     public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getCustomizationText(): ?string
+    {
+        return $this->customizationText;
+    }
+
+    public function setCustomizationText(?string $customizationText): static
+    {
+        $this->customizationText = $customizationText;
+
+        return $this;
+    }
+
+    public function getCustomizationFilePath(): ?string
+    {
+        return $this->customizationFilePath;
+    }
+
+    public function setCustomizationFilePath(?string $customizationFilePath): static
+    {
+        $this->customizationFilePath = $customizationFilePath;
 
         return $this;
     }

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande enregistrée — Kdos Graphie{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-neutral-50 text-neutral-800 flex items-center justify-center px-6">
+    <div class="max-w-2xl w-full bg-white border border-neutral-200 rounded-2xl p-8 text-center space-y-4">
+        <h1 class="font-display text-4xl text-neutral-900">Merci pour votre demande</h1>
+        <p class="text-neutral-700">Votre commande <strong>{{ reference }}</strong> a bien ete enregistree avec le statut <strong>a_confirmer</strong>.</p>
+        <p class="text-neutral-600">L'atelier peut vous recontacter par email ou telephone pour valider certains details.</p>
+        <div class="pt-2">
+            <a href="{{ path('app_catalog_index') }}" class="inline-flex bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Retour au catalogue</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,7 +4,35 @@
 {% block page_title %}Modifier {{ order.reference }}{% endblock %}
 
 {% block admin_content %}
-<div class="max-w-5xl bg-white border border-neutral-200 rounded-xl p-6">
-    {{ include('admin/order/_form.html.twig', {form: form}) }}
+<div class="space-y-4 max-w-5xl">
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        {{ include('admin/order/_form.html.twig', {form: form, statusLabels: statusLabels}) }}
+    </div>
+
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        <h2 class="text-sm font-semibold text-neutral-900 mb-3">Actions de statut</h2>
+        <div class="flex flex-wrap items-center gap-2">
+            {% if order.status == 'a_confirmer' %}
+                <form method="post" action="{{ path('app_admin_order_accept', {id: order.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_accept_' ~ order.id) }}">
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700">Confirmer</button>
+                </form>
+            {% endif %}
+
+            {% if order.status == 'en_attente_paiement' %}
+                <form method="post" action="{{ path('app_admin_order_mark_paid', {id: order.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_mark_paid_' ~ order.id) }}">
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">Marquer payee</button>
+                </form>
+            {% endif %}
+
+            {% if order.status == 'a_faire' %}
+                <form method="post" action="{{ path('app_admin_order_complete', {id: order.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_complete_' ~ order.id) }}">
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-700">Marquer terminee</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

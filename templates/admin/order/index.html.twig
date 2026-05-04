@@ -35,16 +35,15 @@
             </thead>
             <tbody>
             {% for order in orders %}
-                <tr class="border-t border-neutral-100">
+                <tr class="border-t border-neutral-100 cursor-pointer hover:bg-neutral-50"
+                    onclick="window.location='{{ path('app_admin_order_edit', {id: order.id}) }}'">
                     <td class="px-4 py-3 font-medium text-neutral-900">{{ order.reference }}</td>
-                    <td class="px-4 py-3 text-neutral-600">{{ order.customerName }}<br><span class="text-xs">{{ order.customerEmail }}</span></td>
+                    <td class="px-4 py-3 text-neutral-600">{{ order.customerFullName }}<br><span class="text-xs">{{ order.customerEmail }}</span></td>
                     <td class="px-4 py-3">{{ include('admin/order/_status_badge.html.twig', {status: order.status, label: statusLabels[order.status] ?? order.status}) }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ order.formattedTotal }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ order.createdAt|date('d/m/Y H:i') }}</td>
                     <td class="px-4 py-3">
-                        <div class="flex justify-end items-center gap-3">
-                            <a href="{{ path('app_admin_order_show', {id: order.id}) }}" class="text-neutral-600 hover:text-neutral-900">Voir</a>
-                            <a href="{{ path('app_admin_order_edit', {id: order.id}) }}" class="text-amber-700 hover:text-amber-800">Modifier</a>
+                        <div class="flex justify-end items-center gap-3" onclick="event.stopPropagation();">
                             <form method="post" action="{{ path('app_admin_order_delete', {id: order.id}) }}" onsubmit="return confirm('Supprimer cette commande ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete_order_' ~ order.id) }}">
                                 <button class="text-red-600 hover:text-red-700" type="submit">Supprimer</button>

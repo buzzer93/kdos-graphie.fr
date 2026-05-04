@@ -59,7 +59,9 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $product->setSlug($slugGenerator->generateProductSlug($product->getSlug()));
+            $slugInput = trim($product->getSlug());
+            $slugSource = $slugInput !== '' ? $slugInput : $product->getName();
+            $product->setSlug($slugGenerator->generateProductSlug($slugSource));
 
             $coverFile = $form->get('coverFile')->getData();
             $product->setCoverImage($productImageStorage->store($coverFile, $product->getCoverImage()));
@@ -81,12 +83,9 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]
-    public function show(Product $product, ProductImageStorage $productImageStorage): Response
+    public function show(Product $product): Response
     {
-        return $this->render('admin/product/show.html.twig', [
-            'product' => $product,
-            'imagePublicPath' => $productImageStorage->getPublicPath($product->getCoverImage()),
-        ]);
+        return $this->redirectToRoute('app_admin_product_edit', ['id' => $product->getId()]);
     }
 
     #[Route('/{id}/edit', name: 'edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
@@ -101,7 +100,9 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $product->setSlug($slugGenerator->generateProductSlug($product->getSlug(), $product->getId()));
+            $slugInput = trim($product->getSlug());
+            $slugSource = $slugInput !== '' ? $slugInput : $product->getName();
+            $product->setSlug($slugGenerator->generateProductSlug($slugSource, $product->getId()));
 
             $coverFile = $form->get('coverFile')->getData();
             $product->setCoverImage($productImageStorage->store($coverFile, $product->getCoverImage()));

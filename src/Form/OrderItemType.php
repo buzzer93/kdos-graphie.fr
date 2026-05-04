@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\OrderItem;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -31,6 +32,15 @@ class OrderItemType extends AbstractType
             ->add('quantity', IntegerType::class, [
                 'label' => 'Quantité',
                 'constraints' => [new GreaterThanOrEqual(1)],
+            ])
+            ->add('customizationText', TextareaType::class, [
+                'label' => 'Texte personnalise',
+                'required' => false,
+            ])
+            ->add('customizationFilePath', TextType::class, [
+                'label' => 'Fichier personnalisation (chemin)',
+                'required' => false,
+                'constraints' => [new Length(max: 255)],
             ]);
     }
 

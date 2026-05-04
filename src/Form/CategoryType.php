@@ -26,8 +26,8 @@ class CategoryType extends AbstractType
             ])
             ->add('slug', TextType::class, [
                 'label' => 'Slug',
+                'required' => false,
                 'constraints' => [
-                    new NotBlank(),
                     new Length(max: 255),
                 ],
             ])

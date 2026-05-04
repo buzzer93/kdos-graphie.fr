@@ -5,6 +5,8 @@ namespace App\Controller\Admin;
 use App\Entity\Order;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
+use App\Service\OrderArchiveService;
+use App\Service\OrderLifecycleService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -66,22 +68,34 @@ class OrderController extends AbstractController
 
         return $this->render('admin/order/new.html.twig', [
             'form' => $form,
+            'statusLabels' => Order::getStatusLabels(),
         ]);
     }
 
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]
     public function show(Order $order): Response
     {
-        return $this->render('admin/order/show.html.twig', [
-            'order' => $order,
-            'statusLabels' => Order::getStatusLabels(),
-        ]);
+        return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
     }
 
     #[Route('/{id}/edit', name: 'edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
     public function edit(Order $order, Request $request, EntityManagerInterface $entityManager, OrderRepository $orderRepository): Response
     {
-        $form = $this->createForm(OrderType::class, $order);
+        if ($this->isTerminalStatus($order->getStatus())) {
+            $this->addFlash('danger', 'Cette commande est finalisee: edition verrouillee pour proteger son integrite.');
+
+            return $this->redirectToRoute('app_admin_order_index');
+        }
+
+        $lockCommercialData = $order->getStatus() !== Order::STATUS_A_CONFIRMER;
+
+        if ($lockCommercialData) {
+            $this->addFlash('warning', 'Commande deja engagee: seules les notes internes restent modifiables.');
+        }
+
+        $form = $this->createForm(OrderType::class, $order, [
+            'lock_commercial_data' => $lockCommercialData,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -101,20 +115,70 @@ class OrderController extends AbstractController
             'order' => $order,
             'form' => $form,
             'statusLabels' => Order::getStatusLabels(),
+            'lockCommercialData' => $lockCommercialData,
         ]);
     }
 
     #[Route('/{id}/delete', name: 'delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
-    public function delete(Order $order, Request $request, EntityManagerInterface $entityManager): Response
+    public function delete(Order $order, Request $request, EntityManagerInterface $entityManager, OrderArchiveService $orderArchiveService): Response
     {
-        if ($this->isCsrfTokenValid('delete_order_' . $order->getId(), (string) $request->request->get('_token'))) {
-            $entityManager->remove($order);
-            $entityManager->flush();
+        if (!$this->isCsrfTokenValid('delete_order_' . $order->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Action invalide (token CSRF).');
 
-            $this->addFlash('success', 'Commande supprimée.');
+            return $this->redirectToRoute('app_admin_order_index');
         }
 
+        if (!in_array($order->getStatus(), [Order::STATUS_ANNULE, Order::STATUS_REFUSE, Order::STATUS_TERMINE], true)) {
+            $this->addFlash('danger', 'Suppression interdite: seule une commande annulee, refusee ou terminee peut etre supprimee.');
+
+            return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
+        }
+
+        $archivedBy = $this->getUser()?->getUserIdentifier();
+        $orderArchiveService->archiveAndDelete($order, $archivedBy, 'Suppression admin apres archivage');
+        $this->addFlash('success', 'Commande archivee puis supprimee.');
+
         return $this->redirectToRoute('app_admin_order_index');
+    }
+
+    #[Route('/{id}/accept', name: 'accept', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function accept(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    {
+        return $this->handleAction($order, $request, 'accept', static fn () => $orderLifecycleService->accept($order));
+    }
+
+    #[Route('/{id}/remind-payment', name: 'remind_payment', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function remindPayment(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    {
+        return $this->handleAction($order, $request, 'remind_payment', static fn () => $orderLifecycleService->remindPayment($order));
+    }
+
+    #[Route('/{id}/reject', name: 'reject', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function reject(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    {
+        $reason = (string) $request->request->get('reason', '');
+
+        return $this->handleAction($order, $request, 'reject', static fn () => $orderLifecycleService->reject($order, $reason));
+    }
+
+    #[Route('/{id}/cancel', name: 'cancel', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function cancel(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    {
+        $reason = (string) $request->request->get('reason', '');
+
+        return $this->handleAction($order, $request, 'cancel', static fn () => $orderLifecycleService->cancel($order, $reason));
+    }
+
+    #[Route('/{id}/mark-paid', name: 'mark_paid', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function markPaid(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    {
+        return $this->handleAction($order, $request, 'mark_paid', static fn () => $orderLifecycleService->markAsPaid($order));
+    }
+
+    #[Route('/{id}/complete', name: 'complete', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function complete(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    {
+        return $this->handleAction($order, $request, 'complete', static fn () => $orderLifecycleService->complete($order));
     }
 
     private function recalculateTotal(Order $order): void
@@ -134,5 +198,27 @@ class OrderController extends AbstractController
         } while ($orderRepository->existsReference($reference));
 
         return $reference;
+    }
+
+    private function handleAction(Order $order, Request $request, string $action, callable $callback): Response
+    {
+        if (!$this->isCsrfTokenValid(
+            'order_action_' . $action . '_' . $order->getId(),
+            (string) $request->request->get('_token')
+        )) {
+            $this->addFlash('danger', 'Action invalide (token CSRF).');
+
+            return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
+        }
+
+        $result = $callback();
+        $this->addFlash($result->level, $result->message);
+
+        return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
+    }
+
+    private function isTerminalStatus(string $status): bool
+    {
+        return in_array($status, [Order::STATUS_TERMINE, Order::STATUS_REFUSE, Order::STATUS_ANNULE], true);
     }
 }

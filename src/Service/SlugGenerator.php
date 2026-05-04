@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
-use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class SlugGenerator
 {
     public function __construct(
-        private readonly AsciiSlugger $slugger,
+        private readonly SluggerInterface $slugger,
         private readonly CategoryRepository $categoryRepository,
         private readonly ProductRepository $productRepository,
     ) {

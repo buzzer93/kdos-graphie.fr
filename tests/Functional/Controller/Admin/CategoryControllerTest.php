@@ -51,11 +51,13 @@ final class CategoryControllerTest extends AbstractWebTestCase
         $updatedCategory = $categoryRepository->find($category->getId());
         self::assertSame('Papeterie MAJ', $updatedCategory?->getName());
 
-        $client->request('POST', '/admin/categories/' . $category->getId() . '/delete', [
-            '_token' => $this->csrfToken('delete_category_' . $category->getId()),
-        ]);
+        $crawler = $client->request('GET', '/admin/categories/');
+        $deleteForm = $crawler->filter('form[action="/admin/categories/' . $category->getId() . '/delete"]')->form();
+        $client->submit($deleteForm);
 
         self::assertResponseRedirects('/admin/categories/');
+        $this->getEntityManager()->clear();
+        $categoryRepository = static::getContainer()->get(CategoryRepository::class);
         self::assertNull($categoryRepository->find($category->getId()));
     }
 }
