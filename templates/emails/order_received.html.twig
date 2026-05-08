@@ -1,4 +1,53 @@
-<h1>Commande recue</h1>
-<p>Bonjour {{ order.customerFullName }},</p>
-<p>Votre demande <strong>{{ order.reference }}</strong> a bien ete enregistree avec le statut <strong>a_confirmer</strong>.</p>
-<p>L'atelier peut vous recontacter par email ou telephone ({{ order.customerPhone }}) si des precisions sont necessaires avant validation.</p>
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Demande reçue — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Votre demande a bien été reçue</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Nous avons bien enregistré votre demande de commande. Notre atelier va l'étudier et vous recontactera si des précisions sont nécessaires.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+{% if order.items is not empty %}
+<table class="order-table">
+    <thead>
+        <tr>
+            <th>Produit</th>
+            <th style="text-align:right">Qté</th>
+            <th style="text-align:right">Prix unit.</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td>{{ item.productName }}</td>
+            <td style="text-align:right">{{ item.quantity }}</td>
+            <td style="text-align:right">{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+            <td colspan="2">Total estimé</td>
+            <td style="text-align:right">{{ order.formattedTotal }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+<div class="info-block">
+    <strong>Coordonnées renseignées :</strong><br>
+    {{ order.customerFirstName }} {{ order.customerLastName }}<br>
+    {{ order.customerEmail }}<br>
+    {{ order.customerPhone }}<br>
+    {{ order.shippingAddress|nl2br }}
+</div>
+
+<p>L'atelier peut vous recontacter par email ou par téléphone avant de valider votre commande.</p>
+
+<p>Merci pour votre confiance,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

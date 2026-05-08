@@ -38,7 +38,6 @@ final class ProductControllerTest extends AbstractWebTestCase
             'product[slug]' => 'mug-perso',
             'product[description]' => 'Desc test',
             'product[price]' => '1590',
-            'product[stock]' => '12',
             'product[category]' => (string) $category->getId(),
             'product[isVisible]' => '1',
         ]);
@@ -55,7 +54,6 @@ final class ProductControllerTest extends AbstractWebTestCase
             'product[slug]' => 'mug-perso-maj',
             'product[description]' => 'Desc maj',
             'product[price]' => '1990',
-            'product[stock]' => '7',
             'product[category]' => (string) $category->getId(),
             'product[isVisible]' => '1',
         ]);

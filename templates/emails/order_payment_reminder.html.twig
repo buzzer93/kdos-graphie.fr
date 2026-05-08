@@ -1,0 +1,54 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Rappel de paiement — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Rappel : votre paiement est en attente</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Nous vous rappelons que votre commande est confirmée et attend votre paiement pour être lancée en production.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+{% if order.items is not empty %}
+<table class="order-table">
+    <thead>
+        <tr>
+            <th>Produit</th>
+            <th style="text-align:right">Qté</th>
+            <th style="text-align:right">Prix unit.</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td>{{ item.productName }}</td>
+            <td style="text-align:right">{{ item.quantity }}</td>
+            <td style="text-align:right">{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+            <td colspan="2">Total à régler</td>
+            <td style="text-align:right">{{ order.formattedTotal }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+{% if order.paymentLink %}
+<p>Pour finaliser votre commande, cliquez sur le bouton ci-dessous pour accéder à notre page de paiement sécurisé :</p>
+
+<a href="{{ order.paymentLink }}" class="btn">Payer ma commande</a>
+
+<p style="font-size:13px; color:#78716c;">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+<a href="{{ order.paymentLink }}" style="color:#b45309; word-break:break-all;">{{ order.paymentLink }}</a></p>
+{% endif %}
+
+<p>Si vous avez la moindre question ou si vous souhaitez annuler votre commande, n'hésitez pas à nous contacter.</p>
+
+<p>Cordialement,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

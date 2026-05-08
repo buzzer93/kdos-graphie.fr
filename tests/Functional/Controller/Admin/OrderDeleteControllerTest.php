@@ -26,7 +26,7 @@ final class OrderDeleteControllerTest extends AbstractWebTestCase
         $deleteForm = $crawler->filter('form[action="/admin/orders/' . $order->getId() . '/delete"]')->form();
         $client->submit($deleteForm);
 
-        self::assertResponseRedirects('/admin/orders/' . $order->getId());
+        self::assertResponseRedirects('/admin/orders/' . $order->getId() . '/edit');
 
         $orderRepository = static::getContainer()->get(OrderRepository::class);
         self::assertNotNull($orderRepository->find($order->getId()));

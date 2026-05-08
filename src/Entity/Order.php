@@ -66,6 +66,15 @@ class Order
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $paymentLink = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $refundNote = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $refundedAt = null;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -286,6 +295,47 @@ class Order
         $this->notes = $notes;
 
         return $this;
+    }
+
+    public function getPaymentLink(): ?string
+    {
+        return $this->paymentLink;
+    }
+
+    public function setPaymentLink(?string $paymentLink): static
+    {
+        $this->paymentLink = $paymentLink;
+
+        return $this;
+    }
+
+    public function getRefundNote(): ?string
+    {
+        return $this->refundNote;
+    }
+
+    public function setRefundNote(?string $refundNote): static
+    {
+        $this->refundNote = $refundNote;
+
+        return $this;
+    }
+
+    public function getRefundedAt(): ?\DateTimeImmutable
+    {
+        return $this->refundedAt;
+    }
+
+    public function setRefundedAt(?\DateTimeImmutable $refundedAt): static
+    {
+        $this->refundedAt = $refundedAt;
+
+        return $this;
+    }
+
+    public function isRefunded(): bool
+    {
+        return $this->refundedAt !== null;
     }
 
     public function getCreatedAt(): \DateTimeImmutable

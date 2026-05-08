@@ -75,6 +75,13 @@ class OrderController extends AbstractController
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]
     public function show(Order $order): Response
     {
+        if ($this->isTerminalStatus($order->getStatus())) {
+            return $this->render('admin/order/show.html.twig', [
+                'order' => $order,
+                'statusLabels' => Order::getStatusLabels(),
+            ]);
+        }
+
         return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
     }
 
@@ -82,9 +89,7 @@ class OrderController extends AbstractController
     public function edit(Order $order, Request $request, EntityManagerInterface $entityManager, OrderRepository $orderRepository): Response
     {
         if ($this->isTerminalStatus($order->getStatus())) {
-            $this->addFlash('danger', 'Cette commande est finalisee: edition verrouillee pour proteger son integrite.');
-
-            return $this->redirectToRoute('app_admin_order_index');
+            return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
         }
 
         $lockCommercialData = $order->getStatus() !== Order::STATUS_A_CONFIRMER;
@@ -179,6 +184,37 @@ class OrderController extends AbstractController
     public function complete(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
     {
         return $this->handleAction($order, $request, 'complete', static fn () => $orderLifecycleService->complete($order));
+    }
+
+    #[Route('/{id}/mark-refunded', name: 'mark_refunded', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function markRefunded(Order $order, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if (!$this->isCsrfTokenValid('mark_refunded_' . $order->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Action invalide (token CSRF).');
+
+            return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
+        }
+
+        if ($order->getStatus() !== Order::STATUS_ANNULE) {
+            $this->addFlash('warning', 'Le remboursement ne peut etre marque que sur une commande annulee.');
+
+            return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
+        }
+
+        if ($order->isRefunded()) {
+            $this->addFlash('warning', 'Cette commande est deja marquee comme remboursee.');
+
+            return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
+        }
+
+        $note = trim((string) $request->request->get('refund_note', ''));
+        $order->setRefundedAt(new \DateTimeImmutable());
+        $order->setRefundNote($note !== '' ? $note : null);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Remboursement enregistre.');
+
+        return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
     }
 
     private function recalculateTotal(Order $order): void

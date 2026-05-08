@@ -1,4 +1,47 @@
-<h1>Commande confirmee</h1>
-<p>Bonjour {{ order.customerFullName }},</p>
-<p>Votre commande <strong>{{ order.reference }}</strong> est validee par l'atelier.</p>
-<p>Le paiement vous sera propose dans l'etape suivante. Statut actuel: <strong>{{ order.status }}</strong>.</p>
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Commande confirmée — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Votre commande est confirmée</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Bonne nouvelle ! Notre atelier a étudié votre demande et confirme la prise en charge de votre commande.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+<p>Vous allez recevoir très prochainement un email séparé contenant votre lien de paiement sécurisé.</p>
+
+{% if order.items is not empty %}
+<table class="order-table">
+    <thead>
+        <tr>
+            <th>Produit</th>
+            <th style="text-align:right">Qté</th>
+            <th style="text-align:right">Prix unit.</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td>{{ item.productName }}</td>
+            <td style="text-align:right">{{ item.quantity }}</td>
+            <td style="text-align:right">{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+            <td colspan="2">Total à régler</td>
+            <td style="text-align:right">{{ order.formattedTotal }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+<p>Pour toute question, vous pouvez nous répondre directement à cet email.</p>
+
+<p>À très bientôt,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

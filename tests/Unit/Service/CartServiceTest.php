@@ -22,7 +22,7 @@ final class CartServiceTest extends TestCase
             ->setName('Produit TDD')
             ->setSlug('produit-tdd')
             ->setPrice(2500)
-            ->setStock(10)
+
             ->setIsVisible(true);
 
         $service->addLine($product, 2, 'Texte test', null);
@@ -40,7 +40,7 @@ final class CartServiceTest extends TestCase
             ->setName('Produit TDD')
             ->setSlug('produit-tdd')
             ->setPrice(1000)
-            ->setStock(10)
+
             ->setIsVisible(true);
 
         $service->addLine($product, 1, null, null);
@@ -60,7 +60,7 @@ final class CartServiceTest extends TestCase
             ->setName('Produit TDD')
             ->setSlug('produit-tdd')
             ->setPrice(1000)
-            ->setStock(10)
+
             ->setIsVisible(true);
 
         $service->addLine($product, 1, null, 'custom.pdf');

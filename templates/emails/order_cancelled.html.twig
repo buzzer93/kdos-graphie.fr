@@ -1,0 +1,36 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Commande annulée — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Votre commande a été annulée</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Votre commande a été annulée.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+{% if order.decisionReason %}
+<div class="info-block">
+    <strong>Motif :</strong><br>
+    {{ order.decisionReason }}
+</div>
+{% endif %}
+
+{% if order.total > 0 and order.isRefunded %}
+<div class="info-block">
+    <strong>Remboursement :</strong> votre paiement a été remboursé le {{ order.refundedAt|date('d/m/Y') }}.
+    {% if order.refundNote %}<br>{{ order.refundNote }}{% endif %}
+</div>
+{% elseif order.total > 0 %}
+<p>Si vous avez déjà effectué un paiement pour cette commande, notre équipe vous contactera pour organiser le remboursement.</p>
+{% endif %}
+
+<p>Si vous souhaitez passer une nouvelle commande, vous pouvez visiter notre site à tout moment.</p>
+
+<p>Cordialement,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

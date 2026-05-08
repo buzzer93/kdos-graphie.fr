@@ -28,7 +28,6 @@ final class CartControllerTest extends AbstractWebTestCase
             ->setName('Affiche Personnalisee')
             ->setSlug('affiche-personnalisee')
             ->setPrice(2500)
-            ->setStock(10)
             ->setIsVisible(true);
 
         $entityManager->persist($product);

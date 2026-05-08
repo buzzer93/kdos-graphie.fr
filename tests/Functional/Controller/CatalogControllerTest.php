@@ -24,7 +24,7 @@ final class CatalogControllerTest extends AbstractWebTestCase
             ->setName('Produit visible')
             ->setSlug('produit-visible')
             ->setPrice(1000)
-            ->setStock(10)
+
             ->setIsVisible(true)
             ->setCategory($category);
 
@@ -32,7 +32,7 @@ final class CatalogControllerTest extends AbstractWebTestCase
             ->setName('Produit cache')
             ->setSlug('produit-cache')
             ->setPrice(1000)
-            ->setStock(10)
+
             ->setIsVisible(false)
             ->setCategory($category);
 
@@ -57,7 +57,7 @@ final class CatalogControllerTest extends AbstractWebTestCase
             ->setName('Produit cache')
             ->setSlug('produit-cache')
             ->setPrice(1000)
-            ->setStock(10)
+
             ->setIsVisible(false);
 
         $entityManager->persist($hiddenProduct);

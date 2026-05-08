@@ -1,0 +1,58 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}[Admin] Paiement reçu — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Paiement reçu — commande à traiter</h1>
+
+<p>Un client vient de régler sa commande. Elle passe au statut <strong>À faire</strong>.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+<div class="info-block">
+    <strong>Client :</strong> {{ order.customerFirstName }} {{ order.customerLastName }}<br>
+    <strong>Email :</strong> {{ order.customerEmail }}<br>
+    <strong>Téléphone :</strong> {{ order.customerPhone }}<br>
+    <strong>Adresse :</strong> {{ order.shippingAddress|nl2br }}
+</div>
+
+{% if order.items is not empty %}
+<table class="order-table">
+    <thead>
+        <tr>
+            <th>Produit</th>
+            <th style="text-align:right">Qté</th>
+            <th style="text-align:right">Prix unit.</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td>
+                {{ item.productName }}
+                {% if item.customText %}<br><span style="font-size:12px;color:#78716c;">Texte: {{ item.customText }}</span>{% endif %}
+            </td>
+            <td style="text-align:right">{{ item.quantity }}</td>
+            <td style="text-align:right">{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+            <td colspan="2">Total réglé</td>
+            <td style="text-align:right">{{ order.formattedTotal }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+{% if order.additionalInfo %}
+<div class="info-block">
+    <strong>Informations complémentaires du client :</strong><br>
+    {{ order.additionalInfo }}
+</div>
+{% endif %}
+
+<p style="font-size:13px;color:#78716c;">Rendez-vous dans l'interface admin pour gérer cette commande.</p>
+{% endblock %}

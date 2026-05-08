@@ -31,9 +31,6 @@ class Product
     private int $price;
 
     #[ORM\Column]
-    private int $stock = 0;
-
-    #[ORM\Column]
     private bool $isVisible = true;
 
     /** Filename only, not a full path. */
@@ -110,18 +107,6 @@ class Product
     public function setPrice(int $price): static
     {
         $this->price = $price;
-
-        return $this;
-    }
-
-    public function getStock(): int
-    {
-        return $this->stock;
-    }
-
-    public function setStock(int $stock): static
-    {
-        $this->stock = $stock;
 
         return $this;
     }

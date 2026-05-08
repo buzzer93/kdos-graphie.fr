@@ -94,16 +94,16 @@ class AppFixtures extends Fixture
     private function createProducts(ObjectManager $manager, array $categories): array
     {
         $definitions = [
-            ['name' => 'Planche apéro signature', 'slug' => 'planche-apero-signature', 'price' => 3490, 'stock' => 12, 'category' => 'bois', 'visible' => true],
-            ['name' => 'Porte-clés prénom chêne', 'slug' => 'porte-cles-prenom-chene', 'price' => 1290, 'stock' => 38, 'category' => 'bois', 'visible' => true],
-            ['name' => 'Cadre citation atelier', 'slug' => 'cadre-citation-atelier', 'price' => 4290, 'stock' => 7, 'category' => 'bois', 'visible' => true],
-            ['name' => 'Flûte mariage élégante', 'slug' => 'flute-mariage-elegante', 'price' => 2490, 'stock' => 16, 'category' => 'verre', 'visible' => true],
-            ['name' => 'Gourde inox logo pro', 'slug' => 'gourde-inox-logo-pro', 'price' => 2890, 'stock' => 22, 'category' => 'verre', 'visible' => true],
-            ['name' => 'Plaque de porte atelier', 'slug' => 'plaque-de-porte-atelier', 'price' => 1990, 'stock' => 15, 'category' => 'verre', 'visible' => true],
-            ['name' => 'Carnet cuir initiales', 'slug' => 'carnet-cuir-initiales', 'price' => 3190, 'stock' => 10, 'category' => 'papeterie', 'visible' => true],
-            ['name' => 'Faire-part bohème', 'slug' => 'faire-part-boheme', 'price' => 390, 'stock' => 220, 'category' => 'papeterie', 'visible' => true],
-            ['name' => 'Marque-page aquarelle', 'slug' => 'marque-page-aquarelle', 'price' => 590, 'stock' => 140, 'category' => 'papeterie', 'visible' => true],
-            ['name' => 'Prototype non publié', 'slug' => 'prototype-non-publie', 'price' => 1590, 'stock' => 2, 'category' => 'bois', 'visible' => false],
+            ['name' => 'Planche apéro signature', 'slug' => 'planche-apero-signature', 'price' => 3490, 'category' => 'bois', 'visible' => true],
+            ['name' => 'Porte-clés prénom chêne', 'slug' => 'porte-cles-prenom-chene', 'price' => 1290, 'category' => 'bois', 'visible' => true],
+            ['name' => 'Cadre citation atelier', 'slug' => 'cadre-citation-atelier', 'price' => 4290, 'category' => 'bois', 'visible' => true],
+            ['name' => 'Flûte mariage élégante', 'slug' => 'flute-mariage-elegante', 'price' => 2490, 'category' => 'verre', 'visible' => true],
+            ['name' => 'Gourde inox logo pro', 'slug' => 'gourde-inox-logo-pro', 'price' => 2890, 'category' => 'verre', 'visible' => true],
+            ['name' => 'Plaque de porte atelier', 'slug' => 'plaque-de-porte-atelier', 'price' => 1990, 'category' => 'verre', 'visible' => true],
+            ['name' => 'Carnet cuir initiales', 'slug' => 'carnet-cuir-initiales', 'price' => 3190, 'category' => 'papeterie', 'visible' => true],
+            ['name' => 'Faire-part bohème', 'slug' => 'faire-part-boheme', 'price' => 390, 'category' => 'papeterie', 'visible' => true],
+            ['name' => 'Marque-page aquarelle', 'slug' => 'marque-page-aquarelle', 'price' => 590, 'category' => 'papeterie', 'visible' => true],
+            ['name' => 'Prototype non publié', 'slug' => 'prototype-non-publie', 'price' => 1590, 'category' => 'bois', 'visible' => false],
         ];
 
         $products = [];
@@ -114,7 +114,6 @@ class AppFixtures extends Fixture
                 ->setSlug($definition['slug'])
                 ->setDescription('Produit de démonstration pour le catalogue et les tests locaux.')
                 ->setPrice($definition['price'])
-                ->setStock($definition['stock'])
                 ->setIsVisible($definition['visible'])
                 ->setCategory($categories[$definition['category']]);
 

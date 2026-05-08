@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email envoyé — KDOS-GRAPHIE{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-neutral-50 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md text-center">
+        <div class="bg-white rounded-[20px] px-8 py-10"
+             style="box-shadow: rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px;">
+            <p class="text-4xl mb-4">✉️</p>
+            <h1 class="font-display text-xl font-semibold text-neutral-900 mb-3">Email envoyé</h1>
+            <p class="text-sm text-neutral-600 leading-relaxed">
+                Si un compte existe pour cet email, vous recevrez un lien valable
+                <strong>{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</strong>.
+            </p>
+        </div>
+        <p class="text-center text-xs text-neutral-400 mt-6">
+            <a href="{{ path('app_login') }}" class="hover:text-neutral-600 transition-colors">← Retour à la connexion</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

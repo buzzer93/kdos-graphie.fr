@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Order;
-use App\Service\OrderActionResult;
+use App\Message\AdminOrderPaidNotification;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class OrderLifecycleService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly OrderMailer $orderMailer,
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
@@ -35,17 +37,26 @@ final class OrderLifecycleService
             return OrderActionResult::warning('La relance est disponible uniquement pour les commandes en attente de paiement.');
         }
 
-        return OrderActionResult::success('Relance de paiement enregistree.');
+        $this->orderMailer->sendPaymentReminder($order);
+
+        return OrderActionResult::success('Relance de paiement envoyee.');
     }
 
     public function reject(Order $order, string $reason): OrderActionResult
     {
-        return $this->rejectOrCancel($order, $reason, 'refusee');
+        return $this->rejectOrCancel($order, $reason, 'refusee', [
+            Order::STATUS_A_CONFIRMER,
+            Order::STATUS_EN_ATTENTE_PAIEMENT,
+        ]);
     }
 
     public function cancel(Order $order, string $reason): OrderActionResult
     {
-        return $this->rejectOrCancel($order, $reason, 'annulee');
+        return $this->rejectOrCancel($order, $reason, 'annulee', [
+            Order::STATUS_A_CONFIRMER,
+            Order::STATUS_EN_ATTENTE_PAIEMENT,
+            Order::STATUS_A_FAIRE,
+        ]);
     }
 
     public function markAsPaid(Order $order): OrderActionResult
@@ -56,6 +67,8 @@ final class OrderLifecycleService
 
         $order->setStatus(Order::STATUS_A_FAIRE);
         $this->entityManager->flush();
+
+        $this->messageBus->dispatch(new AdminOrderPaidNotification((int) $order->getId()));
 
         return OrderActionResult::success('Paiement confirme. Commande passee au statut A faire.');
     }
@@ -73,10 +86,11 @@ final class OrderLifecycleService
         return OrderActionResult::success('Commande terminee.');
     }
 
-    private function rejectOrCancel(Order $order, string $reason, string $verb): OrderActionResult
+    /** @param list<string> $allowedStatuses */
+    private function rejectOrCancel(Order $order, string $reason, string $verb, array $allowedStatuses): OrderActionResult
     {
-        if (!in_array($order->getStatus(), [Order::STATUS_A_CONFIRMER, Order::STATUS_EN_ATTENTE_PAIEMENT], true)) {
-            return OrderActionResult::warning('Action disponible uniquement pour les commandes a confirmer ou en attente de paiement.');
+        if (!in_array($order->getStatus(), $allowedStatuses, true)) {
+            return OrderActionResult::warning('Cette action n\'est pas disponible pour le statut actuel de la commande.');
         }
 
         $normalizedReason = trim($reason);
@@ -96,6 +110,8 @@ final class OrderLifecycleService
 
         if ($verb === 'refusee') {
             $this->orderMailer->sendOrderRefused($order);
+        } else {
+            $this->orderMailer->sendOrderCancelled($order);
         }
 
         return OrderActionResult::success('Commande ' . $verb . '.');

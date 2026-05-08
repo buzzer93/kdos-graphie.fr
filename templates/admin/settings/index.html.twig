@@ -1,0 +1,67 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Paramètres — Admin{% endblock %}
+{% block page_title %}Paramètres globaux{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6 max-w-3xl">
+
+    {% if settings is not empty %}
+        <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+            <form method="post" action="{{ path('app_admin_settings_index') }}" class="divide-y divide-neutral-100">
+                <input type="hidden" name="_token" value="{{ csrf_token('settings_save') }}">
+
+                {% for setting in settings %}
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <div>
+                            <p class="text-sm font-medium text-neutral-900">{{ setting.label }}</p>
+                            <p class="text-xs text-neutral-400 mt-0.5 font-mono">{{ setting.settingKey }}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <textarea
+                                name="settings[{{ setting.settingKey }}]"
+                                rows="2"
+                                class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-y"
+                            >{{ setting.settingValue }}</textarea>
+                            <p class="text-xs text-neutral-400 mt-1">Dernière modification: {{ setting.updatedAt|date('d/m/Y H:i') }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="px-6 py-4">
+                    <button type="submit" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <div class="bg-white border border-neutral-200 rounded-xl px-6 py-8 text-center text-neutral-500 text-sm">
+            Aucun paramètre défini. Créez le premier ci-dessous.
+        </div>
+    {% endif %}
+
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        <h2 class="text-sm font-semibold text-neutral-900 mb-4">Ajouter un paramètre</h2>
+        <form method="post" action="{{ path('app_admin_settings_new') }}" class="grid md:grid-cols-3 gap-3">
+            <input type="hidden" name="_token" value="{{ csrf_token('settings_new') }}">
+            <div>
+                <label class="block text-xs font-medium text-neutral-600 mb-1">Clé (identifiant unique)</label>
+                <input type="text" name="setting_key" required placeholder="ex: site_phone"
+                    class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm font-mono">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-neutral-600 mb-1">Libellé</label>
+                <input type="text" name="label" required placeholder="ex: Numéro de téléphone"
+                    class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-neutral-900 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-neutral-700">
+                    Créer
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

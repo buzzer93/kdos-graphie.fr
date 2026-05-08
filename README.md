@@ -113,7 +113,7 @@ Par rapport aux features documentees dans l'ancien projet, il manque encore des 
 - Panier session avance (controle stock, recapitulatif fiable, coherence avec paiement)
 - Tests metier (services, workflows, webhooks, fonctionnalites critiques)
 
-## TODO backlog (a faire plus tard)
+## TODO backlog
 
 ### Point d'avancement (deja fait)
 
@@ -124,34 +124,141 @@ Par rapport aux features documentees dans l'ancien projet, il manque encore des 
 - [x] Ajouter archivage avant suppression des commandes annulees/refusees/terminees.
 - [x] Ajouter envois email metier de base pour le cycle de vie de commande.
 - [x] Ajouter des tests fonctionnels/unitaires sur les parcours admin et le cycle de vie commande.
+- [x] Definir les regles d'annulation — admin uniquement, statuts a_confirmer / en_attente_paiement / a_faire annulables.
+- [x] Definir la gestion des remboursements — tracabilite manuelle (refund_note + refunded_at), remboursement Stripe effectue manuellement.
+- [x] Ajouter contraintes validation metier — suppression stock non utilise, prix recalcule depuis la base au checkout.
+- [x] Ajouter formulaire contact backend — ContactController + ContactType + CSRF + reCAPTCHA v3 (RecaptchaService).
+- [x] Ajouter flux mot de passe oublie admin — symfonycasts/reset-password-bundle, entity + migration + controller + mailer + templates.
+- [x] Ajouter ecran admin parametres globaux — SiteSetting entity + migration + SettingsController + template.
+- [x] Ajouter section deploiement complete — variables Stripe, worker Messenger, webhook, Caddy.
 
-### Reste a faire
+### Admin UX (inspire du projet similaire)
 
-- [ ] Definir precisement a quel moment une commande peut etre annulee (avant paiement, apres paiement, en production) et qui a le droit d'annuler.
-- [ ] Definir la gestion des remboursements quand une commande deja payee est annulee (partiel/complet, delai, tracabilite, notifications client).
-- [ ] Ajouter contraintes de validation metier manquantes (unicite reference commande, garde-fous stock/prix).
-- [ ] Ajouter formulaire de contact backend (validation + CSRF + reCAPTCHA).
-- [ ] Ajouter flux mot de passe oublie admin (request, token, expiration, reset).
-- [ ] Ajouter ecran admin de parametres globaux (master admin).
-- [ ] Ajouter une section deployment complete (worker messenger, variables Stripe, checklist prod).
+- [ ] Dashboard admin : cartes de synthese par statut de commande (compteurs, liens filtres, total CA).
+- [ ] Composant `_status_badge.html.twig` reutilisable avec couleurs semantiques par statut.
+- [ ] Service `OrderAdminActionAvailabilityResolver` : centralise les actions disponibles par statut (canAccept, canReject, canCancel, canComplete, canSendPaymentLink).
+- [ ] Action admin "Demander des informations complementaires" — email automatique au client depuis la fiche commande.
+- [ ] Action admin "Renvoyer le lien de paiement" — disponible en statut en_attente_paiement.
+- [ ] Action admin "Purge" — suppression en masse des commandes terminees/refusees/annulees (avec archivage obligatoire).
+- [ ] Parametres admin : coordonnees contact editables (telephone, email, adresse, reseaux sociaux).
+- [ ] Parametres admin : changement identifiants master admin (email + mot de passe).
+- [ ] Parametres admin : reordonnancement des categories par drag-and-drop.
 
-### Niveau 1 - Fondations
+### Cycle de vie commande
 
-- [ ] Implementer le panier session complet (ajout/retrait, quantites, recalculs, controle stock).
-- [ ] Adapter le service de cycle de vie commande au processus metier cible (confirmation, paiement Stripe, passage a faire, cloture, refus/annulation).
-- [ ] Completer les envois email metier (templates Twig definitifs, cas de remboursement et relances avancees).
+- [ ] Adapter OrderLifecycleService au processus metier cible complet (confirmation, paiement Stripe, passage a faire, cloture, refus/annulation).
+- [ ] Completer les templates email (refus, remboursement, livraison avec numero de suivi).
 - [ ] Ajouter message/handler Messenger pour notification admin post-paiement.
 
-### Niveau 2 - Fonctionnalites transverses
+### Panier
+
+- [ ] Implémenter le panier session complet (ajout/retrait, quantites, recalculs, controle stock).
+
+### Tests
 
 - [ ] Ajouter tests unitaires/integration sur services metier (lifecycle, mailer, messenger, webhook).
 
-### Niveau 3 - Stripe (a faire en dernier)
+### Stripe (en dernier)
 
 - [ ] Implementer Stripe cote serveur (creation PaymentIntent) et interface paiement cote client.
-- [ ] Ajouter routes de paiement: page paiement, creation intent, page confirmation.
+- [ ] Ajouter routes de paiement : page paiement, creation intent, page confirmation.
 - [ ] Ajouter webhook Stripe securise (verification signature + idempotence).
 - [ ] Ajouter tests unitaires/integration sur services Stripe et webhook.
+
+## Déploiement production
+
+### Variables d'environnement requises
+
+Configurer dans `.env.local` (ne jamais committer les secrets) :
+
+```dotenv
+APP_ENV=prod
+APP_SECRET=<valeur aléatoire forte>
+
+# Base de données
+DATABASE_URL="mysql://user:password@host:3306/kdos_graphie?serverVersion=8.0.36&charset=utf8mb4"
+
+# Mailer
+MAILER_DSN=smtp://user:password@host:587
+MAILER_FROM_ADDRESS=noreply@kdos-graphie.fr
+CONTACT_RECIPIENT_ADDRESS=contact@kdos-graphie.fr
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# reCAPTCHA v3 (https://www.google.com/recaptcha/admin)
+RECAPTCHA_SITE_KEY=...
+RECAPTCHA_SECRET_KEY=...
+```
+
+### Checklist déploiement initial
+
+```bash
+git clone git@github.com:<repo> /var/www/kdos-graphie
+cd /var/www/kdos-graphie
+composer install --no-dev --optimize-autoloader
+cp .env .env.local          # puis renseigner les variables ci-dessus
+php bin/console doctrine:database:create --if-not-exists
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console cache:clear --env=prod
+chmod -R 775 var/
+chown -R www-data:www-data var/ public/
+```
+
+### Checklist mise à jour
+
+```bash
+git pull
+composer install --no-dev --optimize-autoloader
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console cache:clear --env=prod
+```
+
+### Worker Messenger (tâches asynchrones)
+
+Le transport Doctrine est configuré. En production, créer un service systemd ou supervisor.
+
+**Exemple supervisor** (`/etc/supervisor/conf.d/kdos-messenger.conf`) :
+
+```ini
+[program:kdos-messenger]
+command=php /var/www/kdos-graphie/bin/console messenger:consume async --time-limit=3600
+autostart=true
+autorestart=true
+user=www-data
+stdout_logfile=/var/log/supervisor/kdos-messenger.log
+```
+
+**Activer et démarrer** :
+```bash
+supervisorctl reread && supervisorctl update && supervisorctl start kdos-messenger
+```
+
+**Surveiller la file** :
+```bash
+php bin/console messenger:stats
+php bin/console messenger:failed:show   # messages en erreur
+```
+
+### Webhook Stripe
+
+Déclarer l'URL `https://kdos-graphie.fr/webhook/stripe` dans le Dashboard Stripe.
+Événements requis : `payment_intent.succeeded`, `payment_intent.payment_failed`, `checkout.session.completed`.
+La signature doit être vérifiée côté serveur avec `STRIPE_WEBHOOK_SECRET` — ne jamais faire confiance au seul retour navigateur.
+
+### Caddy (exemple de configuration)
+
+```caddy
+kdos-graphie.fr {
+    root * /var/www/kdos-graphie/public
+    php_fastcgi unix//run/php/php8.4-fpm.sock
+    encode gzip
+    file_server
+    try_files {path} /index.php
+}
+```
 
 ## Commandes utiles
 

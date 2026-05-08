@@ -29,7 +29,6 @@ final class CheckoutControllerTest extends AbstractWebTestCase
             ->setName('Poster Premium')
             ->setSlug('poster-premium')
             ->setPrice(3200)
-            ->setStock(20)
             ->setIsVisible(true);
 
         $entityManager->persist($product);

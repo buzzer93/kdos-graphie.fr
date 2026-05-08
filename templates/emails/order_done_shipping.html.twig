@@ -1,10 +1,33 @@
-<h1>Commande terminee</h1>
-<p>Bonjour {{ order.customerFullName }},</p>
-<p>Votre commande <strong>{{ order.reference }}</strong> est terminee.</p>
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Commande expédiée — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Votre commande est en route !</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Votre commande est terminée et vient d'être expédiée à l'adresse indiquée.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
 {% if order.shippingCarrier or order.trackingNumber %}
-    <p>Informations de livraison:</p>
-    <ul>
-        {% if order.shippingCarrier %}<li>Transporteur: {{ order.shippingCarrier }}</li>{% endif %}
-        {% if order.trackingNumber %}<li>Numero de suivi: {{ order.trackingNumber }}</li>{% endif %}
-    </ul>
+<div class="info-block">
+    <strong>Informations de livraison :</strong><br>
+    {% if order.shippingCarrier %}Transporteur : {{ order.shippingCarrier }}<br>{% endif %}
+    {% if order.trackingNumber %}Numéro de suivi : <strong>{{ order.trackingNumber }}</strong>{% endif %}
+</div>
 {% endif %}
+
+<div class="info-block">
+    <strong>Adresse de livraison :</strong><br>
+    {{ order.shippingAddress|nl2br }}
+</div>
+
+<p>Merci pour votre confiance, nous espérons vous revoir très bientôt !</p>
+
+<p>À bientôt,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

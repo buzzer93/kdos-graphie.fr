@@ -27,7 +27,6 @@ final class ProductTest extends TestCase
             ->setSlug('planche-gravee')
             ->setDescription('Desc')
             ->setPrice(1999)
-            ->setStock(8)
             ->setIsVisible(false)
             ->setCoverImage('cover.jpg')
             ->setCategory($category);
@@ -36,7 +35,6 @@ final class ProductTest extends TestCase
         self::assertSame('planche-gravee', $product->getSlug());
         self::assertSame('Desc', $product->getDescription());
         self::assertSame(1999, $product->getPrice());
-        self::assertSame(8, $product->getStock());
         self::assertFalse($product->isVisible());
         self::assertSame('cover.jpg', $product->getCoverImage());
         self::assertSame($category, $product->getCategory());

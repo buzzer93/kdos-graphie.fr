@@ -47,12 +47,6 @@ class ProductType extends AbstractType
                     new GreaterThanOrEqual(0),
                 ],
             ])
-            ->add('stock', IntegerType::class, [
-                'label' => 'Stock',
-                'constraints' => [
-                    new GreaterThanOrEqual(0),
-                ],
-            ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',

@@ -1,4 +1,27 @@
-<h1>Commande refusee</h1>
-<p>Bonjour {{ order.customerFullName }},</p>
-<p>Votre commande <strong>{{ order.reference }}</strong> a ete refusee.</p>
-<p>Motif: {{ order.decisionReason ?: 'Non precise' }}</p>
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Commande refusée — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Votre commande n'a pas pu être acceptée</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Après étude de votre demande, nous sommes dans l'impossibilité de traiter votre commande.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+{% if order.decisionReason %}
+<div class="info-block">
+    <strong>Motif :</strong><br>
+    {{ order.decisionReason }}
+</div>
+{% endif %}
+
+<p>Si vous pensez qu'il s'agit d'une erreur ou si vous souhaitez des précisions, n'hésitez pas à nous recontacter.</p>
+
+<p>Cordialement,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

@@ -8,6 +8,7 @@ use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Form\CheckoutOrderType;
 use App\Repository\OrderRepository;
+use App\Repository\ProductRepository;
 use App\Service\CartService;
 use App\Service\OrderMailer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,6 +25,7 @@ final class CheckoutController extends AbstractController
         Request $request,
         CartService $cartService,
         OrderRepository $orderRepository,
+        ProductRepository $productRepository,
         EntityManagerInterface $entityManager,
         OrderMailer $orderMailer,
     ): Response {
@@ -32,6 +34,13 @@ final class CheckoutController extends AbstractController
             $this->addFlash('warning', 'Votre panier est vide.');
 
             return $this->redirectToRoute('app_cart_index');
+        }
+
+        $productIds = array_filter(array_map(static fn (array $l) => (int) ($l['productId'] ?? 0), $lines));
+        $products = $productRepository->findBy(['id' => $productIds]);
+        $priceMap = [];
+        foreach ($products as $product) {
+            $priceMap[(int) $product->getId()] = $product->getPrice();
         }
 
         $order = new Order();
@@ -44,9 +53,12 @@ final class CheckoutController extends AbstractController
 
             $total = 0;
             foreach ($lines as $line) {
+                $productId = (int) ($line['productId'] ?? 0);
+                $unitPrice = $priceMap[$productId] ?? (int) ($line['unitPrice'] ?? 0);
+
                 $item = (new OrderItem())
                     ->setProductName((string) ($line['productName'] ?? 'Produit'))
-                    ->setUnitPrice((int) ($line['unitPrice'] ?? 0))
+                    ->setUnitPrice($unitPrice)
                     ->setQuantity((int) ($line['quantity'] ?? 1))
                     ->setCustomizationText($line['customizationText'] ?? null)
                     ->setCustomizationFilePath($line['customizationFilePath'] ?? null);
@@ -67,10 +79,17 @@ final class CheckoutController extends AbstractController
             return $this->redirectToRoute('app_checkout_confirmation', ['reference' => $order->getReference()]);
         }
 
+        $totalCents = 0;
+        foreach ($lines as $line) {
+            $productId = (int) ($line['productId'] ?? 0);
+            $unitPrice = $priceMap[$productId] ?? (int) ($line['unitPrice'] ?? 0);
+            $totalCents += $unitPrice * (int) ($line['quantity'] ?? 1);
+        }
+
         return $this->render('checkout/form.html.twig', [
             'form' => $form,
             'lines' => $lines,
-            'totalCents' => $cartService->getTotalCents(),
+            'totalCents' => $totalCents,
         ]);
     }
 
