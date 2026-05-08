@@ -1,6 +1,6 @@
 # KDOS-GRAPHIE
 
-Etat du projet au 4 mai 2026.
+Etat du projet au 8 mai 2026.
 
 ## Processus de commande personnalisee (cible metier)
 
@@ -89,29 +89,33 @@ Ce chapitre formalise le parcours commande souhaite pour les produits personnali
 - Authentification admin (login/logout) avec protection des routes /admin.
 - CRUD admin complet:
   - Produits (liste, filtre, pagination, create/edit/show/delete, upload image)
-  - Categories (liste, filtre, pagination, create/edit/show/delete)
+  - Categories (liste, filtre, pagination, create/edit/show/delete, reordonnancement drag-and-drop)
   - Commandes (liste, filtre, pagination, create/edit/show/delete, edition des lignes)
+- Dashboard admin avec cartes de synthese par statut (compteurs, CA total, liens filtres).
+- Cycle de vie commande complet : transitions metier via OrderLifecycleService (accepter, marquer paye, terminer, refuser avec motif, annuler, relancer paiement, demander infos).
+- Actions admin contextuelles : resolver de disponibilite par statut, badge statut reutilisable.
+- Purge admin : suppression en masse des commandes terminees/refusees/annulees de plus de 30 jours, avec archivage obligatoire avant suppression.
+- Parametres admin : coordonnees contact editables, changement email/mot de passe admin avec verification.
+- Emails metier : reception commande, confirmation paiement, relance paiement (avec lien), refus (avec motif), annulation, livraison (avec transporteur/suivi), notification admin paiement, demande d'informations complementaires.
+- Notification admin asynchrone apres paiement via Symfony Messenger (transport Doctrine).
+- Formulaire contact public + anti-spam reCAPTCHA v3.
+- Flux mot de passe oublie admin (symfonycasts/reset-password-bundle).
 - Catalogue public:
   - Liste des produits visibles avec filtre categorie/recherche + pagination
   - Detail produit visible
 - Services techniques:
   - generation de slug unique (produit/categorie)
   - stockage image produit
+  - archivage commande avant suppression
+- Tests : 95 tests (unitaires + fonctionnels), 437 assertions.
 
 ## Comparaison avec l'ancien projet similaire
 
-Par rapport aux features documentees dans l'ancien projet, il manque encore des briques importantes:
+Briques restantes avant parité complète :
 
 - Paiement Stripe complet (PaymentIntent + parcours de paiement client)
 - Webhook Stripe securise (signature, mapping des evenements)
-- Workflow metier de cycle de vie commande (pending -> awaiting_payment -> paid -> done/rejected)
-- Envoi d'emails metier (lien de paiement, refus, cloture, notifications admin)
-- Notification admin asynchrone apres paiement (Messenger message + handler)
-- Formulaire contact serveur + anti-spam (reCAPTCHA)
-- Mot de passe oublie admin (token, expiration, invalidation)
-- Ecran de parametres admin (email master admin / regeneration mot de passe)
 - Panier session avance (controle stock, recapitulatif fiable, coherence avec paiement)
-- Tests metier (services, workflows, webhooks, fonctionnalites critiques)
 
 ## TODO backlog
 
@@ -134,29 +138,29 @@ Par rapport aux features documentees dans l'ancien projet, il manque encore des 
 
 ### Admin UX (inspire du projet similaire)
 
-- [ ] Dashboard admin : cartes de synthese par statut de commande (compteurs, liens filtres, total CA).
-- [ ] Composant `_status_badge.html.twig` reutilisable avec couleurs semantiques par statut.
-- [ ] Service `OrderAdminActionAvailabilityResolver` : centralise les actions disponibles par statut (canAccept, canReject, canCancel, canComplete, canSendPaymentLink).
-- [ ] Action admin "Demander des informations complementaires" — email automatique au client depuis la fiche commande.
-- [ ] Action admin "Renvoyer le lien de paiement" — disponible en statut en_attente_paiement.
-- [ ] Action admin "Purge" — suppression en masse des commandes terminees/refusees/annulees (avec archivage obligatoire).
-- [ ] Parametres admin : coordonnees contact editables (telephone, email, adresse, reseaux sociaux).
-- [ ] Parametres admin : changement identifiants master admin (email + mot de passe).
-- [ ] Parametres admin : reordonnancement des categories par drag-and-drop.
+- [x] Dashboard admin : cartes de synthese par statut de commande (compteurs, liens filtres, total CA).
+- [x] Composant `_status_badge.html.twig` reutilisable avec couleurs semantiques par statut.
+- [x] Service `OrderAdminActionAvailabilityResolver` : centralise les actions disponibles par statut (canAccept, canReject, canCancel, canComplete, canMarkPaid, canRemindPayment, canRequestInfo).
+- [x] Action admin "Demander des informations complementaires" — email automatique au client depuis la fiche commande.
+- [x] Action admin "Renvoyer le lien de paiement" — disponible en statut en_attente_paiement.
+- [x] Action admin "Purge" — suppression en masse des commandes terminees/refusees/annulees de plus de 30 jours (avec archivage obligatoire).
+- [x] Parametres admin : coordonnees contact editables (telephone, email, adresse, reseaux sociaux).
+- [x] Parametres admin : changement identifiants master admin (email + mot de passe).
+- [x] Parametres admin : reordonnancement des categories par drag-and-drop.
 
 ### Cycle de vie commande
 
-- [ ] Adapter OrderLifecycleService au processus metier cible complet (confirmation, paiement Stripe, passage a faire, cloture, refus/annulation).
-- [ ] Completer les templates email (refus, remboursement, livraison avec numero de suivi).
-- [ ] Ajouter message/handler Messenger pour notification admin post-paiement.
+- [x] Adapter OrderLifecycleService au processus metier cible complet (confirmation, paiement, passage a faire, cloture, refus/annulation).
+- [x] Completer les templates email (refus, annulation, livraison, relance paiement, notification admin, demande d'infos).
+- [x] Ajouter message/handler Messenger pour notification admin post-paiement.
 
 ### Panier
 
-- [ ] Implémenter le panier session complet (ajout/retrait, quantites, recalculs, controle stock).
+- [x] Implémenter le panier session complet (ajout/retrait, quantites, recalculs) — controle stock non applicable (produits personnalises a la commande, pas de stock fini).
 
 ### Tests
 
-- [ ] Ajouter tests unitaires/integration sur services metier (lifecycle, mailer, messenger, webhook).
+- [x] Ajouter tests unitaires/integration sur services metier (OrderLifecycleService, OrderAdminActionAvailabilityResolver, purge, parametres, reordonnancement categories).
 
 ### Stripe (en dernier)
 
@@ -180,8 +184,8 @@ DATABASE_URL="mysql://user:password@host:3306/kdos_graphie?serverVersion=8.0.36&
 
 # Mailer
 MAILER_DSN=smtp://user:password@host:587
-MAILER_FROM_ADDRESS=noreply@kdos-graphie.fr
-CONTACT_RECIPIENT_ADDRESS=contact@kdos-graphie.fr
+MAIL_FROM=noreply@kdos-graphie.fr
+MAIL_ADMIN=contact@kdos-graphie.fr
 
 # Stripe
 STRIPE_SECRET_KEY=sk_live_...
