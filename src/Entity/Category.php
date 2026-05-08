@@ -30,6 +30,9 @@ class Category
     private bool $isVisible = true;
 
     #[ORM\Column]
+    private int $sortOrder = 0;
+
+    #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
     public function __construct()
@@ -86,6 +89,18 @@ class Category
     public function setIsVisible(bool $isVisible): static
     {
         $this->isVisible = $isVisible;
+
+        return $this;
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
+    }
+
+    public function setSortOrder(int $sortOrder): static
+    {
+        $this->sortOrder = $sortOrder;
 
         return $this;
     }

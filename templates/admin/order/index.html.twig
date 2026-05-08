@@ -4,6 +4,13 @@
 {% block page_title %}Commandes{% endblock %}
 
 {% block header_actions %}
+    <form method="post" action="{{ path('app_admin_order_purge') }}"
+          onsubmit="return confirm('Archiver et supprimer définitivement toutes les commandes terminées, refusées et annulées de plus de 30 jours ?')">
+        <input type="hidden" name="_token" value="{{ csrf_token('order_purge') }}">
+        <button type="submit" class="text-sm text-neutral-500 border border-neutral-200 px-3 py-2 rounded-lg hover:bg-neutral-50">
+            Purger (&gt; 30 j.)
+        </button>
+    </form>
     <a href="{{ path('app_admin_order_new') }}" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Nouvelle commande</a>
 {% endblock %}
 
@@ -39,7 +46,7 @@
                     onclick="window.location='{{ path('app_admin_order_edit', {id: order.id}) }}'">
                     <td class="px-4 py-3 font-medium text-neutral-900">{{ order.reference }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ order.customerFullName }}<br><span class="text-xs">{{ order.customerEmail }}</span></td>
-                    <td class="px-4 py-3">{{ include('admin/order/_status_badge.html.twig', {status: order.status, label: statusLabels[order.status] ?? order.status}) }}</td>
+                    <td class="px-4 py-3">{{ include('admin/partials/_status_badge.html.twig', {status: order.status, label: statusLabels[order.status] ?? order.status}) }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ order.formattedTotal }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ order.createdAt|date('d/m/Y H:i') }}</td>
                     <td class="px-4 py-3">

@@ -1,0 +1,24 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Informations requises — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Nous avons besoin de précisions</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Concernant votre commande, notre atelier a besoin d'informations complémentaires avant de pouvoir la traiter.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+<div class="info-block">
+    {{ message|nl2br }}
+</div>
+
+<p>Vous pouvez nous répondre directement à cet email ou nous contacter par téléphone.</p>
+
+<p>Merci pour votre compréhension,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

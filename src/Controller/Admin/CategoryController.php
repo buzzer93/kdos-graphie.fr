@@ -8,6 +8,7 @@ use App\Repository\CategoryRepository;
 use App\Service\SlugGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,14 +30,16 @@ class CategoryController extends AbstractController
         );
 
         return $this->render('admin/category/index.html.twig', [
-            'categories' => $pagination['items'],
-            'page' => $page,
-            'pages' => $pagination['pages'],
-            'total' => $pagination['total'],
-            'filters' => [
-                'q' => $search,
+            'categories'    => $pagination['items'],
+            'page'          => $page,
+            'pages'         => $pagination['pages'],
+            'total'         => $pagination['total'],
+            'filters'       => [
+                'q'       => $search,
                 'visible' => $request->query->get('visible', ''),
             ],
+            'allCategories' => $categoryRepository->findAllOrderedBySortOrder(),
+            'reorderUrl'    => $this->generateUrl('app_admin_category_reorder'),
         ]);
     }
 
@@ -63,6 +66,30 @@ class CategoryController extends AbstractController
         return $this->render('admin/category/new.html.twig', [
             'form' => $form,
         ]);
+    }
+
+    #[Route('/reorder', name: 'reorder', methods: ['POST'])]
+    public function reorder(Request $request, CategoryRepository $categoryRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        if (!$this->isCsrfTokenValid('category_reorder', (string) $request->headers->get('X-CSRF-Token'))) {
+            return new JsonResponse(['error' => 'Token invalide'], Response::HTTP_FORBIDDEN);
+        }
+
+        /** @var array<int, int> $ids */
+        $ids = json_decode((string) $request->getContent(), true)['ids'] ?? [];
+
+        if (!is_array($ids)) {
+            return new JsonResponse(['error' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
+        }
+
+        foreach ($ids as $position => $id) {
+            $category = $categoryRepository->find((int) $id);
+            $category?->setSortOrder($position);
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse(['ok' => true]);
     }
 
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]

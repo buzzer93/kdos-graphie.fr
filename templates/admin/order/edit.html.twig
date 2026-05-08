@@ -3,36 +3,129 @@
 {% block title %}Modifier commande — Admin{% endblock %}
 {% block page_title %}Modifier {{ order.reference }}{% endblock %}
 
+{% block header_actions %}
+    <a href="{{ path('app_admin_order_index') }}" class="text-sm text-neutral-600 hover:text-neutral-900">← Retour aux commandes</a>
+{% endblock %}
+
 {% block admin_content %}
 <div class="space-y-4 max-w-5xl">
+
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="rounded-lg border px-4 py-3 text-sm {{ type == 'danger' ? 'border-red-200 bg-red-50 text-red-700' : (type == 'warning' ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700') }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {# ── Bloc actions de statut ── #}
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        <h2 class="text-sm font-semibold text-neutral-900 mb-3">Actions</h2>
+        <div class="flex flex-wrap items-start gap-3">
+
+            {% if actions.canAccept %}
+                <form method="post" action="{{ path('app_admin_order_accept', {id: order.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_accept_' ~ order.id) }}">
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700">
+                        ✓ Confirmer la commande
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if actions.canMarkPaid %}
+                <form method="post" action="{{ path('app_admin_order_mark_paid', {id: order.id}) }}"
+                      onsubmit="return confirm('Confirmer le paiement manuellement ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_mark_paid_' ~ order.id) }}">
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-emerald-700 text-white text-sm font-medium hover:bg-emerald-800">
+                        € Confirmer le paiement
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if actions.canRemindPayment %}
+                <form method="post" action="{{ path('app_admin_order_remind_payment', {id: order.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_remind_payment_' ~ order.id) }}">
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">
+                        ↩ Renvoyer le lien de paiement
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if actions.canComplete %}
+                <form method="post" action="{{ path('app_admin_order_complete', {id: order.id}) }}"
+                      onsubmit="return confirm('Marquer cette commande comme terminée ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_complete_' ~ order.id) }}">
+                    <button type="submit" class="px-3 py-2 rounded-lg bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-700">
+                        ✓ Marquer terminée
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if actions.canReject %}
+                <details class="relative">
+                    <summary class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-medium cursor-pointer hover:bg-red-700 list-none">
+                        ✕ Refuser
+                    </summary>
+                    <div class="absolute z-10 mt-1 w-72 bg-white border border-neutral-200 rounded-xl shadow-lg p-4 space-y-3">
+                        <form method="post" action="{{ path('app_admin_order_reject', {id: order.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('order_action_reject_' ~ order.id) }}">
+                            <label class="block text-xs font-medium text-neutral-700 mb-1">Motif (obligatoire)</label>
+                            <textarea name="reason" rows="3" required
+                                class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm"
+                                placeholder="Ex: Fichier illisible, délai non respecté…"></textarea>
+                            <button type="submit" class="mt-2 w-full px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700">
+                                Confirmer le refus
+                            </button>
+                        </form>
+                    </div>
+                </details>
+            {% endif %}
+
+            {% if actions.canCancel %}
+                <details class="relative">
+                    <summary class="px-3 py-2 rounded-lg bg-rose-100 text-rose-700 text-sm font-medium cursor-pointer hover:bg-rose-200 list-none">
+                        ✕ Annuler
+                    </summary>
+                    <div class="absolute z-10 mt-1 w-72 bg-white border border-neutral-200 rounded-xl shadow-lg p-4 space-y-3">
+                        <form method="post" action="{{ path('app_admin_order_cancel', {id: order.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('order_action_cancel_' ~ order.id) }}">
+                            <label class="block text-xs font-medium text-neutral-700 mb-1">Motif (obligatoire)</label>
+                            <textarea name="reason" rows="3" required
+                                class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm"
+                                placeholder="Ex: Demande du client, stock épuisé…"></textarea>
+                            <button type="submit" class="mt-2 w-full px-3 py-2 rounded-lg bg-rose-600 text-white text-sm font-medium hover:bg-rose-700">
+                                Confirmer l'annulation
+                            </button>
+                        </form>
+                    </div>
+                </details>
+            {% endif %}
+
+            {% if actions.canRequestInfo %}
+                <details class="relative">
+                    <summary class="px-3 py-2 rounded-lg border border-neutral-300 text-neutral-700 text-sm font-medium cursor-pointer hover:bg-neutral-50 list-none">
+                        ✉ Demander des informations
+                    </summary>
+                    <div class="absolute z-10 mt-1 w-80 bg-white border border-neutral-200 rounded-xl shadow-lg p-4 right-0">
+                        <form method="post" action="{{ path('app_admin_order_request_info', {id: order.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('order_action_request_info_' ~ order.id) }}">
+                            <label class="block text-xs font-medium text-neutral-700 mb-1">Message au client</label>
+                            <textarea name="message" rows="4" required
+                                class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm"
+                                placeholder="Ex: Pourriez-vous nous envoyer un fichier en haute résolution ?"></textarea>
+                            <button type="submit" class="mt-2 w-full px-3 py-2 rounded-lg bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-700">
+                                Envoyer l'email
+                            </button>
+                        </form>
+                    </div>
+                </details>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {# ── Formulaire commande ── #}
     <div class="bg-white border border-neutral-200 rounded-xl p-6">
         {{ include('admin/order/_form.html.twig', {form: form, statusLabels: statusLabels}) }}
     </div>
 
-    <div class="bg-white border border-neutral-200 rounded-xl p-6">
-        <h2 class="text-sm font-semibold text-neutral-900 mb-3">Actions de statut</h2>
-        <div class="flex flex-wrap items-center gap-2">
-            {% if order.status == 'a_confirmer' %}
-                <form method="post" action="{{ path('app_admin_order_accept', {id: order.id}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_accept_' ~ order.id) }}">
-                    <button type="submit" class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700">Confirmer</button>
-                </form>
-            {% endif %}
-
-            {% if order.status == 'en_attente_paiement' %}
-                <form method="post" action="{{ path('app_admin_order_mark_paid', {id: order.id}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_mark_paid_' ~ order.id) }}">
-                    <button type="submit" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">Marquer payee</button>
-                </form>
-            {% endif %}
-
-            {% if order.status == 'a_faire' %}
-                <form method="post" action="{{ path('app_admin_order_complete', {id: order.id}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('order_action_complete_' ~ order.id) }}">
-                    <button type="submit" class="px-3 py-2 rounded-lg bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-700">Marquer terminee</button>
-                </form>
-            {% endif %}
-        </div>
-    </div>
 </div>
 {% endblock %}

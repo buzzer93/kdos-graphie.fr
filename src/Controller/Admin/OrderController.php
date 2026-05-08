@@ -5,8 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\Order;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
+use App\Service\OrderAdminActionAvailabilityResolver;
 use App\Service\OrderArchiveService;
 use App\Service\OrderLifecycleService;
+use App\Service\OrderMailer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -73,12 +75,13 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]
-    public function show(Order $order): Response
+    public function show(Order $order, OrderAdminActionAvailabilityResolver $resolver): Response
     {
         if ($this->isTerminalStatus($order->getStatus())) {
             return $this->render('admin/order/show.html.twig', [
                 'order' => $order,
                 'statusLabels' => Order::getStatusLabels(),
+                'actions' => $resolver->resolve($order),
             ]);
         }
 
@@ -86,7 +89,7 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
-    public function edit(Order $order, Request $request, EntityManagerInterface $entityManager, OrderRepository $orderRepository): Response
+    public function edit(Order $order, Request $request, EntityManagerInterface $entityManager, OrderRepository $orderRepository, OrderAdminActionAvailabilityResolver $resolver): Response
     {
         if ($this->isTerminalStatus($order->getStatus())) {
             return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
@@ -121,6 +124,7 @@ class OrderController extends AbstractController
             'form' => $form,
             'statusLabels' => Order::getStatusLabels(),
             'lockCommercialData' => $lockCommercialData,
+            'actions' => $resolver->resolve($order),
         ]);
     }
 
@@ -184,6 +188,62 @@ class OrderController extends AbstractController
     public function complete(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
     {
         return $this->handleAction($order, $request, 'complete', static fn () => $orderLifecycleService->complete($order));
+    }
+
+    #[Route('/purge', name: 'purge', methods: ['POST'])]
+    public function purge(Request $request, OrderRepository $orderRepository, OrderArchiveService $orderArchiveService): Response
+    {
+        if (!$this->isCsrfTokenValid('order_purge', (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Action invalide (token CSRF).');
+
+            return $this->redirectToRoute('app_admin_order_index');
+        }
+
+        $orders = $orderRepository->findPurgeable(30);
+
+        if (empty($orders)) {
+            $this->addFlash('warning', 'Aucune commande éligible à la purge (terminées/refusées/annulées de plus de 30 jours).');
+
+            return $this->redirectToRoute('app_admin_order_index');
+        }
+
+        $archivedBy = $this->getUser()?->getUserIdentifier();
+        $count = 0;
+
+        foreach ($orders as $order) {
+            $orderArchiveService->archiveAndDelete($order, $archivedBy, 'Purge automatique (> 30 jours)');
+            ++$count;
+        }
+
+        $this->addFlash('success', $count . ' commande(s) archivée(s) et supprimée(s).');
+
+        return $this->redirectToRoute('app_admin_order_index');
+    }
+
+    #[Route('/{id}/request-info', name: 'request_info', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function requestInfo(Order $order, Request $request, OrderMailer $orderMailer): Response
+    {
+        if (!$this->isCsrfTokenValid(
+            'order_action_request_info_' . $order->getId(),
+            (string) $request->request->get('_token')
+        )) {
+            $this->addFlash('danger', 'Action invalide (token CSRF).');
+
+            return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
+        }
+
+        $message = trim((string) $request->request->get('message', ''));
+
+        if ($message === '') {
+            $this->addFlash('warning', 'Le message ne peut pas être vide.');
+
+            return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
+        }
+
+        $orderMailer->sendRequestInfo($order, $message);
+        $this->addFlash('success', 'Email envoyé au client.');
+
+        return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
     }
 
     #[Route('/{id}/mark-refunded', name: 'mark_refunded', requirements: ['id' => '\\d+'], methods: ['POST'])]

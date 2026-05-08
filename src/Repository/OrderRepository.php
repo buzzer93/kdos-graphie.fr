@@ -79,6 +79,26 @@ class OrderRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 
+    /**
+     * Returns terminal orders older than $olderThanDays days eligible for purge.
+     *
+     * @return list<Order>
+     */
+    public function findPurgeable(int $olderThanDays = 30): array
+    {
+        $threshold = new \DateTimeImmutable('-' . $olderThanDays . ' days');
+
+        /** @var list<Order> */
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.status IN (:statuses)')
+            ->andWhere('o.createdAt <= :threshold')
+            ->setParameter('statuses', [Order::STATUS_ANNULE, Order::STATUS_REFUSE, Order::STATUS_TERMINE])
+            ->setParameter('threshold', $threshold)
+            ->orderBy('o.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getRevenueCentsExcludingRejected(): int
     {
         return (int) $this->createQueryBuilder('o')

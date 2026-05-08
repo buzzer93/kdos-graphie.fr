@@ -19,7 +19,7 @@
     <div class="bg-white border border-neutral-200 rounded-xl p-6 space-y-5">
         <div class="flex items-center gap-3">
             <h2 class="text-sm font-semibold text-neutral-900">Statut</h2>
-            {{ include('admin/order/_status_badge.html.twig', {status: order.status, label: statusLabels[order.status] ?? order.status}) }}
+            {{ include('admin/partials/_status_badge.html.twig', {status: order.status, label: statusLabels[order.status] ?? order.status}) }}
         </div>
 
         <div class="grid md:grid-cols-2 gap-4 text-sm">

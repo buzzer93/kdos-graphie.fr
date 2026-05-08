@@ -16,32 +16,59 @@ class DashboardController extends AbstractController
     #[Route('/', name: 'dashboard')]
     public function index(OrderRepository $orderRepository): Response
     {
-        $statuses = [
+        $activeStatuses = [
             [
-                'code' => Order::STATUS_A_CONFIRMER,
-                'label' => 'A confirmer',
+                'code'  => Order::STATUS_A_CONFIRMER,
+                'label' => 'À confirmer',
+                'color' => 'neutral',
             ],
             [
-                'code' => Order::STATUS_EN_ATTENTE_PAIEMENT,
+                'code'  => Order::STATUS_EN_ATTENTE_PAIEMENT,
                 'label' => 'En attente de paiement',
+                'color' => 'blue',
             ],
             [
-                'code' => Order::STATUS_A_FAIRE,
-                'label' => 'A faire',
+                'code'  => Order::STATUS_A_FAIRE,
+                'label' => 'À faire',
+                'color' => 'amber',
             ],
         ];
 
-        $columns = [];
-        foreach ($statuses as $status) {
-            $columns[] = [
-                'code' => $status['code'],
-                'label' => $status['label'],
-                'count' => $orderRepository->count(['status' => $status['code']]),
-            ];
-        }
+        $archivedStatuses = [
+            [
+                'code'  => Order::STATUS_TERMINE,
+                'label' => 'Terminées',
+                'color' => 'green',
+            ],
+            [
+                'code'  => Order::STATUS_REFUSE,
+                'label' => 'Refusées',
+                'color' => 'red',
+            ],
+            [
+                'code'  => Order::STATUS_ANNULE,
+                'label' => 'Annulées',
+                'color' => 'rose',
+            ],
+        ];
+
+        $buildCards = static function (array $statuses) use ($orderRepository): array {
+            return array_map(static function (array $s) use ($orderRepository): array {
+                return [
+                    'code'  => $s['code'],
+                    'label' => $s['label'],
+                    'color' => $s['color'],
+                    'count' => $orderRepository->count(['status' => $s['code']]),
+                ];
+            }, $statuses);
+        };
+
+        $revenueCents = $orderRepository->getRevenueCentsExcludingRejected();
 
         return $this->render('admin/dashboard.html.twig', [
-            'columns' => $columns,
+            'activeCards'   => $buildCards($activeStatuses),
+            'archivedCards' => $buildCards($archivedStatuses),
+            'revenueCents'  => $revenueCents,
         ]);
     }
 }

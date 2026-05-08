@@ -24,7 +24,8 @@ class CategoryRepository extends ServiceEntityRepository
         $page = max(1, $page);
 
         $qb = $this->createQueryBuilder('c')
-            ->orderBy('c.createdAt', 'DESC');
+            ->orderBy('c.sortOrder', 'ASC')
+            ->addOrderBy('c.id', 'ASC');
 
         if ($search !== null && $search !== '') {
             $qb
@@ -58,6 +59,16 @@ class CategoryRepository extends ServiceEntityRepository
             'total' => $total,
             'pages' => $pages,
         ];
+    }
+
+    /** @return list<Category> */
+    public function findAllOrderedBySortOrder(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.sortOrder', 'ASC')
+            ->addOrderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /** @return list<Category> */

@@ -92,6 +92,19 @@ final class OrderMailer
         );
     }
 
+    public function sendRequestInfo(Order $order, string $message): void
+    {
+        $this->send(
+            (new TemplatedEmail())
+                ->from($this->fromAddress)
+                ->to($order->getCustomerEmail())
+                ->replyTo($this->adminAddress)
+                ->subject('Informations complémentaires requises : ' . $order->getReference())
+                ->htmlTemplate('emails/order_request_info.html.twig')
+                ->context(['order' => $order, 'message' => $message])
+        );
+    }
+
     public function sendAdminOrderPaidNotification(Order $order): void
     {
         $this->send(

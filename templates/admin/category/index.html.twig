@@ -27,7 +27,7 @@
                     <th class="text-left px-4 py-3">Nom</th>
                     <th class="text-left px-4 py-3">Slug</th>
                     <th class="text-left px-4 py-3">Visible</th>
-                    <th class="text-left px-4 py-3">Créée</th>
+                    <th class="text-left px-4 py-3">Ordre</th>
                     <th class="text-right px-4 py-3">Actions</th>
                 </tr>
             </thead>
@@ -38,7 +38,7 @@
                     <td class="px-4 py-3 font-medium text-neutral-900">{{ category.name }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ category.slug }}</td>
                     <td class="px-4 py-3">{{ category.isVisible ? 'Oui' : 'Non' }}</td>
-                    <td class="px-4 py-3 text-neutral-600">{{ category.createdAt|date('d/m/Y') }}</td>
+                    <td class="px-4 py-3 text-neutral-400 text-xs">{{ category.sortOrder }}</td>
                     <td class="px-4 py-3">
                         <div class="flex justify-end items-center gap-3" onclick="event.stopPropagation();">
                             <form method="post" action="{{ path('app_admin_category_delete', {id: category.id}) }}" onsubmit="return confirm('Supprimer cette catégorie ?');">
@@ -65,5 +65,45 @@
             {% endfor %}
         </nav>
     {% endif %}
+
+    {# ── Réordonnancement drag-and-drop ── #}
+    {% if allCategories is not empty %}
+    <div class="bg-white border border-neutral-200 rounded-xl p-6"
+         data-controller="category-reorder"
+         data-category-reorder-url-value="{{ reorderUrl }}"
+         data-category-reorder-csrf-token-value="{{ csrf_token('category_reorder') }}">
+
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-sm font-semibold text-neutral-900">Ordre d'affichage</h2>
+                <p class="text-xs text-neutral-500 mt-0.5">Glissez-déposez pour réordonner. L'ordre s'applique au catalogue public.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span data-category-reorder-target="status" class="text-xs"></span>
+                <button type="button"
+                        data-category-reorder-target="save"
+                        data-action="category-reorder#save"
+                        class="px-3 py-2 rounded-lg bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-700 disabled:opacity-50">
+                    Sauvegarder l'ordre
+                </button>
+            </div>
+        </div>
+
+        <ul class="divide-y divide-neutral-100 border border-neutral-200 rounded-lg overflow-hidden">
+            {% for category in allCategories %}
+                <li class="flex items-center gap-3 px-4 py-3 bg-white hover:bg-neutral-50 cursor-grab select-none"
+                    data-category-reorder-target="item"
+                    data-category-id="{{ category.id }}">
+                    <span class="text-neutral-300 text-lg leading-none">⠿</span>
+                    <span class="text-sm font-medium text-neutral-900 flex-1">{{ category.name }}</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full {{ category.isVisible ? 'bg-green-100 text-green-700' : 'bg-neutral-100 text-neutral-500' }}">
+                        {{ category.isVisible ? 'Visible' : 'Masqué' }}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
