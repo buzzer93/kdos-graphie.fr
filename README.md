@@ -118,6 +118,9 @@ Briques restantes avant parité complète :
 - Panier session avance (controle stock, recapitulatif fiable, coherence avec paiement)
 
 ## TODO 
+- nav cassé quand on est sur catalogue et panier
+- proposer des continuer les achat plutot que de basculer sur le panier quand on ajoute un article au pannier 
+- petite vignette du montant d'article sur le nav item panier 
 
 ### Stripe (en dernier)
 
