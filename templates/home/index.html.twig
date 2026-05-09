@@ -13,10 +13,10 @@
             </a>
             <ul class="hidden md:flex items-center gap-8 text-neutral-700 text-sm font-medium">
                 <li><a href="#services" class="hover:text-amber-600 transition">Services</a></li>
-                <li><a href="#produits" class="hover:text-amber-600 transition">Produits</a></li>
-                <li><a href="#contact" class="hover:text-amber-600 transition">Contact</a></li>
+                <li><a href="{{ path('app_catalog_index') }}" class="hover:text-amber-600 transition">Produits</a></li>
+                <li><a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a></li>
             </ul>
-            <a href="#contact" class="hidden md:inline-block bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition shadow-lg shadow-amber-500/30">
+            <a href="{{ path('app_contact') }}" class="hidden md:inline-block bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition shadow-lg shadow-amber-500/30">
                 Demander un devis
             </a>
         </nav>
@@ -52,7 +52,7 @@
                 </p>
 
                 <div class="mt-10 flex flex-wrap gap-4 justify-center md:justify-start">
-                    <a href="#produits" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-7 py-3.5 rounded-full transition shadow-xl shadow-amber-500/30">
+                    <a href="{{ path('app_catalog_index') }}" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-7 py-3.5 rounded-full transition shadow-xl shadow-amber-500/30">
                         Découvrir nos créations
                     </a>
                     <a href="#services" class="border border-neutral-300 text-neutral-800 hover:border-amber-500 hover:text-amber-600 font-semibold px-7 py-3.5 rounded-full transition bg-white/70">
@@ -212,7 +212,11 @@
                 <span class="font-display text-neutral-900">Kdos Graphie</span>
             </div>
             <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser. Tous droits réservés.</p>
-            <a href="{{ path('app_login') }}" class="hover:text-amber-600 transition">Espace admin</a>
+            <nav class="flex items-center gap-5">
+                <a href="{{ path('app_catalog_index') }}" class="hover:text-amber-600 transition">Catalogue</a>
+                <a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a>
+                <a href="{{ path('app_login') }}" class="hover:text-amber-600 transition">Espace admin</a>
+            </nav>
         </div>
     </footer>
 </div>

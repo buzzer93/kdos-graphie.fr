@@ -12,9 +12,10 @@
                 <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-10 w-auto">
                 <span class="font-display text-xl text-neutral-900">Kdos Graphie</span>
             </a>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-5">
+                <a href="{{ path('app_contact') }}" class="text-sm text-neutral-600 hover:text-amber-700 transition">Contact</a>
                 <a href="{{ path('app_cart_index') }}" class="text-sm text-neutral-600 hover:text-amber-700 transition">Panier</a>
-                <a href="{{ path('app_login') }}" class="text-sm text-neutral-600 hover:text-amber-700 transition">Espace admin</a>
+                <a href="{{ path('app_login') }}" class="text-sm text-neutral-600 hover:text-amber-700 transition">Admin</a>
             </div>
         </div>
     </header>

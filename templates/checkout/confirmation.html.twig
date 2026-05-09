@@ -8,8 +8,9 @@
         <h1 class="font-display text-4xl text-neutral-900">Merci pour votre demande</h1>
         <p class="text-neutral-700">Votre commande <strong>{{ reference }}</strong> a bien ete enregistree avec le statut <strong>a_confirmer</strong>.</p>
         <p class="text-neutral-600">L'atelier peut vous recontacter par email ou telephone pour valider certains details.</p>
-        <div class="pt-2">
-            <a href="{{ path('app_catalog_index') }}" class="inline-flex bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Retour au catalogue</a>
+        <div class="pt-2 flex flex-wrap gap-3 justify-center">
+            <a href="{{ path('app_catalog_index') }}" class="inline-flex bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-amber-600 transition">Retour au catalogue</a>
+            <a href="{{ path('app_contact') }}" class="inline-flex border border-neutral-300 text-neutral-700 text-sm font-semibold px-4 py-2.5 rounded-lg hover:border-amber-500 hover:text-amber-600 transition">Nous contacter</a>
         </div>
     </div>
 </div>

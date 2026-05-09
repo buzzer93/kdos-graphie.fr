@@ -4,6 +4,17 @@
 
 {% block body %}
 <div class="min-h-screen bg-neutral-50 text-neutral-800">
+    <header class="bg-white border-b border-neutral-200">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-6">
+                <a href="{{ path('app_home') }}" class="flex items-center gap-2">
+                    <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-8 w-auto">
+                </a>
+                <a href="{{ path('app_cart_index') }}" class="text-sm text-neutral-600 hover:text-neutral-900 transition">← Panier</a>
+            </div>
+            <span class="text-sm text-neutral-500">Finalisation de la commande</span>
+        </div>
+    </header>
     <main class="max-w-7xl mx-auto px-6 py-10 grid lg:grid-cols-2 gap-8">
         <section class="bg-white border border-neutral-200 rounded-xl p-6 space-y-4">
             <h1 class="font-display text-3xl text-neutral-900">Finaliser la commande</h1>

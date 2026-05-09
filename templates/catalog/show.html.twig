@@ -8,10 +8,18 @@
     {# ===== HEADER ===== #}
     <header class="bg-white border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-            <a href="{{ path('app_catalog_index') }}" class="text-sm text-neutral-600 hover:text-neutral-900 transition flex items-center gap-1">
-                ← Retour au catalogue
-            </a>
-            <a href="{{ path('app_cart_index') }}" class="text-sm font-semibold text-neutral-700 hover:text-amber-700 transition">Voir le panier</a>
+            <div class="flex items-center gap-6">
+                <a href="{{ path('app_home') }}" class="flex items-center gap-2">
+                    <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-8 w-auto">
+                </a>
+                <a href="{{ path('app_catalog_index') }}" class="text-sm text-neutral-600 hover:text-neutral-900 transition">
+                    ← Catalogue
+                </a>
+            </div>
+            <div class="flex items-center gap-5">
+                <a href="{{ path('app_contact') }}" class="text-sm text-neutral-600 hover:text-amber-700 transition">Contact</a>
+                <a href="{{ path('app_cart_index') }}" class="text-sm font-semibold text-neutral-700 hover:text-amber-700 transition">Panier</a>
+            </div>
         </div>
     </header>
 
