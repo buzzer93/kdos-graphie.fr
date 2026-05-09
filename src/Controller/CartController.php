@@ -75,9 +75,9 @@ final class CartController extends AbstractController
         }
 
         $cartService->addLine($product, $quantity, $customizationText, $storedFilename);
-        $this->addFlash('success', 'Produit ajoute au panier.');
+        $this->addFlash('cart_added', $product->getName());
 
-        return $this->redirectToRoute('app_cart_index');
+        return $this->redirectToRoute('app_catalog_show', ['slug' => $product->getSlug()]);
     }
 
     #[Route('/ligne/{lineId}/quantite', name: 'update_quantity', methods: ['POST'])]

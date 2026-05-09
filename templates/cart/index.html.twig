@@ -4,17 +4,7 @@
 
 {% block body %}
 <div class="min-h-screen bg-neutral-50 text-neutral-800">
-    <header class="bg-white border-b border-neutral-200">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-6">
-                <a href="{{ path('app_home') }}" class="flex items-center gap-2">
-                    <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-8 w-auto">
-                </a>
-                <a href="{{ path('app_catalog_index') }}" class="text-sm text-neutral-600 hover:text-neutral-900 transition">← Catalogue</a>
-            </div>
-            <a href="{{ path('app_checkout_form') }}" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-amber-600 transition">Passer commande</a>
-        </div>
-    </header>
+    {{ include('partials/_header_public.html.twig', {back_route: 'app_catalog_index', back_label: '← Catalogue'}) }}
 
     <main class="max-w-7xl mx-auto px-6 py-10 space-y-6">
         {% for type, messages in app.flashes %}

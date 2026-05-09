@@ -159,7 +159,7 @@
                             <a href="{{ path('app_catalog_show', {slug: product.slug}) }}" class="block">
                                 <div class="relative h-72 overflow-hidden bg-neutral-100">
                                     {% if product.coverImage %}
-                                        <img src="{{ asset('media/products/' ~ product.coverImage) }}" alt="{{ product.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                                        <img src="{{ asset('assets/media/products/' ~ product.coverImage) }}" alt="{{ product.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                                     {% else %}
                                         <div class="w-full h-full flex items-center justify-center">
                                             <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-20 w-auto opacity-20">

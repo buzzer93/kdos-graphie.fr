@@ -11,12 +11,7 @@
 {% block body %}
 <div class="min-h-screen bg-white text-neutral-800">
 
-    {# ===== HEADER ===== #}
-    <header class="bg-white border-b border-neutral-200">
-        <div class="max-w-7xl mx-auto px-6 py-4">
-            <a href="{{ path('app_home') }}" class="text-sm text-neutral-600 hover:text-neutral-900 transition">← Retour à l'accueil</a>
-        </div>
-    </header>
+    {{ include('partials/_header_public.html.twig', {back_route: 'app_home', back_label: '← Accueil'}) }}
 
     {# ===== HERO ===== #}
     <div class="bg-neutral-50 border-b border-neutral-100 py-12 px-6">

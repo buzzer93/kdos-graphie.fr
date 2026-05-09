@@ -1,0 +1,63 @@
+{#
+  Header partagé pour toutes les pages publiques.
+
+  Variables optionnelles :
+  - back_route  : nom de route pour le lien "← Retour" (ex: 'app_catalog_index')
+  - back_label  : libellé du lien retour (ex: '← Catalogue')
+#}
+{% set count = cart_count() %}
+
+<header class="bg-white border-b border-neutral-200 sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+
+        {# === GAUCHE : logo + lien retour optionnel === #}
+        <div class="flex items-center gap-4 min-w-0">
+            <a href="{{ path('app_home') }}" class="flex items-center gap-2 shrink-0">
+                <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-9 w-auto">
+                <span class="font-display text-lg tracking-wide text-neutral-900 hidden lg:inline">Kdos Graphie</span>
+            </a>
+            {% if back_route is defined and back_route %}
+                <a href="{{ path(back_route) }}"
+                   class="hidden sm:inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition">
+                    {{ back_label|default('← Retour') }}
+                </a>
+            {% endif %}
+        </div>
+
+        {# === DROITE : nav + badge panier === #}
+        <nav class="flex items-center gap-1 sm:gap-3">
+
+            {# Liens masqués sur mobile #}
+            <a href="{{ path('app_catalog_index') }}"
+               class="hidden sm:inline-block px-3 py-1.5 text-sm text-neutral-600 hover:text-amber-700 transition rounded-lg hover:bg-neutral-50">
+                Catalogue
+            </a>
+            <a href="{{ path('app_contact') }}"
+               class="hidden sm:inline-block px-3 py-1.5 text-sm text-neutral-600 hover:text-amber-700 transition rounded-lg hover:bg-neutral-50">
+                Contact
+            </a>
+
+            {# Séparateur visible sur sm+ #}
+            <span class="hidden sm:block w-px h-5 bg-neutral-200 mx-1"></span>
+
+            {# Panier avec badge #}
+            <a href="{{ path('app_cart_index') }}"
+               class="relative flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:text-amber-700 transition rounded-lg hover:bg-neutral-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.962-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                </svg>
+                <span class="hidden sm:inline">Panier</span>
+                {% if count > 0 %}
+                    <span class="absolute -top-1 -right-1 sm:static sm:ml-0.5
+                                 min-w-[1.25rem] h-5 px-1 rounded-full
+                                 bg-amber-500 text-white text-xs font-bold
+                                 flex items-center justify-center leading-none">
+                        {{ count }}
+                    </span>
+                {% endif %}
+            </a>
+
+        </nav>
+    </div>
+</header>
