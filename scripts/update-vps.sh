@@ -6,16 +6,19 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 cd "$PROJECT_DIR"
 
-echo "[1/4] git pull --ff-only"
+echo "[1/5] git pull --ff-only"
 git pull --ff-only
 
-echo "[2/4] Build Tailwind"
+echo "[2/5] Doctrine migrations"
+php bin/console doctrine:migrations:migrate --no-interaction --env="$APP_ENV"
+
+echo "[3/5] Build Tailwind"
 php bin/console tailwind:build --minify
 
-echo "[3/4] Compile AssetMapper"
+echo "[4/5] Compile AssetMapper"
 php bin/console asset-map:compile
 
-echo "[4/4] Clear cache ($APP_ENV)"
+echo "[5/5] Clear cache ($APP_ENV)"
 php bin/console cache:clear --env="$APP_ENV"
 
 echo "Done. VPS update completed."
