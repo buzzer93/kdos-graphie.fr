@@ -11,9 +11,9 @@
     {# ===== FLASH MESSAGES ===== #}
     {% for type, messages in app.flashes %}
         {% for message in messages %}
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 js-auto-dismiss-flash">
                 {% if type == 'cart_added' %}
-                    <div class="flex items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm">
+                    <div class="flex items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm transition-opacity duration-300">
                         <div class="flex items-center gap-2 text-emerald-800">
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
@@ -21,7 +21,6 @@
                             <span><strong>{{ message }}</strong> ajouté au panier.</span>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
-                            <span class="text-emerald-600">Continuer les achats</span>
                             <a href="{{ path('app_cart_index') }}"
                                class="bg-neutral-900 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
                                 Voir le panier →
@@ -29,7 +28,7 @@
                         </div>
                     </div>
                 {% else %}
-                    <div class="rounded-lg border px-4 py-3 text-sm
+                    <div class="rounded-lg border px-4 py-3 text-sm transition-opacity duration-300
                         {{ type == 'danger' ? 'border-red-200 bg-red-50 text-red-700'
                         : (type == 'warning' ? 'border-amber-200 bg-amber-50 text-amber-700'
                         : 'border-emerald-200 bg-emerald-50 text-emerald-700') }}">
@@ -169,4 +168,20 @@
         </div>
     </footer>
 </div>
+
+<script>
+    (function () {
+        const flashes = document.querySelectorAll('.js-auto-dismiss-flash');
+        if (flashes.length === 0) {
+            return;
+        }
+
+        flashes.forEach((flashWrapper) => {
+            window.setTimeout(() => {
+                flashWrapper.classList.add('opacity-0');
+                window.setTimeout(() => flashWrapper.remove(), 300);
+            }, 5000);
+        });
+    })();
+</script>
 {% endblock %}
