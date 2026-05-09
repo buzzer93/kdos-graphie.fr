@@ -110,6 +110,8 @@ class AppFixtures extends Fixture
      */
     private function createProducts(ObjectManager $manager, array $categories): array
     {
+        $defaultCoverImage = 'gravure-laser-bois.jpg';
+
         $definitions = [
             // Bois gravé
             ['name' => 'Planche apéro signature',    'slug' => 'planche-apero-signature',    'price' => 3490, 'category' => 'bois', 'visible' => true,  'description' => 'Planche à découper en chêne massif gravée de votre prénom, d\'une date ou d\'un message. Format généreux, finition huile naturelle. Idéal pour un cadeau de mariage ou d\'anniversaire.'],
@@ -143,6 +145,7 @@ class AppFixtures extends Fixture
                 ->setDescription($definition['description'])
                 ->setPrice($definition['price'])
                 ->setIsVisible($definition['visible'])
+                ->setCoverImage($defaultCoverImage)
                 ->setCategory($categories[$definition['category']]);
 
             $manager->persist($product);
