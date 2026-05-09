@@ -10,58 +10,8 @@
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                overflow-x: hidden;
             }
             .font-display { font-family: 'Playfair Display', serif; }
-
-            body.page-leave-to-left {
-                animation: pageLeaveToLeft 180ms ease-out both;
-            }
-
-            body.page-leave-to-right {
-                animation: pageLeaveToRight 180ms ease-out both;
-            }
-
-            body.page-enter-from-left {
-                --page-enter-offset: -24px;
-            }
-
-            body.page-enter-from-right {
-                --page-enter-offset: 24px;
-            }
-
-            body.page-enter-active {
-                animation: pageEnter 280ms ease-out both;
-            }
-
-            @keyframes pageLeaveToLeft {
-                from { opacity: 1; transform: translateX(0); }
-                to { opacity: 0.9; transform: translateX(-24px); }
-            }
-
-            @keyframes pageLeaveToRight {
-                from { opacity: 1; transform: translateX(0); }
-                to { opacity: 0.9; transform: translateX(24px); }
-            }
-
-            @keyframes pageEnter {
-                from {
-                    opacity: 0;
-                    transform: translateX(var(--page-enter-offset, 24px));
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-                body.page-leave-to-left,
-                body.page-leave-to-right,
-                body.page-enter-active {
-                    animation: none;
-                }
-            }
         </style>
         {% block stylesheets %}
         {% endblock %}
