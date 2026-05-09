@@ -3,7 +3,7 @@
 {% block title %}Kdos Graphie — Gravure laser artisanale & cadeaux personnalisés{% endblock %}
 
 {% block body %}
-<div class="bg-white text-neutral-800">
+<div id="top" class="bg-white text-neutral-800">
     {{ include('partials/_header_public.html.twig') }}
 
     {# =================== HERO =================== #}
@@ -206,54 +206,6 @@
 </div>
 
 <script>
-    (function () {
-        const links = document.querySelectorAll('a.js-services-scroll[href="#services"]');
-        const section = document.getElementById('services');
-
-        if (links.length === 0 || !section) {
-            return;
-        }
-
-        const duration = 700;
-        const easeInOutCubic = (value) => {
-            return value < 0.5
-                ? 4 * value * value * value
-                : 1 - Math.pow(-2 * value + 2, 3) / 2;
-        };
-
-        links.forEach((link) => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-
-                const header = document.querySelector('[data-site-header]');
-                const headerHeight = header ? header.getBoundingClientRect().height : 0;
-                const startY = window.scrollY;
-                const targetY = Math.max(0, section.getBoundingClientRect().top + window.scrollY - headerHeight - 12);
-                const distance = targetY - startY;
-                let startTime = null;
-
-                const step = (timestamp) => {
-                    if (startTime === null) {
-                        startTime = timestamp;
-                    }
-
-                    const elapsed = timestamp - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const eased = easeInOutCubic(progress);
-
-                    window.scrollTo(0, startY + distance * eased);
-
-                    if (progress < 1) {
-                        window.requestAnimationFrame(step);
-                    }
-                };
-
-                window.requestAnimationFrame(step);
-                window.history.replaceState(null, '', '#services');
-            });
-        });
-    })();
-
     (function () {
         const carousel = document.getElementById('carousel');
         const prev = document.getElementById('prev-btn');
