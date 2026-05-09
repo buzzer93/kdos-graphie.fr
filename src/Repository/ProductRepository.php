@@ -142,6 +142,31 @@ class ProductRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return array<int, list<Product>>
+     */
+    public function findVisibleGroupedByCategory(): array
+    {
+        /** @var list<Product> $products */
+        $products = $this->createQueryBuilder('p')
+            ->leftJoin('p.category', 'c')
+            ->addSelect('c')
+            ->andWhere('p.isVisible = :isVisible')
+            ->setParameter('isVisible', true)
+            ->orderBy('c.name', 'ASC')
+            ->addOrderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $grouped = [];
+        foreach ($products as $product) {
+            $catId = $product->getCategory()?->getId() ?? 0;
+            $grouped[$catId][] = $product;
+        }
+
+        return $grouped;
+    }
+
     public function findVisibleBySlug(string $slug): ?Product
     {
         return $this->createQueryBuilder('p')

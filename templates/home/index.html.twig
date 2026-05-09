@@ -137,44 +137,52 @@
                     <p class="uppercase tracking-[0.25em] text-amber-600 text-xs font-semibold">Nos créations</p>
                     <h2 class="font-display text-4xl md:text-5xl font-bold mt-3 text-neutral-900">Produits phares</h2>
                 </div>
-                <div class="flex gap-3">
-                    <button id="prev-btn" aria-label="Précédent" class="w-12 h-12 rounded-full border border-neutral-300 text-neutral-700 hover:border-amber-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
-                        ←
-                    </button>
-                    <button id="next-btn" aria-label="Suivant" class="w-12 h-12 rounded-full border border-neutral-300 text-neutral-700 hover:border-amber-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
-                        →
-                    </button>
+                <div class="flex items-center gap-4">
+                    <div class="flex gap-3">
+                        <button id="prev-btn" aria-label="Précédent" class="w-12 h-12 rounded-full border border-neutral-300 text-neutral-700 hover:border-amber-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
+                            ←
+                        </button>
+                        <button id="next-btn" aria-label="Suivant" class="w-12 h-12 rounded-full border border-neutral-300 text-neutral-700 hover:border-amber-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center">
+                            →
+                        </button>
+                    </div>
+                    <a href="{{ path('app_catalog_index') }}" class="text-sm font-semibold text-amber-600 hover:text-amber-700 transition">
+                        Voir tout →
+                    </a>
                 </div>
             </div>
 
-            {% set produits = [
-                { nom: 'Planche à découper', prix: '39', cat: 'Bois', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80' },
-                { nom: 'Verre à whisky gravé', prix: '24', cat: 'Verre', img: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=800&q=80' },
-                { nom: 'Carnet en cuir', prix: '45', cat: 'Cuir', img: 'https://images.unsplash.com/photo-1531346680078-ca1720b51e69?auto=format&fit=crop&w=800&q=80' },
-                { nom: 'Porte-clés personnalisé', prix: '15', cat: 'Bois', img: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=800&q=80' },
-                { nom: 'Médaillon souvenir', prix: '29', cat: 'Métal', img: 'https://images.unsplash.com/photo-1518544801976-3e188ea4b8e4?auto=format&fit=crop&w=800&q=80' },
-                { nom: 'Plaque décorative', prix: '55', cat: 'Bois', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80' },
-                { nom: 'Bracelet gravé', prix: '35', cat: 'Cuir', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=800&q=80' },
-                { nom: 'Coffret vin personnalisé', prix: '69', cat: 'Bois', img: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80' }
-            ] %}
-
-            <div id="carousel" class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 -mx-6 px-6 [&::-webkit-scrollbar]:hidden" style="scrollbar-width:none;">
-                {% for p in produits %}
-                    <article class="snap-start flex-shrink-0 w-72 md:w-80 bg-white rounded-2xl overflow-hidden border border-neutral-200 group cursor-pointer hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1 hover:border-amber-400 transition">
-                        <div class="relative h-72 overflow-hidden">
-                            <img src="{{ p.img }}" alt="{{ p.nom }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                            <span class="absolute top-4 left-4 bg-white/90 backdrop-blur text-neutral-800 text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{{ p.cat }}</span>
-                        </div>
-                        <div class="p-6">
-                            <div class="flex items-center justify-between">
-                                <h3 class="font-display text-lg font-semibold text-neutral-900">{{ p.nom }}</h3>
-                                <p class="text-amber-600 font-bold">{{ p.prix }}€</p>
-                            </div>
-                            <p class="text-sm text-neutral-500 mt-2">Personnalisation incluse</p>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
+            {% if products is not empty %}
+                <div id="carousel" class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 -mx-6 px-6 [&::-webkit-scrollbar]:hidden" style="scrollbar-width:none;">
+                    {% for product in products %}
+                        <article class="snap-start flex-shrink-0 w-72 md:w-80 bg-white rounded-2xl overflow-hidden border border-neutral-200 group hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1 hover:border-amber-400 transition">
+                            <a href="{{ path('app_catalog_show', {slug: product.slug}) }}" class="block">
+                                <div class="relative h-72 overflow-hidden bg-neutral-100">
+                                    {% if product.coverImage %}
+                                        <img src="{{ asset('media/products/' ~ product.coverImage) }}" alt="{{ product.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                                    {% else %}
+                                        <div class="w-full h-full flex items-center justify-center">
+                                            <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-20 w-auto opacity-20">
+                                        </div>
+                                    {% endif %}
+                                    {% if product.category %}
+                                        <span class="absolute top-4 left-4 bg-white/90 backdrop-blur text-neutral-800 text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">{{ product.category.name }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <h3 class="font-display text-lg font-semibold text-neutral-900 truncate">{{ product.name }}</h3>
+                                        <p class="text-amber-600 font-bold whitespace-nowrap">{{ (product.price / 100)|number_format(2, ',', ' ') }} €</p>
+                                    </div>
+                                    <p class="text-sm text-neutral-500 mt-2">Personnalisation incluse</p>
+                                </div>
+                            </a>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-neutral-500 text-center py-12">Aucun produit disponible pour le moment.</p>
+            {% endif %}
         </div>
     </section>
 

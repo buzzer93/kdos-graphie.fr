@@ -1,59 +1,158 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ product.name }} — Catalogue{% endblock %}
+{% block title %}{{ product.name }} — Kdos Graphie{% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-neutral-50 text-neutral-800">
+<div class="min-h-screen bg-white text-neutral-800">
+
+    {# ===== HEADER ===== #}
     <header class="bg-white border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-            <a href="{{ path('app_catalog_index') }}" class="text-sm text-neutral-600 hover:text-neutral-900">← Retour au catalogue</a>
-            <a href="{{ path('app_cart_index') }}" class="text-sm font-semibold text-neutral-700 hover:text-amber-700">Voir le panier</a>
+            <a href="{{ path('app_catalog_index') }}" class="text-sm text-neutral-600 hover:text-neutral-900 transition flex items-center gap-1">
+                ← Retour au catalogue
+            </a>
+            <a href="{{ path('app_cart_index') }}" class="text-sm font-semibold text-neutral-700 hover:text-amber-700 transition">Voir le panier</a>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-6 py-10">
-        {% for type, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="mb-4 rounded-lg border px-4 py-3 text-sm {{ type == 'danger' ? 'border-red-200 bg-red-50 text-red-700' : (type == 'warning' ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700') }}">{{ message }}</div>
-            {% endfor %}
+    {# ===== FLASH MESSAGES ===== #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="max-w-7xl mx-auto px-6 pt-4">
+                <div class="rounded-lg border px-4 py-3 text-sm {{ type == 'danger' ? 'border-red-200 bg-red-50 text-red-700' : (type == 'warning' ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700') }}">
+                    {{ message }}
+                </div>
+            </div>
         {% endfor %}
+    {% endfor %}
 
-        <div class="bg-white border border-neutral-200 rounded-2xl overflow-hidden grid lg:grid-cols-2">
-            <div class="bg-neutral-100 min-h-[320px] flex items-center justify-center">
+    {# ===== HERO PRODUIT ===== #}
+    <main class="max-w-6xl mx-auto px-6 py-10">
+        <div class="grid lg:grid-cols-2 gap-10 items-start">
+
+            {# Image #}
+            <div class="bg-neutral-100 rounded-2xl overflow-hidden min-h-[380px] flex items-center justify-center">
                 {% if imagePublicPath %}
-                    <img src="{{ asset(imagePublicPath) }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                    <img
+                        src="{{ asset(imagePublicPath) }}"
+                        alt="{{ product.name }}"
+                        class="w-full h-full object-cover"
+                    >
                 {% else %}
-                    <span class="text-neutral-500">Aucune image</span>
+                    <div class="flex flex-col items-center gap-4 py-16 px-8 text-center">
+                        <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-20 w-auto opacity-20">
+                        <p class="text-sm text-neutral-400">Image à venir</p>
+                    </div>
                 {% endif %}
             </div>
-            <div class="p-8 space-y-4">
-                <p class="text-xs uppercase tracking-wider text-neutral-500">{{ product.category ? product.category.name : 'Sans catégorie' }}</p>
-                <h1 class="font-display text-4xl text-neutral-900">{{ product.name }}</h1>
-                <p class="text-amber-700 text-xl font-semibold">{{ (product.price / 100)|number_format(2, ',', ' ') }} €</p>
-                <p class="text-neutral-700 whitespace-pre-line">{{ product.description ?: 'Description à venir.' }}</p>
 
-                <form method="post" action="{{ path('app_cart_add', {id: product.id}) }}" enctype="multipart/form-data" class="pt-4 border-t border-neutral-200 space-y-3">
-                    <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
-                    <input type="hidden" name="product_slug" value="{{ product.slug }}">
+            {# Infos produit #}
+            <div class="space-y-6">
+                {% if product.category %}
+                    <p class="text-xs uppercase tracking-[0.2em] text-amber-600 font-semibold">{{ product.category.name }}</p>
+                {% endif %}
 
-                    <div>
-                        <label class="block text-sm font-medium text-neutral-700 mb-1">Quantite</label>
-                        <input type="number" name="quantity" min="1" value="1" class="w-28 px-3 py-2 border border-neutral-200 rounded-lg text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-neutral-700 mb-1">Texte personnalise</label>
-                        <textarea name="customization_text" rows="3" class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm" placeholder="Votre texte (optionnel)"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-neutral-700 mb-1">Fichier personnalisation</label>
-                        <input type="file" name="customization_file" accept=".png,.jpg,.jpeg,.webp,.pdf" class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
-                        <p class="mt-1 text-xs text-neutral-500">Formats autorises: png, jpg, jpeg, webp, pdf. Taille max: 15 Mo.</p>
-                    </div>
+                <h1 class="font-display text-4xl font-bold text-neutral-900 leading-tight">{{ product.name }}</h1>
 
-                    <button type="submit" class="bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700">Ajouter au panier</button>
-                </form>
+                <p class="text-3xl font-bold text-amber-600">
+                    {{ (product.price / 100)|number_format(2, ',', ' ') }} €
+                </p>
+
+                {% if product.description %}
+                    <p class="text-neutral-600 leading-relaxed whitespace-pre-line">{{ product.description }}</p>
+                {% endif %}
+
+                {# Séparateur #}
+                <div class="border-t border-neutral-200 pt-6 space-y-4">
+
+                    <form method="post" action="{{ path('app_cart_add', {id: product.id}) }}" enctype="multipart/form-data" class="space-y-5">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
+                        <input type="hidden" name="product_slug" value="{{ product.slug }}">
+
+                        <div>
+                            <label for="quantity" class="block text-sm font-medium text-neutral-700 mb-1.5">Quantité</label>
+                            <input
+                                id="quantity"
+                                type="number"
+                                name="quantity"
+                                min="1"
+                                value="1"
+                                class="w-28 px-3 py-2.5 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="customization_text" class="block text-sm font-medium text-neutral-700 mb-1.5">Texte à graver <span class="text-neutral-400 font-normal">(optionnel)</span></label>
+                            <textarea
+                                id="customization_text"
+                                name="customization_text"
+                                rows="3"
+                                class="w-full px-3 py-2.5 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                placeholder="Ex : Joyeux anniversaire Marie, le 12 juin 2025"
+                            ></textarea>
+                        </div>
+
+                        <div>
+                            <label for="customization_file" class="block text-sm font-medium text-neutral-700 mb-1.5">Fichier de personnalisation <span class="text-neutral-400 font-normal">(optionnel)</span></label>
+                            <input
+                                id="customization_file"
+                                type="file"
+                                name="customization_file"
+                                accept=".png,.jpg,.jpeg,.webp,.pdf"
+                                class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm text-neutral-600"
+                            >
+                            <p class="mt-1.5 text-xs text-neutral-400">Formats acceptés : PNG, JPG, WEBP, PDF — 15 Mo max.</p>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="w-full bg-neutral-900 hover:bg-amber-600 text-white font-semibold px-6 py-3.5 rounded-xl transition duration-200 text-sm"
+                        >
+                            Ajouter au panier
+                        </button>
+                    </form>
+                </div>
+
+                {# Garanties / infos atelier #}
+                <div class="bg-neutral-50 rounded-xl p-5 space-y-3 text-sm text-neutral-600">
+                    <div class="flex items-start gap-3">
+                        <span class="text-amber-500 mt-0.5">✦</span>
+                        <div><strong class="text-neutral-800">Gravure artisanale</strong> — chaque pièce est réalisée à la main dans notre atelier.</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-amber-500 mt-0.5">✦</span>
+                        <div><strong class="text-neutral-800">Commande validée manuellement</strong> — nous confirmons chaque demande avant toute facturation.</div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-amber-500 mt-0.5">✦</span>
+                        <div><strong class="text-neutral-800">Délai indicatif : 48h</strong> — selon la complexité et la charge atelier.</div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
+
+    {# ===== CTA RETOUR ===== #}
+    <section class="py-16 bg-amber-50 border-t border-amber-100 mt-10">
+        <div class="max-w-3xl mx-auto px-6 text-center">
+            <h2 class="font-display text-2xl font-bold text-neutral-900">D'autres créations vous attendent</h2>
+            <p class="text-neutral-600 mt-3">Parcourez l'ensemble de notre catalogue pour trouver le cadeau parfait.</p>
+            <a href="{{ path('app_catalog_index') }}" class="mt-6 inline-block bg-neutral-900 hover:bg-amber-600 text-white font-semibold px-8 py-3.5 rounded-full transition duration-200">
+                Voir tout le catalogue
+            </a>
+        </div>
+    </section>
+
+    {# ===== FOOTER ===== #}
+    <footer class="bg-neutral-100 text-neutral-600 py-10 border-t border-neutral-200">
+        <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm">
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-8 w-auto">
+                <span class="font-display text-neutral-900">Kdos Graphie</span>
+            </div>
+            <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser.</p>
+            <a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a>
+        </div>
+    </footer>
 </div>
 {% endblock %}

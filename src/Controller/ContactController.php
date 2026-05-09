@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Form\ContactType;
+use App\Repository\SiteSettingRepository;
 use App\Service\ContactMailer;
 use App\Service\RecaptchaService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,7 @@ final class ContactController extends AbstractController
         Request $request,
         ContactMailer $contactMailer,
         RecaptchaService $recaptchaService,
+        SiteSettingRepository $settingRepository,
         #[Autowire('%env(string:RECAPTCHA_SITE_KEY)%')]
         string $recaptchaSiteKey,
     ): Response {
@@ -36,6 +38,7 @@ final class ContactController extends AbstractController
                 return $this->render('contact/index.html.twig', [
                     'form' => $form,
                     'recaptchaSiteKey' => $recaptchaSiteKey,
+                    'contactInfo' => $this->getContactInfo($settingRepository),
                 ]);
             }
 
@@ -51,6 +54,21 @@ final class ContactController extends AbstractController
         return $this->render('contact/index.html.twig', [
             'form' => $form,
             'recaptchaSiteKey' => $recaptchaSiteKey,
+            'contactInfo' => $this->getContactInfo($settingRepository),
         ]);
+    }
+
+    /**
+     * @return array{phone: string, email: string, address: string, instagram: string, facebook: string}
+     */
+    private function getContactInfo(SiteSettingRepository $repo): array
+    {
+        return [
+            'phone'     => $repo->getValue('contact_phone'),
+            'email'     => $repo->getValue('contact_email'),
+            'address'   => $repo->getValue('contact_address'),
+            'instagram' => $repo->getValue('contact_instagram'),
+            'facebook'  => $repo->getValue('contact_facebook'),
+        ];
     }
 }

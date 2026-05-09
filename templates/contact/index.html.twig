@@ -9,72 +9,178 @@
 {% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-neutral-50 text-neutral-800">
+<div class="min-h-screen bg-white text-neutral-800">
+
+    {# ===== HEADER ===== #}
     <header class="bg-white border-b border-neutral-200">
         <div class="max-w-7xl mx-auto px-6 py-4">
-            <a href="{{ path('app_home') }}" class="text-sm text-neutral-600 hover:text-neutral-900">← Retour à l'accueil</a>
+            <a href="{{ path('app_home') }}" class="text-sm text-neutral-600 hover:text-neutral-900 transition">← Retour à l'accueil</a>
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-6 py-12">
-        <h1 class="font-display text-4xl text-neutral-900 mb-2">Contactez-nous</h1>
-        <p class="text-neutral-500 mb-8">Une question, un projet sur mesure ? Ecrivez-nous.</p>
+    {# ===== HERO ===== #}
+    <div class="bg-neutral-50 border-b border-neutral-100 py-12 px-6">
+        <div class="max-w-7xl mx-auto">
+            <p class="uppercase tracking-[0.25em] text-amber-600 text-xs font-semibold">Parlons de votre projet</p>
+            <h1 class="font-display text-4xl md:text-5xl font-bold text-neutral-900 mt-2">Contactez-nous</h1>
+            <p class="text-neutral-600 mt-3 max-w-xl">Une question, un projet sur mesure, une idée de cadeau ? Écrivez-nous et nous vous répondons sous 24h.</p>
+        </div>
+    </div>
 
-        {% for type, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="mb-6 rounded-lg border px-4 py-3 text-sm {{ type == 'danger' ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700' }}">{{ message }}</div>
-            {% endfor %}
+    {# ===== FLASH MESSAGES ===== #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="max-w-7xl mx-auto px-6 pt-6">
+                <div class="rounded-lg border px-4 py-3 text-sm {{ type == 'danger' ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700' }}">
+                    {{ message }}
+                </div>
+            </div>
         {% endfor %}
+    {% endfor %}
 
-        {{ form_start(form, {attr: {class: 'space-y-5', id: 'contact-form'}}) }}
-            <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+    {# ===== CONTENU PRINCIPAL ===== #}
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="grid lg:grid-cols-5 gap-10 items-start">
 
-            <div>
-                {{ form_label(form.name, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
-                {{ form_widget(form.name, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm'}}) }}
-                {{ form_errors(form.name) }}
+            {# ===== COLONNE COORDONNÉES (2/5) ===== #}
+            <aside class="lg:col-span-2 space-y-4">
+                <div class="bg-neutral-50 rounded-2xl border border-neutral-200 p-8 space-y-6">
+                    <h2 class="font-display text-xl font-bold text-neutral-900">Nos coordonnées</h2>
+
+                    {% if contactInfo.phone %}
+                        <div class="flex items-start gap-4">
+                            <div class="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center shrink-0 text-amber-600 text-sm font-bold">✆</div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-0.5">Téléphone</p>
+                                <a href="tel:{{ contactInfo.phone|replace({' ': '', '.': '', '-': ''}) }}" class="text-neutral-800 font-medium hover:text-amber-600 transition">
+                                    {{ contactInfo.phone }}
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if contactInfo.email %}
+                        <div class="flex items-start gap-4">
+                            <div class="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center shrink-0 text-amber-600 text-sm font-bold">@</div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-0.5">Email</p>
+                                <a href="mailto:{{ contactInfo.email }}" class="text-neutral-800 font-medium hover:text-amber-600 transition break-all">
+                                    {{ contactInfo.email }}
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if contactInfo.address %}
+                        <div class="flex items-start gap-4">
+                            <div class="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center shrink-0 text-amber-600 text-sm font-bold">📍</div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-0.5">Atelier</p>
+                                <p class="text-neutral-800 font-medium whitespace-pre-line">{{ contactInfo.address }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if contactInfo.instagram or contactInfo.facebook %}
+                        <div class="border-t border-neutral-200 pt-5 space-y-3">
+                            <p class="text-xs uppercase tracking-wider text-neutral-400 font-semibold">Réseaux sociaux</p>
+                            {% if contactInfo.instagram %}
+                                <a href="{{ contactInfo.instagram }}" target="_blank" rel="noreferrer" class="flex items-center gap-2 text-sm text-neutral-700 hover:text-amber-600 transition font-medium">
+                                    <span class="text-base">📷</span> Instagram
+                                </a>
+                            {% endif %}
+                            {% if contactInfo.facebook %}
+                                <a href="{{ contactInfo.facebook }}" target="_blank" rel="noreferrer" class="flex items-center gap-2 text-sm text-neutral-700 hover:text-amber-600 transition font-medium">
+                                    <span class="text-base">💬</span> Facebook
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="bg-amber-50 rounded-2xl border border-amber-100 p-6 text-sm text-neutral-700 space-y-2">
+                    <p class="font-semibold text-neutral-900">Commandes personnalisées</p>
+                    <p>Chaque commande est confirmée manuellement avant facturation. Précisez votre besoin dans le formulaire pour un devis rapide.</p>
+                </div>
+            </aside>
+
+            {# ===== COLONNE FORMULAIRE (3/5) ===== #}
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-2xl border border-neutral-200 p-8">
+                    <h2 class="font-display text-xl font-bold text-neutral-900 mb-6">Envoyer un message</h2>
+
+                    {{ form_start(form, {attr: {class: 'space-y-5', id: 'contact-form'}}) }}
+                        <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+
+                        <div class="grid sm:grid-cols-2 gap-5">
+                            <div>
+                                {{ form_label(form.name, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
+                                {{ form_widget(form.name, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500'}}) }}
+                                {{ form_errors(form.name) }}
+                            </div>
+                            <div>
+                                {{ form_label(form.email, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
+                                {{ form_widget(form.email, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500'}}) }}
+                                {{ form_errors(form.email) }}
+                            </div>
+                        </div>
+
+                        <div>
+                            {{ form_label(form.subject, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
+                            {{ form_widget(form.subject, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500', placeholder: 'Ex : Commande gravure, devis, information...'}}) }}
+                            {{ form_errors(form.subject) }}
+                        </div>
+
+                        <div>
+                            {{ form_label(form.message, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
+                            {{ form_widget(form.message, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-36', placeholder: 'Décrivez votre projet ou votre question...'}}) }}
+                            {{ form_errors(form.message) }}
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">
+                            <button
+                                type="submit"
+                                class="bg-neutral-900 hover:bg-amber-600 text-white text-sm font-semibold px-7 py-3.5 rounded-xl transition duration-200"
+                            >
+                                Envoyer le message
+                            </button>
+                            <p class="text-xs text-neutral-400">Vos informations restent confidentielles et ne sont utilisées que pour vous répondre.</p>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
             </div>
 
-            <div>
-                {{ form_label(form.email, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
-                {{ form_widget(form.email, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm'}}) }}
-                {{ form_errors(form.email) }}
-            </div>
-
-            <div>
-                {{ form_label(form.subject, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
-                {{ form_widget(form.subject, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm'}}) }}
-                {{ form_errors(form.subject) }}
-            </div>
-
-            <div>
-                {{ form_label(form.message, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
-                {{ form_widget(form.message, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm min-h-32'}}) }}
-                {{ form_errors(form.message) }}
-            </div>
-
-            <button type="submit" class="bg-neutral-900 text-white text-sm font-semibold px-5 py-3 rounded-lg hover:bg-neutral-700">
-                Envoyer le message
-            </button>
-        {{ form_end(form) }}
-
-        {% if recaptchaSiteKey %}
-            <script>
-                (function () {
-                    const form = document.getElementById('contact-form');
-                    if (!form) return;
-                    form.addEventListener('submit', function (e) {
-                        e.preventDefault();
-                        grecaptcha.ready(function () {
-                            grecaptcha.execute('{{ recaptchaSiteKey }}', {action: 'contact'}).then(function (token) {
-                                document.getElementById('recaptcha_token').value = token;
-                                form.submit();
-                            });
-                        });
-                    });
-                })();
-            </script>
-        {% endif %}
+        </div>
     </main>
+
+    {# ===== FOOTER ===== #}
+    <footer class="bg-neutral-100 text-neutral-600 py-10 border-t border-neutral-200 mt-10">
+        <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm">
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-8 w-auto">
+                <span class="font-display text-neutral-900">Kdos Graphie</span>
+            </div>
+            <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser.</p>
+            <a href="{{ path('app_catalog_index') }}" class="hover:text-amber-600 transition">Catalogue</a>
+        </div>
+    </footer>
 </div>
+
+{% if recaptchaSiteKey %}
+    <script>
+        (function () {
+            const form = document.getElementById('contact-form');
+            if (!form) return;
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                grecaptcha.ready(function () {
+                    grecaptcha.execute('{{ recaptchaSiteKey }}', {action: 'contact'}).then(function (token) {
+                        document.getElementById('recaptcha_token').value = token;
+                        form.submit();
+                    });
+                });
+            });
+        })();
+    </script>
+{% endif %}
 {% endblock %}
