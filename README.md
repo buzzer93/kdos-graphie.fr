@@ -117,50 +117,7 @@ Briques restantes avant parité complète :
 - Webhook Stripe securise (signature, mapping des evenements)
 - Panier session avance (controle stock, recapitulatif fiable, coherence avec paiement)
 
-## TODO backlog
-
-### Point d'avancement (deja fait)
-
-- [x] Generer et appliquer la migration Doctrine pour Product/Category/Order/OrderItem.
-- [x] Mettre a jour l'entite Order et les transitions pour les statuts cibles (a_confirmer, en_attente_paiement, a_faire, termine, refuse, annule).
-- [x] Ajouter les champs checkout invite (prenom, telephone, adresse livraison, informations complementaires).
-- [x] Ajouter support personnalisation par ligne de commande (texte/image selon produit).
-- [x] Ajouter archivage avant suppression des commandes annulees/refusees/terminees.
-- [x] Ajouter envois email metier de base pour le cycle de vie de commande.
-- [x] Ajouter des tests fonctionnels/unitaires sur les parcours admin et le cycle de vie commande.
-- [x] Definir les regles d'annulation — admin uniquement, statuts a_confirmer / en_attente_paiement / a_faire annulables.
-- [x] Definir la gestion des remboursements — tracabilite manuelle (refund_note + refunded_at), remboursement Stripe effectue manuellement.
-- [x] Ajouter contraintes validation metier — suppression stock non utilise, prix recalcule depuis la base au checkout.
-- [x] Ajouter formulaire contact backend — ContactController + ContactType + CSRF + reCAPTCHA v3 (RecaptchaService).
-- [x] Ajouter flux mot de passe oublie admin — symfonycasts/reset-password-bundle, entity + migration + controller + mailer + templates.
-- [x] Ajouter ecran admin parametres globaux — SiteSetting entity + migration + SettingsController + template.
-- [x] Ajouter section deploiement complete — variables Stripe, worker Messenger, webhook, Caddy.
-
-### Admin UX (inspire du projet similaire)
-
-- [x] Dashboard admin : cartes de synthese par statut de commande (compteurs, liens filtres, total CA).
-- [x] Composant `_status_badge.html.twig` reutilisable avec couleurs semantiques par statut.
-- [x] Service `OrderAdminActionAvailabilityResolver` : centralise les actions disponibles par statut (canAccept, canReject, canCancel, canComplete, canMarkPaid, canRemindPayment, canRequestInfo).
-- [x] Action admin "Demander des informations complementaires" — email automatique au client depuis la fiche commande.
-- [x] Action admin "Renvoyer le lien de paiement" — disponible en statut en_attente_paiement.
-- [x] Action admin "Purge" — suppression en masse des commandes terminees/refusees/annulees de plus de 30 jours (avec archivage obligatoire).
-- [x] Parametres admin : coordonnees contact editables (telephone, email, adresse, reseaux sociaux).
-- [x] Parametres admin : changement identifiants master admin (email + mot de passe).
-- [x] Parametres admin : reordonnancement des categories par drag-and-drop.
-
-### Cycle de vie commande
-
-- [x] Adapter OrderLifecycleService au processus metier cible complet (confirmation, paiement, passage a faire, cloture, refus/annulation).
-- [x] Completer les templates email (refus, annulation, livraison, relance paiement, notification admin, demande d'infos).
-- [x] Ajouter message/handler Messenger pour notification admin post-paiement.
-
-### Panier
-
-- [x] Implémenter le panier session complet (ajout/retrait, quantites, recalculs) — controle stock non applicable (produits personnalises a la commande, pas de stock fini).
-
-### Tests
-
-- [x] Ajouter tests unitaires/integration sur services metier (OrderLifecycleService, OrderAdminActionAvailabilityResolver, purge, parametres, reordonnancement categories).
+## TODO 
 
 ### Stripe (en dernier)
 
