@@ -4,58 +4,7 @@
 
 {% block body %}
 <div class="bg-white text-neutral-800">
-    {# =================== NAVBAR =================== #}
-    <header class="fixed top-0 inset-x-0 z-30 bg-white/90 backdrop-blur border-b border-neutral-200">
-        <nav class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4" aria-label="Navigation principale">
-            <a href="{{ path('app_home') }}" class="flex items-center gap-3 text-neutral-900">
-                <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="Kdos Graphie" class="h-10 w-auto">
-                <span class="font-display text-xl tracking-wide hidden sm:inline">Kdos Graphie</span>
-            </a>
-            <ul class="hidden md:flex items-center gap-8 text-neutral-700 text-sm font-medium">
-                <li><a href="{{ path('app_home') }}" class="text-amber-600 transition">Accueil</a></li>
-                <li><a href="#services" class="hover:text-amber-600 transition">Services</a></li>
-                <li><a href="{{ path('app_catalog_index') }}" class="hover:text-amber-600 transition">Produits</a></li>
-                <li><a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a></li>
-                <li><a href="{{ path('app_cart_index') }}" class="hover:text-amber-600 transition">Panier</a></li>
-            </ul>
-
-            <div class="hidden md:flex items-center gap-3">
-                <a href="{{ path('app_cart_index') }}" class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-neutral-300 text-neutral-700 hover:border-amber-500 hover:text-amber-600 transition" aria-label="Voir le panier">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.962-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                    </svg>
-                </a>
-                <a href="{{ path('app_contact') }}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition shadow-lg shadow-amber-500/30">
-                    Demander un devis
-                </a>
-            </div>
-
-            <details class="md:hidden relative">
-                <summary class="list-none cursor-pointer inline-flex items-center justify-center w-10 h-10 rounded-lg border border-neutral-200 text-neutral-700 hover:text-amber-700 hover:border-amber-300">
-                    <span class="sr-only">Ouvrir le menu</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
-                    </svg>
-                </summary>
-                <div class="absolute right-0 mt-2 w-56 rounded-xl border border-neutral-200 bg-white shadow-xl p-2">
-                    <a href="#services" class="block rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50">Services</a>
-                    <a href="{{ path('app_catalog_index') }}" class="block rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50">Produits</a>
-                    <a href="{{ path('app_contact') }}" class="block rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50">Contact</a>
-                    <a href="{{ path('app_cart_index') }}" class="block rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-50">Panier</a>
-                    <a href="{{ path('app_contact') }}" class="mt-1 block rounded-lg px-3 py-2 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600">Demander un devis</a>
-                </div>
-            </details>
-        </nav>
-
-        <nav class="md:hidden border-t border-neutral-200 bg-white/90" aria-label="Navigation rapide mobile">
-            <div class="max-w-7xl mx-auto px-4 py-2 grid grid-cols-4 gap-2 text-xs">
-                <a href="#services" class="rounded-lg px-2 py-2 text-center text-neutral-700">Services</a>
-                <a href="{{ path('app_catalog_index') }}" class="rounded-lg px-2 py-2 text-center text-neutral-700">Produits</a>
-                <a href="{{ path('app_contact') }}" class="rounded-lg px-2 py-2 text-center text-neutral-700">Contact</a>
-                <a href="{{ path('app_cart_index') }}" class="rounded-lg px-2 py-2 text-center text-neutral-700">Panier</a>
-            </div>
-        </nav>
-    </header>
+    {{ include('partials/_header_public.html.twig') }}
 
     {# =================== HERO =================== #}
     <section class="relative flex items-center overflow-hidden bg-gradient-to-br from-amber-50 via-white to-neutral-50">
@@ -125,7 +74,7 @@
     </section>
 
     {# =================== SERVICES =================== #}
-    <section id="services" class="py-24 bg-neutral-50 border-t border-neutral-100">
+    <section id="services" class="py-24 bg-neutral-50 border-t border-neutral-100 scroll-mt-28">
         <div class="max-w-7xl mx-auto px-6">
             <div class="max-w-2xl mx-auto text-center mb-16">
                 <p class="uppercase tracking-[0.25em] text-amber-600 text-xs font-semibold">Nos savoir-faire</p>
@@ -257,6 +206,54 @@
 </div>
 
 <script>
+    (function () {
+        const links = document.querySelectorAll('a.js-services-scroll[href="#services"]');
+        const section = document.getElementById('services');
+
+        if (links.length === 0 || !section) {
+            return;
+        }
+
+        const duration = 700;
+        const easeInOutCubic = (value) => {
+            return value < 0.5
+                ? 4 * value * value * value
+                : 1 - Math.pow(-2 * value + 2, 3) / 2;
+        };
+
+        links.forEach((link) => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+
+                const header = document.querySelector('[data-site-header]');
+                const headerHeight = header ? header.getBoundingClientRect().height : 0;
+                const startY = window.scrollY;
+                const targetY = Math.max(0, section.getBoundingClientRect().top + window.scrollY - headerHeight - 12);
+                const distance = targetY - startY;
+                let startTime = null;
+
+                const step = (timestamp) => {
+                    if (startTime === null) {
+                        startTime = timestamp;
+                    }
+
+                    const elapsed = timestamp - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = easeInOutCubic(progress);
+
+                    window.scrollTo(0, startY + distance * eased);
+
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+
+                window.requestAnimationFrame(step);
+                window.history.replaceState(null, '', '#services');
+            });
+        });
+    })();
+
     (function () {
         const carousel = document.getElementById('carousel');
         const prev = document.getElementById('prev-btn');

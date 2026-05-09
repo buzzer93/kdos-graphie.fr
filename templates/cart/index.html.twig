@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="min-h-screen bg-neutral-50 text-neutral-800">
-    {{ include('partials/_header_public.html.twig', {back_route: 'app_catalog_index', back_label: '← Catalogue'}) }}
+    {{ include('partials/_header_public.html.twig') }}
 
     <main class="max-w-7xl mx-auto px-6 py-10 space-y-6">
         {% for type, messages in app.flashes %}

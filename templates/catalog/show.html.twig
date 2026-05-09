@@ -6,7 +6,7 @@
 <div class="min-h-screen bg-white text-neutral-800">
 
     {# ===== HEADER ===== #}
-    {{ include('partials/_header_public.html.twig', {back_route: 'app_catalog_index', back_label: '← Catalogue'}) }}
+    {{ include('partials/_header_public.html.twig') }}
 
     {# ===== FLASH MESSAGES ===== #}
     {% for type, messages in app.flashes %}
