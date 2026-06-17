@@ -8,6 +8,7 @@ use App\Entity\Order;
 use App\Message\AdminOrderPaidNotification;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class OrderLifecycleService
 {
@@ -15,6 +16,8 @@ final class OrderLifecycleService
         private readonly EntityManagerInterface $entityManager,
         private readonly OrderMailer $orderMailer,
         private readonly MessageBusInterface $messageBus,
+        private readonly StripePaymentService $stripePaymentService,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -24,7 +27,16 @@ final class OrderLifecycleService
             return OrderActionResult::warning('Seules les commandes a confirmer peuvent etre acceptees.');
         }
 
+        $paymentIntent = $this->stripePaymentService->createPaymentIntent($order);
+
+        $order->setStripePaymentIntentId($paymentIntent->id);
+        $order->setPaymentLink($this->urlGenerator->generate(
+            'app_payment_form',
+            ['reference' => $order->getReference()],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        ));
         $order->setStatus(Order::STATUS_EN_ATTENTE_PAIEMENT);
+
         $this->entityManager->flush();
         $this->orderMailer->sendOrderConfirmedForPayment($order);
 

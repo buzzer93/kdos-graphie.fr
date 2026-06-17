@@ -69,6 +69,9 @@ class Order
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $paymentLink = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $stripePaymentIntentId = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $refundNote = null;
 
@@ -305,6 +308,18 @@ class Order
     public function setPaymentLink(?string $paymentLink): static
     {
         $this->paymentLink = $paymentLink;
+
+        return $this;
+    }
+
+    public function getStripePaymentIntentId(): ?string
+    {
+        return $this->stripePaymentIntentId;
+    }
+
+    public function setStripePaymentIntentId(?string $stripePaymentIntentId): static
+    {
+        $this->stripePaymentIntentId = $stripePaymentIntentId;
 
         return $this;
     }

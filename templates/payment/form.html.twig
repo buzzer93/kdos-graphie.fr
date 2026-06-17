@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement sécurisé — {{ order.reference }}{% endblock %}
+
+{% block javascripts %}
+    <script src="https://js.stripe.com/v3/"></script>
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-neutral-50 text-neutral-800 flex items-center justify-center px-6 py-12">
+    <div class="max-w-lg w-full space-y-6">
+
+        <div class="text-center">
+            <h1 class="font-display text-3xl text-neutral-900">Paiement sécurisé</h1>
+            <p class="text-neutral-500 mt-1 text-sm">Commande {{ order.reference }}</p>
+        </div>
+
+        <div class="bg-white border border-neutral-200 rounded-2xl p-6 space-y-4">
+            {% if order.items is not empty %}
+            <ul class="divide-y divide-neutral-100 text-sm">
+                {% for item in order.items %}
+                <li class="py-2 flex justify-between">
+                    <span class="text-neutral-700">{{ item.productName }} × {{ item.quantity }}</span>
+                    <span class="font-medium text-neutral-900">{{ (item.unitPrice * item.quantity / 100)|number_format(2, ',', ' ') }} €</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="pt-2 border-t border-neutral-200 flex justify-between font-semibold text-neutral-900">
+                <span>Total</span>
+                <span>{{ order.formattedTotal }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-white border border-neutral-200 rounded-2xl p-6">
+            <form id="payment-form" class="space-y-4">
+                <div id="payment-element"></div>
+
+                <div id="payment-message" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2"></div>
+
+                <button
+                    id="submit-btn"
+                    type="submit"
+                    class="w-full bg-neutral-900 text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-amber-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Payer {{ order.formattedTotal }}
+                </button>
+            </form>
+        </div>
+
+        <p class="text-center text-xs text-neutral-400">
+            Paiement sécurisé par <strong>Stripe</strong>. Vos données bancaires ne transitent pas par notre serveur.
+        </p>
+    </div>
+</div>
+
+<script>
+(function () {
+    const stripe = Stripe('{{ stripePublicKey|e('js') }}');
+    const elements = stripe.elements({ clientSecret: '{{ clientSecret|e('js') }}' });
+
+    const paymentElement = elements.create('payment');
+    paymentElement.mount('#payment-element');
+
+    const form = document.getElementById('payment-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const messageBox = document.getElementById('payment-message');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        messageBox.classList.add('hidden');
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: '{{ url('app_payment_success', {'reference': order.reference})|e('js') }}',
+            },
+        });
+
+        if (error) {
+            messageBox.textContent = error.message;
+            messageBox.classList.remove('hidden');
+            submitBtn.disabled = false;
+        }
+    });
+}());
+</script>
+{% endblock %}

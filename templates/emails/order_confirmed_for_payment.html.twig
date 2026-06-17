@@ -14,7 +14,20 @@
     <div class="value">{{ order.reference }}</div>
 </div>
 
-<p>Vous allez recevoir très prochainement un email séparé contenant votre lien de paiement sécurisé.</p>
+<p>Vous pouvez procéder au paiement sécurisé de votre commande en cliquant sur le bouton ci-dessous :</p>
+
+{% if order.paymentLink %}
+<p style="text-align:center;margin:24px 0">
+    <a href="{{ order.paymentLink }}"
+       style="display:inline-block;background-color:#171717;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 28px;border-radius:10px;">
+        Payer {{ order.formattedTotal }}
+    </a>
+</p>
+<p style="font-size:13px;color:#6b7280">
+    Ou copiez ce lien dans votre navigateur :<br>
+    <a href="{{ order.paymentLink }}" style="color:#d97706;word-break:break-all;">{{ order.paymentLink }}</a>
+</p>
+{% endif %}
 
 {% if order.items is not empty %}
 <table class="order-table">

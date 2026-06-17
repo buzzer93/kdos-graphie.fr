@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lien de paiement indisponible — Kdos Graphie{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-neutral-50 text-neutral-800 flex items-center justify-center px-6">
+    <div class="max-w-2xl w-full bg-white border border-neutral-200 rounded-2xl p-8 text-center space-y-4">
+        <h1 class="font-display text-3xl text-neutral-900">Lien indisponible</h1>
+        <p class="text-neutral-600">
+            Ce lien de paiement n'est plus actif.
+            {% if order is not null %}
+                La commande <strong>{{ order.reference }}</strong> a le statut <strong>{{ order.status }}</strong>.
+            {% endif %}
+        </p>
+        <p class="text-neutral-500 text-sm">Si vous pensez qu'il s'agit d'une erreur, contactez-nous.</p>
+        <div class="pt-2">
+            <a href="{{ path('app_contact') }}" class="inline-flex bg-neutral-900 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-amber-600 transition">
+                Nous contacter
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
