@@ -19,6 +19,10 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
+###> docker ###
+/.env.docker.local
+###< docker ###
+
 ###> claude-code ###
 /.claude/
 # Claude Code local settings
