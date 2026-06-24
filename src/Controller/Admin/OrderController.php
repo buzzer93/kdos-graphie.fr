@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Order;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
+use App\Service\CustomizationFileStorage;
 use App\Service\OrderAdminActionAvailabilityResolver;
 use App\Service\OrderArchiveService;
 use App\Service\OrderLifecycleService;
@@ -75,13 +76,14 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]
-    public function show(Order $order, OrderAdminActionAvailabilityResolver $resolver): Response
+    public function show(Order $order, OrderAdminActionAvailabilityResolver $resolver, CustomizationFileStorage $fileStorage): Response
     {
         if ($this->isTerminalStatus($order->getStatus())) {
             return $this->render('admin/order/show.html.twig', [
                 'order' => $order,
                 'statusLabels' => Order::getStatusLabels(),
                 'actions' => $resolver->resolve($order),
+                'fileStorage' => $fileStorage,
             ]);
         }
 
@@ -89,7 +91,7 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
-    public function edit(Order $order, Request $request, EntityManagerInterface $entityManager, OrderRepository $orderRepository, OrderAdminActionAvailabilityResolver $resolver): Response
+    public function edit(Order $order, Request $request, EntityManagerInterface $entityManager, OrderRepository $orderRepository, OrderAdminActionAvailabilityResolver $resolver, CustomizationFileStorage $fileStorage): Response
     {
         if ($this->isTerminalStatus($order->getStatus())) {
             return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
@@ -125,6 +127,7 @@ class OrderController extends AbstractController
             'statusLabels' => Order::getStatusLabels(),
             'lockCommercialData' => $lockCommercialData,
             'actions' => $resolver->resolve($order),
+            'fileStorage' => $fileStorage,
         ]);
     }
 
