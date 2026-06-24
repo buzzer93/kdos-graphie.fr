@@ -9,13 +9,16 @@ cd "$PROJECT_DIR"
 echo "[1/5] git pull --ff-only"
 git pull --ff-only
 
-echo "[2/4] Doctrine migrations"
+echo "[2/5] composer install"
+composer install --no-dev --optimize-autoloader
+
+echo "[3/5] Doctrine migrations"
 php bin/console doctrine:migrations:migrate --no-interaction --env="$APP_ENV"
 
-echo "[3/4] Compile AssetMapper"
+echo "[4/5] Compile AssetMapper"
 php bin/console asset-map:compile
 
-echo "[4/4] Clear cache ($APP_ENV)"
+echo "[5/5] Clear cache ($APP_ENV)"
 php bin/console cache:clear --env="$APP_ENV"
 
 echo "Done. VPS update completed."
