@@ -8,6 +8,7 @@ final readonly class OrderAdminActions
 {
     public function __construct(
         public bool $canAccept,
+        public bool $canSendQuote,
         public bool $canReject,
         public bool $canCancel,
         public bool $canComplete,

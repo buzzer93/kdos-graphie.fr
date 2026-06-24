@@ -16,7 +16,7 @@ final class CartControllerTest extends AbstractWebTestCase
         $client->request('GET', '/panier/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('body', 'Votre panier est vide.');
+        self::assertSelectorTextContains('body', 'Votre demande est vide.');
     }
 
     public function testAddUpdateAndRemoveLineFlow(): void
@@ -34,7 +34,7 @@ final class CartControllerTest extends AbstractWebTestCase
         $entityManager->flush();
 
         $client->request('GET', '/catalogue/' . $product->getSlug());
-        $client->submitForm('Ajouter au panier', [
+        $client->submitForm('Ajouter à ma demande', [
             'quantity' => 2,
             'customization_text' => 'Texte perso',
         ]);
@@ -63,6 +63,6 @@ final class CartControllerTest extends AbstractWebTestCase
 
         self::assertResponseRedirects('/panier/');
         $client->followRedirect();
-        self::assertSelectorTextContains('body', 'Votre panier est vide.');
+        self::assertSelectorTextContains('body', 'Votre demande est vide.');
     }
 }

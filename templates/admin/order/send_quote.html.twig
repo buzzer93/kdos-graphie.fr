@@ -1,0 +1,97 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Envoyer le devis — {{ order.reference }} — Admin{% endblock %}
+{% block page_title %}Envoyer le devis — {{ order.reference }}{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ path('app_admin_order_edit', {id: order.id}) }}" class="text-sm text-neutral-600 hover:text-neutral-900">← Retour à la commande</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-2xl space-y-6">
+
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="rounded-lg border px-4 py-3 text-sm {{ type == 'danger' ? 'border-red-200 bg-red-50 text-red-700' : (type == 'warning' ? 'border-amber-200 bg-amber-50 text-amber-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700') }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Récapitulatif de la demande client #}
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 space-y-3">
+        <h2 class="text-sm font-semibold text-amber-900">Demande client</h2>
+        <p class="text-sm text-neutral-700">Client : <strong>{{ order.customerFirstName }} {{ order.customerLastName }}</strong> — {{ order.customerEmail }}</p>
+
+        {% for item in order.items %}
+            <div class="bg-white border border-amber-100 rounded-lg p-4 space-y-1">
+                <p class="font-medium text-neutral-900 text-sm">{{ item.productName }}</p>
+                {% if item.optionsSummary %}
+                    <p class="text-sm text-neutral-600">Options : {{ item.optionsSummary }}</p>
+                {% endif %}
+                {% if item.customizationText %}
+                    <p class="text-sm text-neutral-600">Texte à graver : {{ item.customizationText }}</p>
+                {% endif %}
+                {% if item.specialRequest %}
+                    <p class="text-sm font-medium text-amber-800 mt-1">Demande particulière :</p>
+                    <p class="text-sm text-amber-700 whitespace-pre-line">{{ item.specialRequest }}</p>
+                {% endif %}
+                {% if item.customizationFilePath %}
+                    <p class="text-sm text-neutral-500 mt-1">Fichier joint : <code class="text-xs bg-neutral-100 px-1 rounded">{{ item.customizationFilePath }}</code></p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="border-t border-amber-200 pt-3">
+            <p class="text-sm text-neutral-600">Estimation initiale (options) : <strong>{{ (order.total / 100)|number_format(2, ',', ' ') }} €</strong></p>
+        </div>
+    </div>
+
+    {# Formulaire devis #}
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        <h2 class="text-sm font-semibold text-neutral-900 mb-4">Rédiger le devis</h2>
+
+        <form method="post" action="{{ path('app_admin_order_send_quote', {id: order.id}) }}" class="space-y-4">
+            <input type="hidden" name="_token" value="{{ csrf_token('order_send_quote_' ~ order.id) }}">
+
+            <div>
+                <label for="quote_description" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                    Description de la personnalisation <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                    id="quote_description"
+                    name="quote_description"
+                    rows="4"
+                    required
+                    class="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    placeholder="Ex : Gravure laser « Joyeux Anniversaire Marie » sur plaque bois 20×30 cm — format vectoriel appliqué."
+                ></textarea>
+                <p class="mt-1 text-xs text-neutral-400">Cette description apparaîtra dans l'email envoyé au client.</p>
+            </div>
+
+            <div>
+                <label for="quoted_price" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                    Prix total devisé (€) <span class="text-red-500">*</span>
+                </label>
+                <input
+                    id="quoted_price"
+                    type="number"
+                    name="quoted_price"
+                    min="0.01"
+                    step="0.01"
+                    required
+                    value="{{ (order.total / 100)|number_format(2, '.', '') }}"
+                    class="w-48 px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                <p class="mt-1 text-xs text-neutral-400">Pré-rempli depuis l'estimation. Modifiez si nécessaire.</p>
+            </div>
+
+            <div class="pt-4 border-t border-neutral-200 flex items-center gap-3">
+                <button type="submit" class="bg-amber-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-amber-700">
+                    ✉ Envoyer le devis au client
+                </button>
+                <a href="{{ path('app_admin_order_edit', {id: order.id}) }}" class="text-sm text-neutral-600 hover:text-neutral-900">Annuler</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

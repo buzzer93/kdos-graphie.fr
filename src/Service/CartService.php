@@ -16,7 +16,7 @@ final class CartService
     {
     }
 
-    /** @return list<array{id: string, productId: int, productName: string, unitPrice: int, quantity: int, customizationText: ?string, customizationFilePath: ?string, optionValueIds: int[], optionsSummary: ?string}> */
+    /** @return list<array{id: string, productId: int, productName: string, unitPrice: int, quantity: int, customizationText: ?string, customizationFilePath: ?string, optionValueIds: int[], optionsSummary: ?string, specialRequest: ?string}> */
     public function getLines(): array
     {
         $cart = $this->getCart();
@@ -33,6 +33,7 @@ final class CartService
         int $unitPrice,
         array $optionValueIds = [],
         ?string $optionsSummary = null,
+        ?string $specialRequest = null,
     ): void {
         $cart = $this->getCart();
         $lines = $cart['lines'] ?? [];
@@ -47,6 +48,7 @@ final class CartService
             'customizationFilePath' => $customizationFilePath,
             'optionValueIds' => $optionValueIds,
             'optionsSummary' => $optionsSummary,
+            'specialRequest' => $specialRequest,
         ];
 
         $cart['lines'] = $lines;
@@ -69,7 +71,7 @@ final class CartService
         $this->saveCart($cart);
     }
 
-    /** @return array{id: string, productId: int, productName: string, unitPrice: int, quantity: int, customizationText: ?string, customizationFilePath: ?string, optionValueIds: int[], optionsSummary: ?string}|null */
+    /** @return array{id: string, productId: int, productName: string, unitPrice: int, quantity: int, customizationText: ?string, customizationFilePath: ?string, optionValueIds: int[], optionsSummary: ?string, specialRequest: ?string}|null */
     public function removeLine(string $lineId): ?array
     {
         $cart = $this->getCart();
@@ -119,7 +121,7 @@ final class CartService
         return $total;
     }
 
-    /** @return array{lines: list<array{id: string, productId: int, productName: string, unitPrice: int, quantity: int, customizationText: ?string, customizationFilePath: ?string, optionValueIds: int[], optionsSummary: ?string}>} */
+    /** @return array{lines: list<array{id: string, productId: int, productName: string, unitPrice: int, quantity: int, customizationText: ?string, customizationFilePath: ?string, optionValueIds: int[], optionsSummary: ?string, specialRequest: ?string}>} */
     private function getCart(): array
     {
         $session = $this->getSession();

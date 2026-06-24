@@ -95,7 +95,7 @@ class OrderController extends AbstractController
             return $this->redirectToRoute('app_admin_order_show', ['id' => $order->getId()]);
         }
 
-        $lockCommercialData = $order->getStatus() !== Order::STATUS_A_CONFIRMER;
+        $lockCommercialData = !in_array($order->getStatus(), [Order::STATUS_EN_ATTENTE_DEVIS, Order::STATUS_A_CONFIRMER], true);
 
         if ($lockCommercialData) {
             $this->addFlash('warning', 'Commande deja engagee: seules les notes internes restent modifiables.');
@@ -148,6 +148,49 @@ class OrderController extends AbstractController
         $this->addFlash('success', 'Commande archivee puis supprimee.');
 
         return $this->redirectToRoute('app_admin_order_index');
+    }
+
+    #[Route('/{id}/send-quote', name: 'send_quote', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
+    public function sendQuote(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    {
+        if ($order->getStatus() !== Order::STATUS_EN_ATTENTE_DEVIS) {
+            $this->addFlash('warning', 'Cette commande n\'est pas en attente de devis.');
+
+            return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
+        }
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('order_send_quote_' . $order->getId(), (string) $request->request->get('_token'))) {
+                $this->addFlash('danger', 'Action invalide (token CSRF).');
+
+                return $this->redirectToRoute('app_admin_order_send_quote', ['id' => $order->getId()]);
+            }
+
+            $priceEuros = (float) str_replace(',', '.', (string) $request->request->get('quoted_price', '0'));
+            $quotedPriceCents = (int) round($priceEuros * 100);
+            $quoteDescription = trim((string) $request->request->get('quote_description', ''));
+
+            if ($quotedPriceCents <= 0) {
+                $this->addFlash('danger', 'Le prix devisé doit être supérieur à 0.');
+
+                return $this->redirectToRoute('app_admin_order_send_quote', ['id' => $order->getId()]);
+            }
+
+            if ($quoteDescription === '') {
+                $this->addFlash('danger', 'La description de la personnalisation est obligatoire.');
+
+                return $this->redirectToRoute('app_admin_order_send_quote', ['id' => $order->getId()]);
+            }
+
+            $result = $orderLifecycleService->sendQuote($order, $quotedPriceCents, $quoteDescription);
+            $this->addFlash($result->level, $result->message);
+
+            return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);
+        }
+
+        return $this->render('admin/order/send_quote.html.twig', [
+            'order' => $order,
+        ]);
     }
 
     #[Route('/{id}/accept', name: 'accept', requirements: ['id' => '\\d+'], methods: ['POST'])]

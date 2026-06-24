@@ -53,6 +53,8 @@ final class CartController extends AbstractController
         $quantity = max(1, $request->request->getInt('quantity', 1));
         $customizationText = trim((string) $request->request->get('customization_text', ''));
         $customizationText = $customizationText !== '' ? $customizationText : null;
+        $specialRequest = trim((string) $request->request->get('special_request', ''));
+        $specialRequest = $specialRequest !== '' ? $specialRequest : null;
 
         $uploadedFile = $request->files->get('customization_file');
         $storedFilename = null;
@@ -114,6 +116,7 @@ final class CartController extends AbstractController
             $unitPrice,
             $optionValueIds,
             $optionsSummary,
+            $specialRequest,
         );
 
         $this->addFlash('cart_added', $product->getName());

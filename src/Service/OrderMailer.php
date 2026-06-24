@@ -105,6 +105,18 @@ final class OrderMailer
         );
     }
 
+    public function sendQuoteToCustomer(Order $order): void
+    {
+        $this->send(
+            (new TemplatedEmail())
+                ->from($this->fromAddress)
+                ->to($order->getCustomerEmail())
+                ->subject('Votre devis Kdos Graphie : ' . $order->getReference())
+                ->htmlTemplate('emails/order_quote.html.twig')
+                ->context(['order' => $order])
+        );
+    }
+
     public function sendAdminOrderPaidNotification(Order $order): void
     {
         $this->send(

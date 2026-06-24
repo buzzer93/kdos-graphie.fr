@@ -54,9 +54,36 @@ final class OrderLifecycleService
         return OrderActionResult::success('Relance de paiement envoyee.');
     }
 
+    public function sendQuote(Order $order, int $quotedPrice, string $quoteDescription): OrderActionResult
+    {
+        if ($order->getStatus() !== Order::STATUS_EN_ATTENTE_DEVIS) {
+            return OrderActionResult::warning('Seules les commandes en attente de devis peuvent recevoir un devis.');
+        }
+
+        $order->setQuotedPrice($quotedPrice);
+        $order->setTotal($quotedPrice);
+        $order->setQuoteDescription(trim($quoteDescription));
+
+        $paymentIntent = $this->stripePaymentService->createPaymentIntent($order);
+
+        $order->setStripePaymentIntentId($paymentIntent->id);
+        $order->setPaymentLink($this->urlGenerator->generate(
+            'app_payment_form',
+            ['reference' => $order->getReference()],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        ));
+        $order->setStatus(Order::STATUS_EN_ATTENTE_PAIEMENT);
+
+        $this->entityManager->flush();
+        $this->orderMailer->sendQuoteToCustomer($order);
+
+        return OrderActionResult::success('Devis envoye au client. Commande passee en attente de paiement.');
+    }
+
     public function reject(Order $order, string $reason): OrderActionResult
     {
         return $this->rejectOrCancel($order, $reason, 'refusee', [
+            Order::STATUS_EN_ATTENTE_DEVIS,
             Order::STATUS_A_CONFIRMER,
             Order::STATUS_EN_ATTENTE_PAIEMENT,
         ]);
@@ -65,6 +92,7 @@ final class OrderLifecycleService
     public function cancel(Order $order, string $reason): OrderActionResult
     {
         return $this->rejectOrCancel($order, $reason, 'annulee', [
+            Order::STATUS_EN_ATTENTE_DEVIS,
             Order::STATUS_A_CONFIRMER,
             Order::STATUS_EN_ATTENTE_PAIEMENT,
             Order::STATUS_A_FAIRE,

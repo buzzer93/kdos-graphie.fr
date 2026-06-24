@@ -13,11 +13,11 @@
             {% endfor %}
         {% endfor %}
 
-        <h1 class="font-display text-4xl text-neutral-900">Panier</h1>
+        <h1 class="font-display text-4xl text-neutral-900">Ma demande</h1>
 
         {% if lines is empty %}
             <div class="bg-white border border-neutral-200 rounded-xl p-8 text-center text-neutral-600">
-                Votre panier est vide.
+                Votre demande est vide.
             </div>
         {% else %}
             <div class="space-y-4">
@@ -30,7 +30,10 @@
                             {% endif %}
                             <p class="text-sm text-neutral-600">Prix unitaire: {{ (line.unitPrice / 100)|number_format(2, ',', ' ') }} €</p>
                             {% if line.customizationText %}
-                                <p class="text-sm text-neutral-700 whitespace-pre-line"><span class="font-medium">Texte perso:</span> {{ line.customizationText }}</p>
+                                <p class="text-sm text-neutral-700 whitespace-pre-line"><span class="font-medium">Texte à graver :</span> {{ line.customizationText }}</p>
+                            {% endif %}
+                            {% if line.specialRequest is defined and line.specialRequest %}
+                                <p class="text-sm text-amber-700 whitespace-pre-line mt-1"><span class="font-medium">Demande particulière :</span> {{ line.specialRequest }}</p>
                             {% endif %}
                             {% if line.customizationFilePath %}
                                 {% set customizationUrl = asset(fileStorage.getPublicPath(line.customizationFilePath)) %}

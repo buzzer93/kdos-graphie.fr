@@ -51,7 +51,16 @@ final class CheckoutController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $order->setReference($this->generateReference($orderRepository));
-            $order->setStatus(Order::STATUS_A_CONFIRMER);
+
+            // Determine status: devis if any line has an image or a special request.
+            $isDevis = false;
+            foreach ($lines as $line) {
+                if (($line['customizationFilePath'] ?? null) !== null || ($line['specialRequest'] ?? null) !== null) {
+                    $isDevis = true;
+                    break;
+                }
+            }
+            $order->setStatus($isDevis ? Order::STATUS_EN_ATTENTE_DEVIS : Order::STATUS_A_CONFIRMER);
 
             $total = 0;
             foreach ($lines as $line) {
@@ -78,7 +87,8 @@ final class CheckoutController extends AbstractController
                     ->setQuantity((int) ($line['quantity'] ?? 1))
                     ->setCustomizationText($line['customizationText'] ?? null)
                     ->setCustomizationFilePath($line['customizationFilePath'] ?? null)
-                    ->setOptionsSummary($line['optionsSummary'] ?? null);
+                    ->setOptionsSummary($line['optionsSummary'] ?? null)
+                    ->setSpecialRequest($line['specialRequest'] ?? null);
 
                 $order->addItem($item);
                 $total += $item->getSubtotal();
@@ -109,10 +119,13 @@ final class CheckoutController extends AbstractController
     }
 
     #[Route('/confirmation/{reference}', name: 'confirmation', methods: ['GET'])]
-    public function confirmation(string $reference): Response
+    public function confirmation(string $reference, OrderRepository $orderRepository): Response
     {
+        $order = $orderRepository->findOneBy(['reference' => $reference]);
+
         return $this->render('checkout/confirmation.html.twig', [
             'reference' => $reference,
+            'isDevis' => $order !== null && $order->getStatus() === Order::STATUS_EN_ATTENTE_DEVIS,
         ]);
     }
 

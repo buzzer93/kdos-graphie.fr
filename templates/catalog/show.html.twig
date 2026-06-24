@@ -18,12 +18,12 @@
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
                             </svg>
-                            <span><strong>{{ message }}</strong> ajouté au panier.</span>
+                            <span><strong>{{ message }}</strong> ajouté à votre demande.</span>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
                             <a href="{{ path('app_cart_index') }}"
                                class="bg-neutral-900 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
-                                Voir le panier →
+                                Voir ma demande →
                             </a>
                         </div>
                     </div>
@@ -154,7 +154,7 @@
                         </div>
 
                         <div>
-                            <label for="customization_file" class="block text-sm font-medium text-neutral-700 mb-1.5">Fichier de personnalisation <span class="text-neutral-400 font-normal">(optionnel)</span></label>
+                            <label for="customization_file" class="block text-sm font-medium text-neutral-700 mb-1.5">Image ou fichier à graver <span class="text-neutral-400 font-normal">(optionnel)</span></label>
                             <input
                                 id="customization_file"
                                 type="file"
@@ -162,7 +162,19 @@
                                 accept=".png,.jpg,.jpeg,.webp,.pdf"
                                 class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm text-neutral-600"
                             >
-                            <p class="mt-1.5 text-xs text-neutral-400">Formats acceptés : PNG, JPG, WEBP, PDF — 15 Mo max.</p>
+                            <p class="mt-1.5 text-xs text-neutral-400">Formats acceptés : PNG, JPG, WEBP, PDF — 15 Mo max. L'ajout d'un fichier génère une demande de devis.</p>
+                        </div>
+
+                        <div>
+                            <label for="special_request" class="block text-sm font-medium text-neutral-700 mb-1.5">Demande particulière <span class="text-neutral-400 font-normal">(optionnel)</span></label>
+                            <textarea
+                                id="special_request"
+                                name="special_request"
+                                rows="3"
+                                class="w-full px-3 py-2.5 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                placeholder="Option non listée, format sur mesure, précision sur la gravure…"
+                            ></textarea>
+                            <p class="mt-1.5 text-xs text-neutral-400">Une demande particulière génère une demande de devis sur mesure.</p>
                         </div>
 
                         <button
@@ -170,7 +182,7 @@
                             {% if optionGroupsJson is not empty %}data-product-option-target="submit" disabled{% endif %}
                             class="w-full bg-neutral-900 hover:bg-amber-600 disabled:bg-neutral-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl transition duration-200 text-sm"
                         >
-                            Ajouter au panier
+                            Ajouter à ma demande
                         </button>
                     </form>
                 </div>

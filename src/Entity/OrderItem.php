@@ -41,6 +41,10 @@ class OrderItem
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $optionsSummary = null;
 
+    /** Demande particulière hors-options saisie par le client (déclenche le flux devis). */
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $specialRequest = null;
+
     public function getSubtotal(): int
     {
         return $this->unitPrice * $this->quantity;
@@ -131,6 +135,18 @@ class OrderItem
     public function setOptionsSummary(?string $optionsSummary): static
     {
         $this->optionsSummary = $optionsSummary;
+
+        return $this;
+    }
+
+    public function getSpecialRequest(): ?string
+    {
+        return $this->specialRequest;
+    }
+
+    public function setSpecialRequest(?string $specialRequest): static
+    {
+        $this->specialRequest = $specialRequest;
 
         return $this;
     }
