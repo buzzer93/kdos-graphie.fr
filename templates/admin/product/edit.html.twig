@@ -4,7 +4,112 @@
 {% block page_title %}Modifier {{ product.name }}{% endblock %}
 
 {% block admin_content %}
-<div class="max-w-4xl bg-white border border-neutral-200 rounded-xl p-6">
-    {{ include('admin/product/_form.html.twig', {form: form, imagePublicPath: imagePublicPath}) }}
+<div class="max-w-4xl space-y-8">
+
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        {{ include('admin/product/_form.html.twig', {form: form, imagePublicPath: imagePublicPath}) }}
+    </div>
+
+    {# ===== SECTION OPTIONS ===== #}
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-lg font-semibold text-neutral-900">Options produit</h2>
+                <p class="text-sm text-neutral-500 mt-0.5">Taille, support, matière… Le client choisira parmi ces options. Le prix affiché = prix de base + suppléments.</p>
+            </div>
+            <a href="{{ path('app_admin_product_option_new_group', {productId: product.id}) }}"
+               class="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-amber-600 text-white text-sm font-semibold px-3 py-2 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                Ajouter un groupe
+            </a>
+        </div>
+
+        {% if product.optionGroups is empty %}
+            <p class="text-sm text-neutral-400 italic">Aucun groupe d'options — ce produit a un prix fixe.</p>
+        {% else %}
+            <div class="space-y-6">
+                {% for group in product.optionGroups %}
+                    <div class="border border-neutral-200 rounded-xl overflow-hidden">
+                        <div class="flex items-center justify-between bg-neutral-50 px-4 py-3 border-b border-neutral-200">
+                            <span class="font-medium text-neutral-800 text-sm">{{ group.name }}</span>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ path('app_admin_product_option_new_value', {productId: product.id, groupId: group.id}) }}"
+                                   class="text-xs font-semibold text-amber-600 hover:text-amber-700 px-2 py-1 rounded hover:bg-amber-50 transition">
+                                    + Valeur
+                                </a>
+                                <a href="{{ path('app_admin_product_option_edit_group', {productId: product.id, groupId: group.id}) }}"
+                                   class="text-xs text-neutral-500 hover:text-neutral-700 px-2 py-1 rounded hover:bg-neutral-100 transition">
+                                    Modifier
+                                </a>
+                                <form method="post" action="{{ path('app_admin_product_option_delete_group', {productId: product.id, groupId: group.id}) }}" class="inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_option_group_' ~ group.id) }}">
+                                    <button type="submit"
+                                            class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition"
+                                            onclick="return confirm('Supprimer ce groupe et toutes ses valeurs ?')">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        {% if group.values is empty %}
+                            <p class="px-4 py-3 text-sm text-neutral-400 italic">Aucune valeur.</p>
+                        {% else %}
+                            <table class="w-full text-sm">
+                                <thead class="text-xs text-neutral-500 uppercase tracking-wide">
+                                    <tr class="border-b border-neutral-100">
+                                        <th class="px-4 py-2 text-left">Valeur</th>
+                                        <th class="px-4 py-2 text-right">Supplément</th>
+                                        <th class="px-4 py-2 text-center">Active</th>
+                                        <th class="px-4 py-2 text-center">Ordre</th>
+                                        <th class="px-4 py-2"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100">
+                                    {% for value in group.values %}
+                                        <tr class="{{ not value.isActive ? 'opacity-40' }}">
+                                            <td class="px-4 py-2.5 font-medium text-neutral-800">{{ value.label }}</td>
+                                            <td class="px-4 py-2.5 text-right text-neutral-600">
+                                                {% if value.priceAdjustment > 0 %}
+                                                    +{{ (value.priceAdjustment / 100)|number_format(2, ',', ' ') }} €
+                                                {% else %}
+                                                    <span class="text-neutral-400">inclus</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-4 py-2.5 text-center">
+                                                {% if value.isActive %}
+                                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                {% else %}
+                                                    <span class="inline-block w-2 h-2 rounded-full bg-neutral-300"></span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="px-4 py-2.5 text-center text-neutral-400">{{ value.sortOrder }}</td>
+                                            <td class="px-4 py-2.5 text-right">
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <a href="{{ path('app_admin_product_option_edit_value', {productId: product.id, groupId: group.id, valueId: value.id}) }}"
+                                                       class="text-xs text-neutral-500 hover:text-neutral-700 px-2 py-1 rounded hover:bg-neutral-100 transition">
+                                                        Modifier
+                                                    </a>
+                                                    <form method="post" action="{{ path('app_admin_product_option_delete_value', {productId: product.id, groupId: group.id, valueId: value.id}) }}" class="inline">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_option_value_' ~ value.id) }}">
+                                                        <button type="submit"
+                                                                class="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition"
+                                                                onclick="return confirm('Supprimer cette valeur ?')">
+                                                            ✕
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
 </div>
 {% endblock %}

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Service\ProductImageStorage;
+use App\Service\ProductOptionSerializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,8 +23,12 @@ class CatalogController extends AbstractController
     }
 
     #[Route('/{slug}', name: 'show', methods: ['GET'])]
-    public function show(string $slug, ProductRepository $productRepository, ProductImageStorage $productImageStorage): Response
-    {
+    public function show(
+        string $slug,
+        ProductRepository $productRepository,
+        ProductImageStorage $productImageStorage,
+        ProductOptionSerializer $optionSerializer,
+    ): Response {
         $product = $productRepository->findVisibleBySlug($slug);
         if ($product === null) {
             throw $this->createNotFoundException('Produit introuvable.');
@@ -32,6 +37,7 @@ class CatalogController extends AbstractController
         return $this->render('catalog/show.html.twig', [
             'product' => $product,
             'imagePublicPath' => $productImageStorage->getPublicPath($product->getCoverImage()),
+            'optionGroupsJson' => $optionSerializer->serializeForFrontend($product),
         ]);
     }
 }

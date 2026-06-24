@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repository\ProductOptionValueRepository;
 use App\Repository\ProductRepository;
 use App\Service\CartService;
 use App\Service\CustomizationFileStorage;
@@ -33,6 +34,7 @@ final class CartController extends AbstractController
         int $id,
         Request $request,
         ProductRepository $productRepository,
+        ProductOptionValueRepository $optionValueRepository,
         CartService $cartService,
         CustomizationFileStorage $customizationFileStorage,
         ValidatorInterface $validator,
@@ -74,7 +76,46 @@ final class CartController extends AbstractController
             $storedFilename = $customizationFileStorage->store($uploadedFile);
         }
 
-        $cartService->addLine($product, $quantity, $customizationText, $storedFilename);
+        // Resolve option values server-side; price is never trusted from the client.
+        $submittedIds = array_filter(
+            array_map('intval', (array) $request->request->all('option_values')),
+            static fn (int $v) => $v > 0,
+        );
+
+        $selectedValues = [];
+        $optionValueIds = [];
+        $priceAdjustment = 0;
+
+        if ($submittedIds !== []) {
+            $values = $optionValueRepository->findByIds($submittedIds);
+
+            foreach ($values as $value) {
+                // Security: ensure each value belongs to a group of this product.
+                if ($value->getGroup()?->getProduct()?->getId() !== $product->getId()) {
+                    continue;
+                }
+                if (!$value->isActive()) {
+                    continue;
+                }
+                $selectedValues[] = $value->getLabel();
+                $optionValueIds[] = (int) $value->getId();
+                $priceAdjustment += $value->getPriceAdjustment();
+            }
+        }
+
+        $unitPrice = $product->getPrice() + $priceAdjustment;
+        $optionsSummary = $selectedValues !== [] ? implode(' — ', $selectedValues) : null;
+
+        $cartService->addLine(
+            $product,
+            $quantity,
+            $customizationText,
+            $storedFilename,
+            $unitPrice,
+            $optionValueIds,
+            $optionsSummary,
+        );
+
         $this->addFlash('cart_added', $product->getName());
 
         return $this->redirectToRoute('app_catalog_show', ['slug' => $product->getSlug()]);

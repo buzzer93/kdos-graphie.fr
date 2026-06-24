@@ -25,6 +25,9 @@
                     <article class="bg-white border border-neutral-200 rounded-xl p-4 grid lg:grid-cols-[1fr_auto] gap-4">
                         <div class="space-y-1">
                             <h2 class="font-semibold text-neutral-900">{{ line.productName }}</h2>
+                            {% if line.optionsSummary is defined and line.optionsSummary %}
+                                <p class="text-sm text-neutral-500">{{ line.optionsSummary }}</p>
+                            {% endif %}
                             <p class="text-sm text-neutral-600">Prix unitaire: {{ (line.unitPrice / 100)|number_format(2, ',', ' ') }} €</p>
                             {% if line.customizationText %}
                                 <p class="text-sm text-neutral-700 whitespace-pre-line"><span class="font-medium">Texte perso:</span> {{ line.customizationText }}</p>

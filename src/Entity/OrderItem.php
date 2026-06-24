@@ -37,6 +37,10 @@ class OrderItem
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $customizationFilePath = null;
 
+    /** Snapshot des options choisies au moment de la commande. Ex : "20×30 cm — Aluminium". */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $optionsSummary = null;
+
     public function getSubtotal(): int
     {
         return $this->unitPrice * $this->quantity;
@@ -115,6 +119,18 @@ class OrderItem
     public function setCustomizationFilePath(?string $customizationFilePath): static
     {
         $this->customizationFilePath = $customizationFilePath;
+
+        return $this;
+    }
+
+    public function getOptionsSummary(): ?string
+    {
+        return $this->optionsSummary;
+    }
+
+    public function setOptionsSummary(?string $optionsSummary): static
+    {
+        $this->optionsSummary = $optionsSummary;
 
         return $this;
     }

@@ -8,6 +8,7 @@ use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Form\CheckoutOrderType;
 use App\Repository\OrderRepository;
+use App\Repository\ProductOptionValueRepository;
 use App\Repository\ProductRepository;
 use App\Service\CartService;
 use App\Service\OrderMailer;
@@ -26,6 +27,7 @@ final class CheckoutController extends AbstractController
         CartService $cartService,
         OrderRepository $orderRepository,
         ProductRepository $productRepository,
+        ProductOptionValueRepository $optionValueRepository,
         EntityManagerInterface $entityManager,
         OrderMailer $orderMailer,
     ): Response {
@@ -38,9 +40,9 @@ final class CheckoutController extends AbstractController
 
         $productIds = array_filter(array_map(static fn (array $l) => (int) ($l['productId'] ?? 0), $lines));
         $products = $productRepository->findBy(['id' => $productIds]);
-        $priceMap = [];
+        $baseProductPriceMap = [];
         foreach ($products as $product) {
-            $priceMap[(int) $product->getId()] = $product->getPrice();
+            $baseProductPriceMap[(int) $product->getId()] = $product->getPrice();
         }
 
         $order = new Order();
@@ -54,14 +56,29 @@ final class CheckoutController extends AbstractController
             $total = 0;
             foreach ($lines as $line) {
                 $productId = (int) ($line['productId'] ?? 0);
-                $unitPrice = $priceMap[$productId] ?? (int) ($line['unitPrice'] ?? 0);
+                $basePrice = $baseProductPriceMap[$productId] ?? (int) ($line['unitPrice'] ?? 0);
+
+                // Re-verify option prices server-side at order time.
+                $optionValueIds = array_filter(array_map('intval', (array) ($line['optionValueIds'] ?? [])));
+                $priceAdjustment = 0;
+                if ($optionValueIds !== []) {
+                    $optionValues = $optionValueRepository->findByIds($optionValueIds);
+                    foreach ($optionValues as $optionValue) {
+                        if ($optionValue->getGroup()?->getProduct()?->getId() === $productId && $optionValue->isActive()) {
+                            $priceAdjustment += $optionValue->getPriceAdjustment();
+                        }
+                    }
+                }
+
+                $unitPrice = $basePrice + $priceAdjustment;
 
                 $item = (new OrderItem())
                     ->setProductName((string) ($line['productName'] ?? 'Produit'))
                     ->setUnitPrice($unitPrice)
                     ->setQuantity((int) ($line['quantity'] ?? 1))
                     ->setCustomizationText($line['customizationText'] ?? null)
-                    ->setCustomizationFilePath($line['customizationFilePath'] ?? null);
+                    ->setCustomizationFilePath($line['customizationFilePath'] ?? null)
+                    ->setOptionsSummary($line['optionsSummary'] ?? null);
 
                 $order->addItem($item);
                 $total += $item->getSubtotal();
@@ -81,9 +98,7 @@ final class CheckoutController extends AbstractController
 
         $totalCents = 0;
         foreach ($lines as $line) {
-            $productId = (int) ($line['productId'] ?? 0);
-            $unitPrice = $priceMap[$productId] ?? (int) ($line['unitPrice'] ?? 0);
-            $totalCents += $unitPrice * (int) ($line['quantity'] ?? 1);
+            $totalCents += (int) ($line['unitPrice'] ?? 0) * (int) ($line['quantity'] ?? 1);
         }
 
         return $this->render('checkout/form.html.twig', [

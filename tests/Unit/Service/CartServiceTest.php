@@ -25,7 +25,7 @@ final class CartServiceTest extends TestCase
 
             ->setIsVisible(true);
 
-        $service->addLine($product, 2, 'Texte test', null);
+        $service->addLine($product, 2, 'Texte test', null, $product->getPrice());
 
         self::assertCount(1, $service->getLines());
         self::assertSame(2, $service->getItemsCount());
@@ -43,7 +43,7 @@ final class CartServiceTest extends TestCase
 
             ->setIsVisible(true);
 
-        $service->addLine($product, 1, null, null);
+        $service->addLine($product, 1, null, null, $product->getPrice());
         $line = $service->getLines()[0];
 
         $service->updateQuantity($line['id'], 4);
@@ -63,7 +63,7 @@ final class CartServiceTest extends TestCase
 
             ->setIsVisible(true);
 
-        $service->addLine($product, 1, null, 'custom.pdf');
+        $service->addLine($product, 1, null, 'custom.pdf', $product->getPrice());
         $line = $service->getLines()[0];
 
         $removed = $service->removeLine($line['id']);
