@@ -25,6 +25,7 @@ final class CartController extends AbstractController
             'lines' => $cartService->getLines(),
             'itemsCount' => $cartService->getItemsCount(),
             'totalCents' => $cartService->getTotalCents(),
+            'hasDevis' => $cartService->hasDevisLines(),
             'fileStorage' => $customizationFileStorage,
         ]);
     }

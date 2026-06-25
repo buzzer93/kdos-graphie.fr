@@ -22,13 +22,17 @@
         {% else %}
             <div class="space-y-4">
                 {% for line in lines %}
+                    {% set isDevis = line.customizationFilePath or (line.specialRequest is defined and line.specialRequest) %}
                     <article class="bg-white border border-neutral-200 rounded-xl p-4 grid lg:grid-cols-[1fr_auto] gap-4">
                         <div class="space-y-1">
                             <h2 class="font-semibold text-neutral-900">{{ line.productName }}</h2>
                             {% if line.optionsSummary is defined and line.optionsSummary %}
                                 <p class="text-sm text-neutral-500">{{ line.optionsSummary }}</p>
                             {% endif %}
-                            <p class="text-sm text-neutral-600">Prix unitaire: {{ (line.unitPrice / 100)|number_format(2, ',', ' ') }} €</p>
+                            <p class="text-sm {% if isDevis %}text-amber-700{% else %}text-neutral-600{% endif %}">
+                                Prix unitaire :
+                                {% if isDevis %}~{% endif %}{{ (line.unitPrice / 100)|number_format(2, ',', ' ') }} €{% if isDevis %} <span class="font-normal text-xs">(indicatif)</span>{% endif %}
+                            </p>
                             {% if line.customizationText %}
                                 <p class="text-sm text-neutral-700 whitespace-pre-line"><span class="font-medium">Texte à graver :</span> {{ line.customizationText }}</p>
                             {% endif %}
@@ -83,7 +87,10 @@
                                 <input type="number" name="quantity" min="1" value="{{ line.quantity }}" class="w-20 px-3 py-2 border border-neutral-200 rounded-lg text-sm">
                                 <button type="submit" class="px-3 py-2 text-sm rounded-lg bg-neutral-900 text-white hover:bg-neutral-700">MAJ</button>
                             </form>
-                            <p class="text-sm text-neutral-700 font-medium">Sous-total: {{ ((line.unitPrice * line.quantity) / 100)|number_format(2, ',', ' ') }} €</p>
+                            <p class="text-sm font-medium {% if isDevis %}text-amber-700{% else %}text-neutral-700{% endif %}">
+                                Sous-total :
+                                {% if isDevis %}~{% endif %}{{ ((line.unitPrice * line.quantity) / 100)|number_format(2, ',', ' ') }} €{% if isDevis %} <span class="font-normal text-xs">(indicatif)</span>{% endif %}
+                            </p>
                             <form method="post" action="{{ path('app_cart_remove', {lineId: line.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('cart_remove_' ~ line.id) }}">
                                 <button
@@ -101,9 +108,21 @@
                 {% endfor %}
             </div>
 
-            <div class="bg-white border border-neutral-200 rounded-xl p-6 flex items-center justify-between">
-                <p class="text-neutral-700">Articles: <span class="font-semibold">{{ itemsCount }}</span></p>
-                <p class="text-xl font-semibold text-neutral-900">Total: {{ (totalCents / 100)|number_format(2, ',', ' ') }} €</p>
+            <div class="bg-white border border-neutral-200 rounded-xl p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                    <p class="text-neutral-700">Articles : <span class="font-semibold">{{ itemsCount }}</span></p>
+                    <p class="text-xl font-semibold {% if hasDevis %}text-amber-700{% else %}text-neutral-900{% endif %}">
+                        Total : {% if hasDevis %}~{% endif %}{{ (totalCents / 100)|number_format(2, ',', ' ') }} €{% if hasDevis %} <span class="text-sm font-normal">(indicatif)</span>{% endif %}
+                    </p>
+                </div>
+                {% if hasDevis %}
+                    <p class="text-xs text-amber-700 flex items-start gap-1.5">
+                        <svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+                        </svg>
+                        Le prix final sera confirmé après validation de votre demande de devis.
+                    </p>
+                {% endif %}
             </div>
 
             <div id="customization-preview-modal" class="hidden fixed inset-0 z-50 bg-neutral-900/70 p-4 items-center justify-center">

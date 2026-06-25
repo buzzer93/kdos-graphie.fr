@@ -121,6 +121,17 @@ final class CartService
         return $total;
     }
 
+    public function hasDevisLines(): bool
+    {
+        foreach ($this->getLines() as $line) {
+            if (!empty($line['customizationFilePath']) || !empty($line['specialRequest'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** @return array{lines: list<array{id: string, productId: int, productName: string, unitPrice: int, quantity: int, customizationText: ?string, customizationFilePath: ?string, optionValueIds: int[], optionsSummary: ?string, specialRequest: ?string}>} */
     private function getCart(): array
     {
