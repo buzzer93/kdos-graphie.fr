@@ -36,12 +36,13 @@ final class CheckoutControllerTest extends AbstractWebTestCase
 
         $client->request('GET', '/catalogue/' . $product->getSlug());
 
-        $client->submitForm('Ajouter au panier', [
+        $client->submitForm('Ajouter à ma demande', [
             'quantity' => 2,
             'customization_text' => 'Hello TDD',
         ]);
 
-        self::assertResponseRedirects('/panier/');
+        // add() redirects back to the product page; navigate to checkout directly.
+        self::assertResponseRedirects('/catalogue/poster-premium');
 
         $client->request('GET', '/commande/');
         self::assertResponseIsSuccessful();
@@ -67,6 +68,6 @@ final class CheckoutControllerTest extends AbstractWebTestCase
         self::assertCount(1, $order->getItems());
 
         $client->request('GET', '/panier/');
-        self::assertSelectorTextContains('body', 'Votre panier est vide.');
+        self::assertSelectorTextContains('body', 'Votre demande est vide.');
     }
 }

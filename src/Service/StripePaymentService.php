@@ -11,7 +11,7 @@ use Stripe\PaymentIntent;
 use Stripe\StripeClient;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class StripePaymentService
+class StripePaymentService
 {
     private readonly StripeClient $stripe;
 

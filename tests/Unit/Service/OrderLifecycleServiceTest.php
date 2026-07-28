@@ -8,12 +8,15 @@ use App\Entity\Order;
 use App\Message\AdminOrderPaidNotification;
 use App\Service\OrderLifecycleService;
 use App\Service\OrderMailer;
+use App\Service\StripePaymentService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Stripe\PaymentIntent;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class OrderLifecycleServiceTest extends TestCase
 {
@@ -27,7 +30,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->accept($order);
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->accept($order);
 
         self::assertSame(Order::STATUS_EN_ATTENTE_PAIEMENT, $order->getStatus());
         self::assertSame('success', $result->level);
@@ -48,7 +51,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->accept($order);
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->accept($order);
 
             self::assertSame('warning', $result->level, "accept() should return warning for status $status");
             self::assertSame($status, $order->getStatus());
@@ -65,7 +68,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::never())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->remindPayment($order);
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->remindPayment($order);
 
         self::assertSame('success', $result->level);
     }
@@ -85,7 +88,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->remindPayment($order);
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->remindPayment($order);
 
             self::assertSame('warning', $result->level, "remindPayment() should return warning for status $status");
         }
@@ -101,7 +104,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->reject($order, 'Fichier illisible');
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->reject($order, 'Fichier illisible');
 
         self::assertSame(Order::STATUS_REFUSE, $order->getStatus());
         self::assertSame('Fichier illisible', $order->getDecisionReason());
@@ -116,7 +119,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->reject($order, 'Paiement expiré');
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->reject($order, 'Paiement expiré');
 
         self::assertSame(Order::STATUS_REFUSE, $order->getStatus());
         self::assertSame('success', $result->level);
@@ -131,7 +134,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->reject($order, $blank);
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->reject($order, $blank);
 
             self::assertSame('danger', $result->level);
             self::assertSame(Order::STATUS_A_CONFIRMER, $order->getStatus());
@@ -146,7 +149,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::never())->method('flush');
         $symfonyMailer->expects(self::never())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->reject($order, 'Motif valide');
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->reject($order, 'Motif valide');
 
         self::assertSame('warning', $result->level);
         self::assertSame(Order::STATUS_A_FAIRE, $order->getStatus());
@@ -161,7 +164,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->reject($order, 'Motif valide');
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->reject($order, 'Motif valide');
 
             self::assertSame('warning', $result->level, "reject() should return warning for status $status");
         }
@@ -177,7 +180,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->cancel($order, 'Commande dupliquée');
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->cancel($order, 'Commande dupliquée');
 
         self::assertSame(Order::STATUS_ANNULE, $order->getStatus());
         self::assertSame('Commande dupliquée', $order->getDecisionReason());
@@ -192,7 +195,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->cancel($order, 'Client désiste');
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->cancel($order, 'Client désiste');
 
         self::assertSame(Order::STATUS_ANNULE, $order->getStatus());
         self::assertSame('success', $result->level);
@@ -206,7 +209,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->cancel($order, 'Problème technique');
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->cancel($order, 'Problème technique');
 
         self::assertSame(Order::STATUS_ANNULE, $order->getStatus());
         self::assertSame('success', $result->level);
@@ -221,7 +224,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->cancel($order, $blank);
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->cancel($order, $blank);
 
             self::assertSame('danger', $result->level);
             self::assertSame(Order::STATUS_A_CONFIRMER, $order->getStatus());
@@ -237,7 +240,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->cancel($order, 'Motif valide');
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->cancel($order, 'Motif valide');
 
             self::assertSame('warning', $result->level, "cancel() should return warning for status $status");
         }
@@ -249,9 +252,11 @@ final class OrderLifecycleServiceTest extends TestCase
         $order->setNotes('Note initiale');
         $em = $this->createStub(EntityManagerInterface::class);
         $bus = $this->createStub(MessageBusInterface::class);
+        $stripe = $this->createStub(StripePaymentService::class);
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $mailer = new OrderMailer($this->createStub(MailerInterface::class), 'no-reply@example.test', 'admin@example.test');
 
-        (new OrderLifecycleService($em, $mailer, $bus))->cancel($order, 'Problème client');
+        (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->cancel($order, 'Problème client');
 
         self::assertStringContainsString('Note initiale', (string) $order->getNotes());
         self::assertStringContainsString('Annulee: Problème client', (string) $order->getNotes());
@@ -262,7 +267,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testMarkAsPaidTransitionsToAFaireAndDispatchesMessage(): void
     {
         $order = $this->createOrder(Order::STATUS_EN_ATTENTE_PAIEMENT);
-        [$em, $mailer, $symfonyMailer] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, , $stripe, $urlGenerator] = $this->createDependencies();
         $bus = $this->createMock(MessageBusInterface::class);
 
         $em->expects(self::once())->method('flush');
@@ -272,7 +277,7 @@ final class OrderLifecycleServiceTest extends TestCase
             ->with(self::isInstanceOf(AdminOrderPaidNotification::class))
             ->willReturn(new Envelope(new AdminOrderPaidNotification(0)));
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->markAsPaid($order);
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->markAsPaid($order);
 
         self::assertSame(Order::STATUS_A_FAIRE, $order->getStatus());
         self::assertSame('success', $result->level);
@@ -293,7 +298,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->markAsPaid($order);
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->markAsPaid($order);
 
             self::assertSame('warning', $result->level, "markAsPaid() should return warning for status $status");
             self::assertSame($status, $order->getStatus());
@@ -310,7 +315,7 @@ final class OrderLifecycleServiceTest extends TestCase
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
 
-        $result = (new OrderLifecycleService($em, $mailer, $bus))->complete($order);
+        $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->complete($order);
 
         self::assertSame(Order::STATUS_TERMINE, $order->getStatus());
         self::assertSame('success', $result->level);
@@ -331,7 +336,7 @@ final class OrderLifecycleServiceTest extends TestCase
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
 
-            $result = (new OrderLifecycleService($em, $mailer, $bus))->complete($order);
+            $result = (new OrderLifecycleService($em, $mailer, $bus, $stripe, $urlGenerator))->complete($order);
 
             self::assertSame('warning', $result->level, "complete() should return warning for status $status");
             self::assertSame($status, $order->getStatus());
@@ -341,7 +346,7 @@ final class OrderLifecycleServiceTest extends TestCase
     // --- helpers ---
 
     /**
-     * @return array{EntityManagerInterface&MockObject, OrderMailer, MailerInterface&MockObject, MessageBusInterface}
+     * @return array{EntityManagerInterface&MockObject, OrderMailer, MailerInterface&MockObject, MessageBusInterface, StripePaymentService, UrlGeneratorInterface}
      */
     private function createDependencies(): array
     {
@@ -350,7 +355,13 @@ final class OrderLifecycleServiceTest extends TestCase
         $mailer = new OrderMailer($symfonyMailer, 'no-reply@example.test', 'admin@example.test');
         $bus = $this->createStub(MessageBusInterface::class);
 
-        return [$em, $mailer, $symfonyMailer, $bus];
+        $stripe = $this->createStub(StripePaymentService::class);
+        $stripe->method('createPaymentIntent')->willReturn(PaymentIntent::constructFrom(['id' => 'pi_test_stub']));
+
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturn('https://example.test/pay/test');
+
+        return [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator];
     }
 
     private function createOrder(string $status): Order

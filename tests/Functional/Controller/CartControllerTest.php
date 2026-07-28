@@ -39,8 +39,11 @@ final class CartControllerTest extends AbstractWebTestCase
             'customization_text' => 'Texte perso',
         ]);
 
-        self::assertResponseRedirects('/panier/');
+        // add() redirects back to the product page with a cart_added flash.
+        self::assertResponseRedirects('/catalogue/affiche-personnalisee');
         $client->followRedirect();
+
+        $client->request('GET', '/panier/');
         self::assertSelectorTextContains('body', 'Affiche Personnalisee');
         self::assertSelectorTextContains('body', 'Articles: 2');
 

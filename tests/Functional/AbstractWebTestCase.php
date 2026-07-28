@@ -66,15 +66,19 @@ abstract class AbstractWebTestCase extends WebTestCase
     private function recreateSchema(): void
     {
         $entityManager = $this->getEntityManager();
+        $connection = $entityManager->getConnection();
         $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
 
         if ($metadata === []) {
             return;
         }
 
+        // Disable FK checks so tables with relationships (e.g. `order`) drop cleanly.
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropSchema($metadata);
         $schemaTool->createSchema($metadata);
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
 
         $entityManager->clear();
     }
