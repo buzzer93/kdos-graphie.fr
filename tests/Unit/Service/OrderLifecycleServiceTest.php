@@ -25,7 +25,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testAcceptTransitionsToAwaitingPaymentAndSendsEmail(): void
     {
         $order = $this->createOrder(Order::STATUS_A_CONFIRMER);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -46,7 +46,7 @@ final class OrderLifecycleServiceTest extends TestCase
             Order::STATUS_ANNULE,
         ] as $status) {
             $order = $this->createOrder($status);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
@@ -63,7 +63,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testRemindPaymentSendsEmailWhenEnAttentePaiement(): void
     {
         $order = $this->createOrder(Order::STATUS_EN_ATTENTE_PAIEMENT);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::never())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -83,7 +83,7 @@ final class OrderLifecycleServiceTest extends TestCase
             Order::STATUS_ANNULE,
         ] as $status) {
             $order = $this->createOrder($status);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
@@ -99,7 +99,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testRejectSetsRefusedStatusAndSendsEmail(): void
     {
         $order = $this->createOrder(Order::STATUS_A_CONFIRMER);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -114,7 +114,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testRejectIsAllowedFromEnAttentePaiement(): void
     {
         $order = $this->createOrder(Order::STATUS_EN_ATTENTE_PAIEMENT);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -129,7 +129,7 @@ final class OrderLifecycleServiceTest extends TestCase
     {
         foreach (['', '   ', "\t"] as $blank) {
             $order = $this->createOrder(Order::STATUS_A_CONFIRMER);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
@@ -144,7 +144,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testRejectBlocksWhenStatusIsAFaire(): void
     {
         $order = $this->createOrder(Order::STATUS_A_FAIRE);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::never())->method('flush');
         $symfonyMailer->expects(self::never())->method('send');
@@ -159,7 +159,7 @@ final class OrderLifecycleServiceTest extends TestCase
     {
         foreach ([Order::STATUS_TERMINE, Order::STATUS_REFUSE, Order::STATUS_ANNULE] as $status) {
             $order = $this->createOrder($status);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
@@ -175,7 +175,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testCancelSetsAnnuleStatusAndSendsEmail(): void
     {
         $order = $this->createOrder(Order::STATUS_A_CONFIRMER);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -190,7 +190,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testCancelIsAllowedFromEnAttentePaiement(): void
     {
         $order = $this->createOrder(Order::STATUS_EN_ATTENTE_PAIEMENT);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -204,7 +204,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testCancelIsAllowedFromAFaire(): void
     {
         $order = $this->createOrder(Order::STATUS_A_FAIRE);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -219,7 +219,7 @@ final class OrderLifecycleServiceTest extends TestCase
     {
         foreach (['', '   ', "\t"] as $blank) {
             $order = $this->createOrder(Order::STATUS_A_CONFIRMER);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
@@ -235,7 +235,7 @@ final class OrderLifecycleServiceTest extends TestCase
     {
         foreach ([Order::STATUS_TERMINE, Order::STATUS_REFUSE, Order::STATUS_ANNULE] as $status) {
             $order = $this->createOrder($status);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
@@ -293,7 +293,7 @@ final class OrderLifecycleServiceTest extends TestCase
             Order::STATUS_ANNULE,
         ] as $status) {
             $order = $this->createOrder($status);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');
@@ -310,7 +310,7 @@ final class OrderLifecycleServiceTest extends TestCase
     public function testCompleteTransitionsToTermineAndSendsShippingEmail(): void
     {
         $order = $this->createOrder(Order::STATUS_A_FAIRE);
-        [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+        [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
         $em->expects(self::once())->method('flush');
         $symfonyMailer->expects(self::once())->method('send');
@@ -331,7 +331,7 @@ final class OrderLifecycleServiceTest extends TestCase
             Order::STATUS_ANNULE,
         ] as $status) {
             $order = $this->createOrder($status);
-            [$em, $mailer, $symfonyMailer, $bus] = $this->createDependencies();
+            [$em, $mailer, $symfonyMailer, $bus, $stripe, $urlGenerator] = $this->createDependencies();
 
             $em->expects(self::never())->method('flush');
             $symfonyMailer->expects(self::never())->method('send');

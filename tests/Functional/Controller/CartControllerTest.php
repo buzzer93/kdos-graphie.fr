@@ -45,7 +45,7 @@ final class CartControllerTest extends AbstractWebTestCase
 
         $client->request('GET', '/panier/');
         self::assertSelectorTextContains('body', 'Affiche Personnalisee');
-        self::assertSelectorTextContains('body', 'Articles: 2');
+        self::assertSelectorTextContains('body', 'Articles : 2');
 
         $session = $client->getRequest()->getSession();
         $cart = $session->get('cart', ['lines' => []]);
@@ -59,7 +59,7 @@ final class CartControllerTest extends AbstractWebTestCase
 
         self::assertResponseRedirects('/panier/');
         $client->followRedirect();
-        self::assertSelectorTextContains('body', 'Articles: 4');
+        self::assertSelectorTextContains('body', 'Articles : 4');
 
         $removeForm = $client->getCrawler()->filter('form[action$="/supprimer"]')->first()->form();
         $client->submit($removeForm);

@@ -47,7 +47,7 @@ final class CheckoutControllerTest extends AbstractWebTestCase
         $client->request('GET', '/commande/');
         self::assertResponseIsSuccessful();
 
-        $client->submitForm('Confirmer la demande', [
+        $client->submitForm('Envoyer ma demande', [
             'checkout_order[customerFirstName]' => 'Nina',
             'checkout_order[customerLastName]' => 'Martin',
             'checkout_order[customerEmail]' => 'nina@example.test',

@@ -1,6 +1,0 @@
-services:
-    App\Service\StripePaymentService:
-        class: App\Tests\Stub\StripePaymentServiceStub
-        autowire: false
-        autoconfigure: false
-        arguments: []

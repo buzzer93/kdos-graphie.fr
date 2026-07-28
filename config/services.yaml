@@ -29,3 +29,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+when@test:
+    services:
+        App\Service\StripePaymentService:
+            class: App\Tests\Stub\StripePaymentServiceStub
+            autowire: false
+            autoconfigure: false
+            arguments: []
