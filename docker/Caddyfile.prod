@@ -1,13 +1,16 @@
 {
 	frankenphp
+	worker {
+		file /var/www/html/public/index.php
+		num 2
+		env APP_ENV prod
+		env APP_DEBUG 0
+	}
 	auto_https off
 }
 
 :80 {
 	root * /var/www/html/public
 	encode gzip
-	php_server {
-		env APP_ENV prod
-		env APP_DEBUG 0
-	}
+	php_server
 }
