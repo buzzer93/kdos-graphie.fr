@@ -35,7 +35,7 @@ jobs:
       DEFAULT_URI: http://localhost
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
-      DB_NAME: kdos_graphie_test
+      DB_NAME: kdos_graphie
       DB_USER: root
       DB_PASSWORD: root
       DB_SERVER_VERSION: "8.0.36"
