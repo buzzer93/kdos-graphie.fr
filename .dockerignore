@@ -9,3 +9,4 @@ assets/vendor/
 .env.*.local
 .env.docker.local
 docker-compose.override.yml
+scripts/

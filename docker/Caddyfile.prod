@@ -1,0 +1,10 @@
+{
+	frankenphp
+	auto_https off
+}
+
+:80 {
+	root * /var/www/html/public
+	encode gzip
+	php_server
+}

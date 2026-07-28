@@ -10,6 +10,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+FROM base AS prod
+
+COPY . .
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
 FROM base AS dev
 
 RUN install-php-extensions xdebug
