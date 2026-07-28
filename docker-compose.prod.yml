@@ -2,6 +2,9 @@ services:
   app:
     build:
       target: prod
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: '0'
     volumes:
       - .:/var/www/html
       - ./docker/Caddyfile.prod:/etc/frankenphp/Caddyfile
