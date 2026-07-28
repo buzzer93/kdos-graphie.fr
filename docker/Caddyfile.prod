@@ -6,5 +6,8 @@
 :80 {
 	root * /var/www/html/public
 	encode gzip
-	php_server
+	php_server {
+		env APP_ENV prod
+		env APP_DEBUG 0
+	}
 }
