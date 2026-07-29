@@ -27,7 +27,6 @@ final class CategoryControllerTest extends AbstractWebTestCase
 
         $client->submitForm('Enregistrer', [
             'category[name]' => 'Papeterie',
-            'category[slug]' => 'papeterie',
             'category[description]' => 'Description test',
             'category[isVisible]' => '1',
         ]);
@@ -41,7 +40,6 @@ final class CategoryControllerTest extends AbstractWebTestCase
         $client->request('GET', '/admin/categories/' . $category->getId() . '/edit');
         $client->submitForm('Enregistrer', [
             'category[name]' => 'Papeterie MAJ',
-            'category[slug]' => 'papeterie-maj',
             'category[description]' => 'Description MAJ',
             'category[isVisible]' => '1',
         ]);
