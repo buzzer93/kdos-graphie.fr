@@ -13,6 +13,7 @@ use App\Repository\ProductRepository;
 use App\Service\CartService;
 use App\Service\OrderMailer;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +31,7 @@ final class CheckoutController extends AbstractController
         ProductOptionValueRepository $optionValueRepository,
         EntityManagerInterface $entityManager,
         OrderMailer $orderMailer,
+        LoggerInterface $logger,
     ): Response {
         $lines = $cartService->getLines();
         if ($lines === []) {
@@ -99,7 +101,14 @@ final class CheckoutController extends AbstractController
             $entityManager->persist($order);
             $entityManager->flush();
 
-            $orderMailer->sendOrderReceived($order);
+            try {
+                $orderMailer->sendOrderReceived($order);
+            } catch (\Throwable $e) {
+                $logger->error('Checkout email failed for order {ref}: {msg}', [
+                    'ref' => $order->getReference(),
+                    'msg' => $e->getMessage(),
+                ]);
+            }
 
             $cartService->clear();
 
