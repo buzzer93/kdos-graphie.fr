@@ -156,7 +156,7 @@ final class ContentController extends AbstractController
             }
 
             $newValue = isset($posted[$key]) ? trim($posted[$key]) : '';
-            $setting->setSettingValue($newValue !== '' ? $newValue : null);
+            $setting->setSettingValue($newValue);
         }
 
         $entityManager->flush();
