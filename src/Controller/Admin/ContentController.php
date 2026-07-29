@@ -20,21 +20,21 @@ final class ContentController extends AbstractController
     /** @var array<string, string> */
     private const HOME_DEFAULTS = [
         // Hero
-        'home_hero_badge'           => 'Fait main · Atelier artisanal',
+        'home_hero_badge'           => 'Gravure laser · Atelier artisanal',
         'home_hero_title'           => 'Conçu pour vous,',
-        'home_hero_title_highlight' => 'gravé à la main.',
+        'home_hero_title_highlight' => 'gravé au laser.',
         'home_hero_subtitle'        => 'Pas de série, pas de catalogue standard. Chaque pièce naît d\'une idée — la vôtre — façonnée sur mesure dans notre atelier avec soin et précision laser.',
         'home_hero_stat_1_value'    => '+500',
         'home_hero_stat_1_label'    => 'Créations uniques',
         'home_hero_stat_2_value'    => '100%',
-        'home_hero_stat_2_label'    => 'Fait main',
+        'home_hero_stat_2_label'    => 'Sur mesure',
         'home_hero_stat_3_value'    => '48h',
         'home_hero_stat_3_label'    => 'Délai express',
 
         // Savoir-faire
         'home_sf_eyebrow'  => 'Notre savoir-faire',
         'home_sf_title'    => 'Des créations uniques, à votre image',
-        'home_sf_subtitle' => 'Chaque projet est pensé et réalisé à la main dans notre atelier, selon vos envies et vos matériaux — pas selon un catalogue.',
+        'home_sf_subtitle' => 'Chaque projet est conçu sur mesure dans notre atelier, selon vos envies et vos matériaux — pas selon un catalogue.',
 
         'home_sf_1_icon'  => '🎁',
         'home_sf_1_title' => 'Cadeaux personnalisés',
@@ -42,11 +42,11 @@ final class ContentController extends AbstractController
 
         'home_sf_2_icon'  => '🏷️',
         'home_sf_2_title' => 'Gravure sur bois',
-        'home_sf_2_desc'  => 'Chêne, hêtre, noyer. La chaleur du bois naturel sublimée par une gravure artisanale, précise et durable.',
+        'home_sf_2_desc'  => 'Chêne, hêtre, noyer. La chaleur du bois naturel sublimée par une gravure laser, précise et durable.',
 
         'home_sf_3_icon'  => '🥃',
         'home_sf_3_title' => 'Gravure sur verre',
-        'home_sf_3_desc'  => 'Verres, carafes, bouteilles : une finition raffinée, réalisée à la main pour vos événements les plus précieux.',
+        'home_sf_3_desc'  => 'Verres, carafes, bouteilles : une finition raffinée gravée au laser, pour vos événements les plus précieux.',
 
         'home_sf_4_icon'  => '💼',
         'home_sf_4_title' => 'Objets professionnels',
