@@ -59,9 +59,7 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $slugInput = trim($product->getSlug());
-            $slugSource = $slugInput !== '' ? $slugInput : $product->getName();
-            $product->setSlug($slugGenerator->generateProductSlug($slugSource));
+            $product->setSlug($slugGenerator->generateProductSlug($product->getName()));
 
             $coverFile = $form->get('coverFile')->getData();
             $product->setCoverImage($productImageStorage->store($coverFile, $product->getCoverImage()));
@@ -100,9 +98,9 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $slugInput = trim($product->getSlug());
-            $slugSource = $slugInput !== '' ? $slugInput : $product->getName();
-            $product->setSlug($slugGenerator->generateProductSlug($slugSource, $product->getId()));
+            if ($product->getSlug() === '') {
+                $product->setSlug($slugGenerator->generateProductSlug($product->getName(), $product->getId()));
+            }
 
             $coverFile = $form->get('coverFile')->getData();
             $product->setCoverImage($productImageStorage->store($coverFile, $product->getCoverImage()));

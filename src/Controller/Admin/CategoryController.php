@@ -51,9 +51,7 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $slugInput = trim($category->getSlug());
-            $slugSource = $slugInput !== '' ? $slugInput : $category->getName();
-            $category->setSlug($slugGenerator->generateCategorySlug($slugSource));
+            $category->setSlug($slugGenerator->generateCategorySlug($category->getName()));
 
             $entityManager->persist($category);
             $entityManager->flush();
@@ -105,9 +103,9 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $slugInput = trim($category->getSlug());
-            $slugSource = $slugInput !== '' ? $slugInput : $category->getName();
-            $category->setSlug($slugGenerator->generateCategorySlug($slugSource, $category->getId()));
+            if ($category->getSlug() === '') {
+                $category->setSlug($slugGenerator->generateCategorySlug($category->getName(), $category->getId()));
+            }
             $entityManager->flush();
 
             $this->addFlash('success', 'Catégorie mise à jour.');
