@@ -44,22 +44,22 @@
                     </a>
                 </div>
 
+                {% set hero_stats = [
+                    { value: home.hero_stat_1_value, label: home.hero_stat_1_label },
+                    { value: home.hero_stat_2_value, label: home.hero_stat_2_label },
+                    { value: home.hero_stat_3_value, label: home.hero_stat_3_label },
+                ]|filter(s => s.value is not empty) %}
+                {% if hero_stats is not empty %}
                 <div class="mt-14 flex items-center justify-center md:justify-start gap-8 text-sm">
-                    <div>
-                        <p class="font-display text-3xl font-bold text-amber-600">{{ home.hero_stat_1_value }}</p>
-                        <p class="text-neutral-500">{{ home.hero_stat_1_label }}</p>
-                    </div>
-                    <div class="w-px h-10 bg-neutral-300"></div>
-                    <div>
-                        <p class="font-display text-3xl font-bold text-amber-600">{{ home.hero_stat_2_value }}</p>
-                        <p class="text-neutral-500">{{ home.hero_stat_2_label }}</p>
-                    </div>
-                    <div class="w-px h-10 bg-neutral-300"></div>
-                    <div>
-                        <p class="font-display text-3xl font-bold text-amber-600">{{ home.hero_stat_3_value }}</p>
-                        <p class="text-neutral-500">{{ home.hero_stat_3_label }}</p>
-                    </div>
+                    {% for stat in hero_stats %}
+                        {% if not loop.first %}<div class="w-px h-10 bg-neutral-300"></div>{% endif %}
+                        <div>
+                            <p class="font-display text-3xl font-bold text-amber-600">{{ stat.value }}</p>
+                            <p class="text-neutral-500">{{ stat.label }}</p>
+                        </div>
+                    {% endfor %}
                 </div>
+                {% endif %}
             </div>
 
             <div class="order-1 md:order-2 flex justify-center md:justify-center">
