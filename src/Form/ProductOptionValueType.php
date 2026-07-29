@@ -6,8 +6,10 @@ namespace App\Form;
 
 use App\Entity\ProductOptionValue;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,10 +29,13 @@ class ProductOptionValueType extends AbstractType
                     new Length(max: 100),
                 ],
             ])
-            ->add('priceAdjustment', IntegerType::class, [
-                'label' => 'Supplément de prix (centimes)',
+            ->add('priceAdjustment', NumberType::class, [
+                'label' => 'Supplément de prix (€)',
+                'scale' => 2,
+                'html5' => true,
                 'required' => false,
                 'empty_data' => '0',
+                'attr' => ['step' => '0.01', 'min' => '0'],
                 'constraints' => [
                     new GreaterThanOrEqual(0),
                 ],
@@ -44,6 +49,11 @@ class ProductOptionValueType extends AbstractType
                 'label' => 'Active',
                 'required' => false,
             ]);
+
+        $builder->get('priceAdjustment')->addModelTransformer(new CallbackTransformer(
+            fn(mixed $centimes) => is_int($centimes) ? $centimes / 100 : 0.0,
+            fn(mixed $euros) => (int) round((float) $euros * 100),
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

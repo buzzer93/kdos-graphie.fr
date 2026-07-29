@@ -36,7 +36,7 @@ final class ProductControllerTest extends AbstractWebTestCase
         $client->submitForm('Enregistrer', [
             'product[name]' => 'Mug Perso',
             'product[description]' => 'Desc test',
-            'product[price]' => '1590',
+            'product[price]' => '15.90',
             'product[category]' => (string) $category->getId(),
             'product[isVisible]' => '1',
         ]);
@@ -51,7 +51,7 @@ final class ProductControllerTest extends AbstractWebTestCase
         $client->submitForm('Enregistrer', [
             'product[name]' => 'Mug Perso MAJ',
             'product[description]' => 'Desc maj',
-            'product[price]' => '1990',
+            'product[price]' => '19.90',
             'product[category]' => (string) $category->getId(),
             'product[isVisible]' => '1',
         ]);

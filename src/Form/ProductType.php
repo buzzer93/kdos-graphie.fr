@@ -6,9 +6,10 @@ use App\Entity\Category;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,8 +35,11 @@ class ProductType extends AbstractType
                 'label' => 'Description',
                 'required' => false,
             ])
-            ->add('price', IntegerType::class, [
-                'label' => 'Prix (centimes)',
+            ->add('price', NumberType::class, [
+                'label' => 'Prix (€)',
+                'scale' => 2,
+                'html5' => true,
+                'attr' => ['step' => '0.01', 'min' => '0'],
                 'constraints' => [
                     new GreaterThanOrEqual(0),
                 ],
@@ -63,6 +67,11 @@ class ProductType extends AbstractType
                 'label' => 'Visible',
                 'required' => false,
             ]);
+
+        $builder->get('price')->addModelTransformer(new CallbackTransformer(
+            fn(mixed $centimes) => is_int($centimes) ? $centimes / 100 : 0.0,
+            fn(mixed $euros) => (int) round((float) $euros * 100),
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
