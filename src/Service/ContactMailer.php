@@ -12,10 +12,8 @@ final class ContactMailer
 {
     public function __construct(
         private readonly MailerInterface $mailer,
-        #[Autowire('%env(string:MAIL_FROM)%')]
-        private readonly string $fromAddress,
-        #[Autowire('%env(string:MAIL_ADMIN)%')]
-        private readonly string $recipientAddress,
+        #[Autowire('%env(string:MAIL_CONTACT)%')]
+        private readonly string $contactAddress,
     ) {
     }
 
@@ -24,8 +22,8 @@ final class ContactMailer
     {
         $this->mailer->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
-                ->to($this->recipientAddress)
+                ->from($this->contactAddress)
+                ->to($this->contactAddress)
                 ->replyTo($data['email'])
                 ->subject('[Contact] ' . $data['subject'])
                 ->htmlTemplate('emails/contact_message.html.twig')

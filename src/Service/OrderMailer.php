@@ -15,8 +15,8 @@ final class OrderMailer
         private readonly MailerInterface $mailer,
         #[Autowire('%env(string:MAIL_FROM)%')]
         private readonly string $fromAddress,
-        #[Autowire('%env(string:MAIL_ADMIN)%')]
-        private readonly string $adminAddress,
+        #[Autowire('%env(string:MAIL_CONTACT)%')]
+        private readonly string $contactAddress,
     ) {
     }
 
@@ -96,9 +96,9 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
-                ->replyTo($this->adminAddress)
+                ->replyTo($this->contactAddress)
                 ->subject('Informations complémentaires requises : ' . $order->getReference())
                 ->htmlTemplate('emails/order_request_info.html.twig')
                 ->context(['order' => $order, 'message' => $message])
@@ -122,7 +122,7 @@ final class OrderMailer
         $this->send(
             (new TemplatedEmail())
                 ->from($this->fromAddress)
-                ->to($this->adminAddress)
+                ->to($this->contactAddress)
                 ->subject('[Admin] Paiement reçu : ' . $order->getReference())
                 ->htmlTemplate('emails/admin_order_paid.html.twig')
                 ->context(['order' => $order])
