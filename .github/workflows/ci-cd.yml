@@ -35,10 +35,11 @@ jobs:
       DEFAULT_URI: http://localhost
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
-      DB_NAME: kdos_graphie
+      DB_NAME: kdos_graphie_test
       DB_USER: root
       DB_PASSWORD: root
       DB_SERVER_VERSION: "8.0.36"
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/kdos_graphie_test?serverVersion=8.0.36&charset=utf8mb4"
       MAILER_DSN: "null://null"
       MAIL_FROM: noreply@example.com
       MAIL_ADMIN: admin@example.com
