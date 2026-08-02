@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional;
 
 use App\Entity\User;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -73,12 +74,17 @@ abstract class AbstractWebTestCase extends WebTestCase
             return;
         }
 
-        // Disable FK checks so tables with relationships (e.g. `order`) drop cleanly.
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        $isMySQL = $connection->getDatabasePlatform() instanceof MySQLPlatform;
+
+        if ($isMySQL) {
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        }
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropSchema($metadata);
         $schemaTool->createSchema($metadata);
-        $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+        if ($isMySQL) {
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+        }
 
         $entityManager->clear();
     }

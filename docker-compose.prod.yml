@@ -3,6 +3,7 @@ services:
     build:
       target: prod
     container_name: kdos-graphie-app
+    env_file: []
     environment:
       APP_ENV: prod
       APP_DEBUG: '0'

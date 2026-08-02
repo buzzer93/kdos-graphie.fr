@@ -9,7 +9,6 @@ services:
       - .:/var/www/html
       - ./docker/Caddyfile:/etc/frankenphp/Caddyfile
       - ./docker/php/conf.d/app.ini:/usr/local/etc/php/conf.d/app.ini
-    env_file: .env.docker
     depends_on:
       mysql:
         condition: service_healthy

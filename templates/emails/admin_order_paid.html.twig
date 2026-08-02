@@ -33,7 +33,7 @@
         <tr>
             <td>
                 {{ item.productName }}
-                {% if item.customText %}<br><span style="font-size:12px;color:#78716c;">Texte: {{ item.customText }}</span>{% endif %}
+                {% if item.customizationText %}<br><span style="font-size:12px;color:#78716c;">Texte: {{ item.customizationText }}</span>{% endif %}
             </td>
             <td style="text-align:right">{{ item.quantity }}</td>
             <td style="text-align:right">{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>

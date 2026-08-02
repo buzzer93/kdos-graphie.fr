@@ -33,16 +33,11 @@ jobs:
       APP_SECRET: ci_placeholder_secret
       APP_SHARE_DIR: var/share
       DEFAULT_URI: http://localhost
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DB_NAME: kdos_graphie
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_SERVER_VERSION: "8.0.36"
       DATABASE_URL: "mysql://root:root@127.0.0.1:3306/kdos_graphie?serverVersion=8.0.36&charset=utf8mb4"
+      MESSENGER_TRANSPORT_DSN: sync://
       MAILER_DSN: "null://null"
       MAIL_FROM: noreply@example.com
-      MAIL_ADMIN: admin@example.com
+      MAIL_CONTACT: contact@example.com
       STRIPE_PUBLIC_KEY: pk_test_ci
       STRIPE_SECRET_KEY: sk_test_ci
       STRIPE_WEBHOOK_SECRET: whsec_ci
