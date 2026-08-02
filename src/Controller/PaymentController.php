@@ -47,6 +47,15 @@ final class PaymentController extends AbstractController
     {
         $order = $orderRepository->findOneBy(['reference' => $reference]);
 
-        return $this->render('payment/success.html.twig', ['order' => $order]);
+        if ($order === null) {
+            throw $this->createNotFoundException('Commande introuvable.');
+        }
+
+        $isConfirmed = in_array($order->getStatus(), [Order::STATUS_A_FAIRE, Order::STATUS_TERMINE], true);
+
+        return $this->render('payment/success.html.twig', [
+            'order' => $order,
+            'isConfirmed' => $isConfirmed,
+        ]);
     }
 }
