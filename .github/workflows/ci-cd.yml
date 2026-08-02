@@ -36,7 +36,6 @@ jobs:
       DATABASE_URL: "mysql://root:root@127.0.0.1:3306/kdos_graphie?serverVersion=8.0.36&charset=utf8mb4"
       MESSENGER_TRANSPORT_DSN: sync://
       MAILER_DSN: "null://null"
-      MAIL_FROM: noreply@example.com
       MAIL_CONTACT: contact@example.com
       STRIPE_PUBLIC_KEY: pk_test_ci
       STRIPE_SECRET_KEY: sk_test_ci

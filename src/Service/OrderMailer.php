@@ -13,8 +13,6 @@ final class OrderMailer
 {
     public function __construct(
         private readonly MailerInterface $mailer,
-        #[Autowire('%env(string:MAIL_FROM)%')]
-        private readonly string $fromAddress,
         #[Autowire('%env(string:MAIL_CONTACT)%')]
         private readonly string $contactAddress,
     ) {
@@ -24,7 +22,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
                 ->subject('Demande reçue : ' . $order->getReference())
                 ->htmlTemplate('emails/order_received.html.twig')
@@ -36,7 +34,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
                 ->subject('Commande refusée : ' . $order->getReference())
                 ->htmlTemplate('emails/order_refused.html.twig')
@@ -48,7 +46,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
                 ->subject('Commande confirmée : ' . $order->getReference())
                 ->htmlTemplate('emails/order_confirmed_for_payment.html.twig')
@@ -60,7 +58,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
                 ->subject('Rappel de paiement : ' . $order->getReference())
                 ->htmlTemplate('emails/order_payment_reminder.html.twig')
@@ -72,7 +70,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
                 ->subject('Commande annulée : ' . $order->getReference())
                 ->htmlTemplate('emails/order_cancelled.html.twig')
@@ -84,7 +82,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
                 ->subject('Commande expédiée : ' . $order->getReference())
                 ->htmlTemplate('emails/order_done_shipping.html.twig')
@@ -109,7 +107,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($order->getCustomerEmail())
                 ->subject('Votre devis Kdos Graphie : ' . $order->getReference())
                 ->htmlTemplate('emails/order_quote.html.twig')
@@ -121,7 +119,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($this->contactAddress)
                 ->subject('[Admin] Nouvelle commande : ' . $order->getReference())
                 ->htmlTemplate('emails/admin_new_order.html.twig')
@@ -133,7 +131,7 @@ final class OrderMailer
     {
         $this->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to($this->contactAddress)
                 ->subject('[Admin] Paiement reçu : ' . $order->getReference())
                 ->htmlTemplate('emails/admin_order_paid.html.twig')
