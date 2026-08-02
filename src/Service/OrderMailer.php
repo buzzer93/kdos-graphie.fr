@@ -117,6 +117,18 @@ final class OrderMailer
         );
     }
 
+    public function sendAdminNewOrderNotification(Order $order): void
+    {
+        $this->send(
+            (new TemplatedEmail())
+                ->from($this->fromAddress)
+                ->to($this->contactAddress)
+                ->subject('[Admin] Nouvelle commande : ' . $order->getReference())
+                ->htmlTemplate('emails/admin_new_order.html.twig')
+                ->context(['order' => $order])
+        );
+    }
+
     public function sendAdminOrderPaidNotification(Order $order): void
     {
         $this->send(

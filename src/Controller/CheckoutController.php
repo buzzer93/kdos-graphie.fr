@@ -100,6 +100,7 @@ final class CheckoutController extends AbstractController
             $entityManager->flush();
 
             $orderMailer->sendOrderReceived($order);
+            $orderMailer->sendAdminNewOrderNotification($order);
 
             $cartService->clear();
 
