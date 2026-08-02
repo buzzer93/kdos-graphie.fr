@@ -161,3 +161,46 @@ Il exécute dans l'ordre :
 3. `doctrine:migrations:migrate`
 4. `asset-map:compile`
 5. `cache:clear`
+
+## Configuration des emails (Brevo + ImprovMX)
+
+L'envoi et la réception d'emails reposent sur deux services distincts et complémentaires. Aucun credential n'est documenté ici — les valeurs réelles vivent uniquement dans `.env.local` (jamais commité).
+
+### Brevo — envoi (SMTP sortant)
+
+Brevo sert de relais SMTP pour tous les emails envoyés par l'application (confirmation de commande, notifications admin, formulaire de contact, réinitialisation de mot de passe...).
+
+- Variable : `MAILER_DSN` (format `smtp://user:password@smtp-relay.brevo.com:587`).
+- Contrainte importante : Brevo n'accepte d'envoyer que **depuis une adresse "expéditeur" explicitement vérifiée** dans le dashboard Brevo (SPF/DKIM/DMARC configurés sur le domaine `kdos-graphie.fr`). Envoyer avec un `from` non vérifié (ex: une adresse Gmail) est rejeté par Brevo.
+- Toutes les méthodes de `OrderMailer`, `ContactMailer` et `ResetPasswordMailer` utilisent donc `MAIL_CONTACT` (`contact@kdos-graphie.fr`, adresse vérifiée) comme `from`.
+- Brevo est un service d'**envoi uniquement** : il n'héberge aucune boîte de réception. Rien n'est jamais "reçu" côté Brevo.
+- Les emails sont envoyés de façon **synchrone** (pas de routage vers un transport Messenger asynchrone) : si un worker Messenger dédié n'est pas déployé, router les emails vers un transport async les ferait s'accumuler sans jamais partir.
+
+### ImprovMX — réception (redirection vers une vraie boîte mail)
+
+Comme Brevo n'héberge pas de boîte mail, il faut une solution séparée pour que les emails **envoyés vers** `contact@kdos-graphie.fr` (réponses de clients, notifications admin) arrivent réellement quelque part.
+
+- ImprovMX fournit un service de redirection mail gratuit : des enregistrements DNS `MX` sont ajoutés chez le registrar du domaine (IONOS), pointant vers les serveurs ImprovMX.
+- Une règle de redirection est configurée dans le dashboard ImprovMX : `contact@kdos-graphie.fr` → boîte Gmail de l'administrateur.
+- Ce mécanisme est totalement indépendant de Brevo et du code de l'application — c'est une configuration DNS/infra, pas applicative.
+
+### Variables d'environnement
+
+| Variable | Rôle |
+|---|---|
+| `MAILER_DSN` | DSN SMTP Brevo utilisé pour l'envoi |
+| `MAIL_CONTACT` | Adresse `from` (vérifiée Brevo) et destinataire des notifications admin — doit rester `contact@kdos-graphie.fr`, jamais une adresse Gmail directe |
+
+### Schéma du flux
+
+```
+Appli Symfony ──(SMTP)──► Brevo ──► destinataire (client)
+                                          │
+Client répond / appli notifie admin ──────┘
+                                          │
+                                    contact@kdos-graphie.fr
+                                          │
+                                   DNS MX → ImprovMX
+                                          │
+                                   Boîte Gmail admin
+```
