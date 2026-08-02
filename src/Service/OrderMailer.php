@@ -127,6 +127,18 @@ final class OrderMailer
         );
     }
 
+    public function sendPaymentConfirmedToCustomer(Order $order): void
+    {
+        $this->send(
+            (new TemplatedEmail())
+                ->from($this->contactAddress)
+                ->to($order->getCustomerEmail())
+                ->subject('Paiement confirmé : ' . $order->getReference())
+                ->htmlTemplate('emails/order_payment_confirmed.html.twig')
+                ->context(['order' => $order])
+        );
+    }
+
     public function sendAdminOrderPaidNotification(Order $order): void
     {
         $this->send(

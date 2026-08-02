@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Order;
-use App\Message\AdminOrderPaidNotification;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class OrderLifecycleService
@@ -15,7 +13,6 @@ final class OrderLifecycleService
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly OrderMailer $orderMailer,
-        private readonly MessageBusInterface $messageBus,
         private readonly StripePaymentService $stripePaymentService,
         private readonly UrlGeneratorInterface $urlGenerator,
     ) {
@@ -108,7 +105,8 @@ final class OrderLifecycleService
         $order->setStatus(Order::STATUS_A_FAIRE);
         $this->entityManager->flush();
 
-        $this->messageBus->dispatch(new AdminOrderPaidNotification((int) $order->getId()));
+        $this->orderMailer->sendAdminOrderPaidNotification($order);
+        $this->orderMailer->sendPaymentConfirmedToCustomer($order);
 
         return OrderActionResult::success('Paiement confirme. Commande passee au statut A faire.');
     }
