@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional;
 
 use App\Entity\User;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -66,15 +67,24 @@ abstract class AbstractWebTestCase extends WebTestCase
     private function recreateSchema(): void
     {
         $entityManager = $this->getEntityManager();
+        $connection = $entityManager->getConnection();
         $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
 
         if ($metadata === []) {
             return;
         }
 
+        $isMySQL = $connection->getDatabasePlatform() instanceof MySQLPlatform;
+
+        if ($isMySQL) {
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        }
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropSchema($metadata);
         $schemaTool->createSchema($metadata);
+        if ($isMySQL) {
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+        }
 
         $entityManager->clear();
     }

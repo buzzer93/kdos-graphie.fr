@@ -5,6 +5,7 @@
 
 {% macro status_card(card) %}
     {% set colors = {
+        'orange':  {bg: 'bg-orange-50',  border: 'border-orange-200',  count: 'text-orange-900',  label: 'text-orange-700',  badge: 'bg-orange-100 text-orange-700'},
         'neutral': {bg: 'bg-neutral-50', border: 'border-neutral-200', count: 'text-neutral-900', label: 'text-neutral-500', badge: 'bg-neutral-100 text-neutral-700'},
         'blue':    {bg: 'bg-blue-50',    border: 'border-blue-200',    count: 'text-blue-900',    label: 'text-blue-600',    badge: 'bg-blue-100 text-blue-700'},
         'amber':   {bg: 'bg-amber-50',   border: 'border-amber-200',   count: 'text-amber-900',   label: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700'},
@@ -27,7 +28,7 @@
     {# ── Commandes actives ── #}
     <section>
         <h2 class="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-3">Commandes actives</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {% for card in activeCards %}
                 {{ _self.status_card(card) }}
             {% endfor %}

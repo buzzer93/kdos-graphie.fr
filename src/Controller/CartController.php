@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repository\ProductOptionValueRepository;
 use App\Repository\ProductRepository;
 use App\Service\CartService;
 use App\Service\CustomizationFileStorage;
@@ -24,6 +25,7 @@ final class CartController extends AbstractController
             'lines' => $cartService->getLines(),
             'itemsCount' => $cartService->getItemsCount(),
             'totalCents' => $cartService->getTotalCents(),
+            'hasDevis' => $cartService->hasDevisLines(),
             'fileStorage' => $customizationFileStorage,
         ]);
     }
@@ -33,6 +35,7 @@ final class CartController extends AbstractController
         int $id,
         Request $request,
         ProductRepository $productRepository,
+        ProductOptionValueRepository $optionValueRepository,
         CartService $cartService,
         CustomizationFileStorage $customizationFileStorage,
         ValidatorInterface $validator,
@@ -51,6 +54,8 @@ final class CartController extends AbstractController
         $quantity = max(1, $request->request->getInt('quantity', 1));
         $customizationText = trim((string) $request->request->get('customization_text', ''));
         $customizationText = $customizationText !== '' ? $customizationText : null;
+        $specialRequest = trim((string) $request->request->get('special_request', ''));
+        $specialRequest = $specialRequest !== '' ? $specialRequest : null;
 
         $uploadedFile = $request->files->get('customization_file');
         $storedFilename = null;
@@ -74,7 +79,47 @@ final class CartController extends AbstractController
             $storedFilename = $customizationFileStorage->store($uploadedFile);
         }
 
-        $cartService->addLine($product, $quantity, $customizationText, $storedFilename);
+        // Resolve option values server-side; price is never trusted from the client.
+        $submittedIds = array_filter(
+            array_map('intval', (array) $request->request->all('option_values')),
+            static fn (int $v) => $v > 0,
+        );
+
+        $selectedValues = [];
+        $optionValueIds = [];
+        $priceAdjustment = 0;
+
+        if ($submittedIds !== []) {
+            $values = $optionValueRepository->findByIds($submittedIds);
+
+            foreach ($values as $value) {
+                // Security: ensure each value belongs to a group of this product.
+                if ($value->getGroup()?->getProduct()?->getId() !== $product->getId()) {
+                    continue;
+                }
+                if (!$value->isActive()) {
+                    continue;
+                }
+                $selectedValues[] = $value->getLabel();
+                $optionValueIds[] = (int) $value->getId();
+                $priceAdjustment += $value->getPriceAdjustment();
+            }
+        }
+
+        $unitPrice = $product->getPrice() + $priceAdjustment;
+        $optionsSummary = $selectedValues !== [] ? implode(' — ', $selectedValues) : null;
+
+        $cartService->addLine(
+            $product,
+            $quantity,
+            $customizationText,
+            $storedFilename,
+            $unitPrice,
+            $optionValueIds,
+            $optionsSummary,
+            $specialRequest,
+        );
+
         $this->addFlash('cart_added', $product->getName());
 
         return $this->redirectToRoute('app_catalog_show', ['slug' => $product->getSlug()]);

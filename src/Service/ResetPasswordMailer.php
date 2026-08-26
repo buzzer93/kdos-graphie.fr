@@ -13,8 +13,8 @@ final class ResetPasswordMailer
 {
     public function __construct(
         private readonly MailerInterface $mailer,
-        #[Autowire('%env(string:MAIL_FROM)%')]
-        private readonly string $fromAddress,
+        #[Autowire('%env(string:MAIL_CONTACT)%')]
+        private readonly string $contactAddress,
     ) {
     }
 
@@ -22,7 +22,7 @@ final class ResetPasswordMailer
     {
         $this->mailer->send(
             (new TemplatedEmail())
-                ->from($this->fromAddress)
+                ->from($this->contactAddress)
                 ->to((string) $user->getEmail())
                 ->subject('Reinitialisation de votre mot de passe')
                 ->htmlTemplate('emails/reset_password.html.twig')

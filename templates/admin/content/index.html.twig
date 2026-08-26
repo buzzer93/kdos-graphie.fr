@@ -1,0 +1,447 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Contenu — Admin{% endblock %}
+{% block page_title %}Contenu de la page d'accueil{% endblock %}
+
+{% block admin_content %}
+<div data-controller="content-preview" class="flex gap-8 items-start">
+
+    {# ── Formulaire ─────────────────────────────────────────── #}
+    <div class="flex-1 min-w-0 space-y-6">
+
+        {# Onglets #}
+        {% set tabs = [
+            { key: 'hero',        label: 'Hero' },
+            { key: 'savoirfaire', label: 'Savoir-faire' },
+            { key: 'produits',    label: 'Produits phares' },
+            { key: 'contact',     label: 'Contact' },
+        ] %}
+
+        <div class="border-b border-neutral-200">
+            <nav class="-mb-px flex gap-1">
+                {% for t in tabs %}
+                    <a href="{{ path('app_admin_content_index', {tab: t.key}) }}"
+                       class="px-5 py-3 text-sm font-medium border-b-2 transition
+                              {{ tab == t.key
+                                  ? 'border-amber-500 text-amber-700'
+                                  : 'border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300' }}">
+                        {{ t.label }}
+                    </a>
+                {% endfor %}
+            </nav>
+        </div>
+
+        {# ══════════════ HERO ══════════════ #}
+        {% if tab == 'hero' %}
+        <form method="post" action="{{ path('app_admin_content_save', {section: 'hero'}) }}" class="space-y-6">
+            <input type="hidden" name="_token" value="{{ csrf_token('content_save_hero') }}">
+
+            <section class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-neutral-100">
+                    <h2 class="text-sm font-semibold text-neutral-900">Badge & accroche</h2>
+                </div>
+                <div class="divide-y divide-neutral-100">
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Badge</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_hero_badge]" value="{{ values.home_hero_badge }}"
+                                   data-field-key="home_hero_badge"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                            <p class="text-xs text-neutral-400 mt-1">Ex : "Gravure laser · Atelier artisanal"</p>
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Titre (partie normale)</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_hero_title]" value="{{ values.home_hero_title }}"
+                                   data-field-key="home_hero_title"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Titre (partie en amber)</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_hero_title_highlight]" value="{{ values.home_hero_title_highlight }}"
+                                   data-field-key="home_hero_title_highlight"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Sous-titre</label>
+                        <div class="md:col-span-2">
+                            <textarea name="content[home_hero_subtitle]" rows="3"
+                                      data-field-key="home_hero_subtitle"
+                                      data-action="focus->content-preview#highlight input->content-preview#update"
+                                      class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-y">{{ values.home_hero_subtitle }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-neutral-100">
+                    <h2 class="text-sm font-semibold text-neutral-900">Statistiques</h2>
+                </div>
+                <div class="divide-y divide-neutral-100">
+                    {% for n in 1..3 %}
+                        <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-center">
+                            <p class="text-sm font-medium text-neutral-700">Stat {{ n }}</p>
+                            <div class="md:col-span-2 flex gap-3">
+                                <div class="flex-1">
+                                    <label class="block text-xs text-neutral-500 mb-1">Valeur</label>
+                                    <input type="text" name="content[home_hero_stat_{{ n }}_value]"
+                                           value="{{ values['home_hero_stat_' ~ n ~ '_value'] }}"
+                                           data-field-key="home_hero_stat_{{ n }}_value"
+                                           data-action="focus->content-preview#highlight input->content-preview#update"
+                                           class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs text-neutral-500 mb-1">Libellé</label>
+                                    <input type="text" name="content[home_hero_stat_{{ n }}_label]"
+                                           value="{{ values['home_hero_stat_' ~ n ~ '_label'] }}"
+                                           data-field-key="home_hero_stat_{{ n }}_label"
+                                           data-action="focus->content-preview#highlight input->content-preview#update"
+                                           class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-neutral-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-neutral-700">
+                    Enregistrer le Hero
+                </button>
+            </div>
+        </form>
+        {% endif %}
+
+        {# ══════════════ SAVOIR-FAIRE ══════════════ #}
+        {% if tab == 'savoirfaire' %}
+        <form method="post" action="{{ path('app_admin_content_save', {section: 'savoirfaire'}) }}" class="space-y-6">
+            <input type="hidden" name="_token" value="{{ csrf_token('content_save_savoirfaire') }}">
+
+            <section class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-neutral-100">
+                    <h2 class="text-sm font-semibold text-neutral-900">En-tête de section</h2>
+                </div>
+                <div class="divide-y divide-neutral-100">
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Eyebrow</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_sf_eyebrow]" value="{{ values.home_sf_eyebrow }}"
+                                   data-field-key="home_sf_eyebrow"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Titre</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_sf_title]" value="{{ values.home_sf_title }}"
+                                   data-field-key="home_sf_title"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Sous-titre</label>
+                        <div class="md:col-span-2">
+                            <textarea name="content[home_sf_subtitle]" rows="2"
+                                      data-field-key="home_sf_subtitle"
+                                      data-action="focus->content-preview#highlight input->content-preview#update"
+                                      class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-y">{{ values.home_sf_subtitle }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {% for n in 1..6 %}
+            <section class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-neutral-100">
+                    <h2 class="text-sm font-semibold text-neutral-900">Carte {{ n }}</h2>
+                </div>
+                <div class="divide-y divide-neutral-100">
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Icône (emoji)</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_sf_{{ n }}_icon]"
+                                   value="{{ values['home_sf_' ~ n ~ '_icon'] }}"
+                                   data-field-key="home_sf_{{ n }}_icon"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-24 px-3 py-2 border border-neutral-200 rounded-lg text-sm text-center text-xl">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Titre</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_sf_{{ n }}_title]"
+                                   value="{{ values['home_sf_' ~ n ~ '_title'] }}"
+                                   data-field-key="home_sf_{{ n }}_title"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Description</label>
+                        <div class="md:col-span-2">
+                            <textarea name="content[home_sf_{{ n }}_desc]" rows="2"
+                                      data-field-key="home_sf_{{ n }}_desc"
+                                      data-action="focus->content-preview#highlight input->content-preview#update"
+                                      class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-y">{{ values['home_sf_' ~ n ~ '_desc'] }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endfor %}
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-neutral-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-neutral-700">
+                    Enregistrer le Savoir-faire
+                </button>
+            </div>
+        </form>
+        {% endif %}
+
+        {# ══════════════ PRODUITS PHARES ══════════════ #}
+        {% if tab == 'produits' %}
+        <form method="post" action="{{ path('app_admin_content_save', {section: 'produits'}) }}" class="space-y-6">
+            <input type="hidden" name="_token" value="{{ csrf_token('content_save_produits') }}">
+
+            <section class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-neutral-100">
+                    <h2 class="text-sm font-semibold text-neutral-900">En-tête de section</h2>
+                    <p class="text-xs text-neutral-500 mt-0.5">Les produits affichés viennent du catalogue (8 derniers produits visibles).</p>
+                </div>
+                <div class="divide-y divide-neutral-100">
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Eyebrow</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_produits_eyebrow]" value="{{ values.home_produits_eyebrow }}"
+                                   data-field-key="home_produits_eyebrow"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Titre</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_produits_title]" value="{{ values.home_produits_title }}"
+                                   data-field-key="home_produits_title"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-neutral-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-neutral-700">
+                    Enregistrer les Produits phares
+                </button>
+            </div>
+        </form>
+        {% endif %}
+
+        {# ══════════════ CONTACT ══════════════ #}
+        {% if tab == 'contact' %}
+        <form method="post" action="{{ path('app_admin_content_save', {section: 'contact'}) }}" class="space-y-6">
+            <input type="hidden" name="_token" value="{{ csrf_token('content_save_contact') }}">
+
+            <section class="bg-white border border-neutral-200 rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-neutral-100">
+                    <h2 class="text-sm font-semibold text-neutral-900">Bloc CTA Contact</h2>
+                    <p class="text-xs text-neutral-500 mt-0.5">Le numéro de téléphone est géré dans <a href="{{ path('app_admin_settings_index') }}" class="underline hover:text-neutral-700">Paramètres → Coordonnées</a>.</p>
+                </div>
+                <div class="divide-y divide-neutral-100">
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Titre</label>
+                        <div class="md:col-span-2">
+                            <input type="text" name="content[home_contact_title]" value="{{ values.home_contact_title }}"
+                                   data-field-key="home_contact_title"
+                                   data-action="focus->content-preview#highlight input->content-preview#update"
+                                   class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 grid md:grid-cols-3 gap-4 items-start">
+                        <label class="text-sm font-medium text-neutral-700 pt-2">Sous-titre</label>
+                        <div class="md:col-span-2">
+                            <textarea name="content[home_contact_subtitle]" rows="3"
+                                      data-field-key="home_contact_subtitle"
+                                      data-action="focus->content-preview#highlight input->content-preview#update"
+                                      class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-y">{{ values.home_contact_subtitle }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-neutral-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-neutral-700">
+                    Enregistrer le Contact
+                </button>
+            </div>
+        </form>
+        {% endif %}
+
+    </div>
+
+    {# ── Preview sticky ─────────────────────────────────────── #}
+    <div class="hidden lg:block w-72 xl:w-80 flex-shrink-0 sticky top-24 space-y-3">
+        <p class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Aperçu de la page</p>
+
+        {# ── Hero ── #}
+        {% if tab == 'hero' %}
+        <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="px-4 py-2.5 bg-neutral-50 border-b border-neutral-100">
+                <p class="text-xs font-medium text-neutral-500">Section Hero</p>
+            </div>
+            <div class="relative bg-gradient-to-br from-amber-50 via-white to-neutral-50 p-4 overflow-hidden">
+                <div class="absolute -top-8 -right-8 w-24 h-24 bg-amber-200 rounded-full blur-2xl opacity-40 pointer-events-none"></div>
+                <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-40 pointer-events-none"></div>
+
+                <div class="relative grid grid-cols-5 gap-2 items-center">
+                    {# Colonne texte #}
+                    <div class="col-span-3 space-y-2">
+                        <div>
+                            <span data-content-preview-target="zone" data-zone-key="home_hero_badge"
+                                  class="inline-flex items-center gap-1 bg-white border border-amber-200 text-amber-700 text-[9px] px-1.5 py-0.5 rounded-full">
+                                <span class="w-1 h-1 bg-amber-500 rounded-full shrink-0"></span>
+                                {{ values.home_hero_badge }}
+                            </span>
+                        </div>
+                        <p class="font-bold text-neutral-900 text-[11px] leading-snug">
+                            <span data-content-preview-target="zone" data-zone-key="home_hero_title">{{ values.home_hero_title }}</span>
+                            <span data-content-preview-target="zone" data-zone-key="home_hero_title_highlight" class="text-amber-600"> {{ values.home_hero_title_highlight }}</span>
+                        </p>
+                        <p data-content-preview-target="zone" data-zone-key="home_hero_subtitle"
+                           class="text-neutral-500 text-[9px] leading-relaxed line-clamp-3">
+                            {{ values.home_hero_subtitle }}
+                        </p>
+                        <div class="flex flex-wrap gap-1 pt-0.5">
+                            <span class="bg-amber-500 text-white text-[8px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">Découvrir nos créations</span>
+                            <span class="border border-neutral-300 text-neutral-700 text-[8px] font-semibold px-2 py-0.5 rounded-full bg-white/70 whitespace-nowrap">Nos services</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 pt-1.5 border-t border-neutral-200">
+                            {% for n in 1..3 %}
+                                {% if n > 1 %}<div class="w-px h-4 bg-neutral-300 flex-shrink-0"></div>{% endif %}
+                                <div class="min-w-0">
+                                    <p data-content-preview-target="zone" data-zone-key="home_hero_stat_{{ n }}_value"
+                                       class="font-bold text-amber-600 text-[9px] leading-tight">{{ values['home_hero_stat_' ~ n ~ '_value'] }}</p>
+                                    <p data-content-preview-target="zone" data-zone-key="home_hero_stat_{{ n }}_label"
+                                       class="text-neutral-400 text-[8px] leading-tight truncate">{{ values['home_hero_stat_' ~ n ~ '_label'] }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {# Colonne logo #}
+                    <div class="col-span-2 flex justify-center">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-amber-300/30 rounded-full blur-xl pointer-events-none"></div>
+                            <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="" class="relative h-16 w-auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── Savoir-faire ── #}
+        {% if tab == 'savoirfaire' %}
+        <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="px-4 py-2.5 bg-neutral-50 border-b border-neutral-100">
+                <p class="text-xs font-medium text-neutral-500">Section Savoir-faire</p>
+            </div>
+            <div class="p-4 bg-neutral-50 space-y-3 text-xs">
+                <div class="text-center space-y-1">
+                    <p data-content-preview-target="zone" data-zone-key="home_sf_eyebrow"
+                       class="text-amber-600 uppercase tracking-widest font-semibold text-[9px]">
+                        {{ values.home_sf_eyebrow }}
+                    </p>
+                    <p data-content-preview-target="zone" data-zone-key="home_sf_title"
+                       class="font-bold text-neutral-900 text-sm">
+                        {{ values.home_sf_title }}
+                    </p>
+                    <p data-content-preview-target="zone" data-zone-key="home_sf_subtitle"
+                       class="text-neutral-500 leading-relaxed">
+                        {{ values.home_sf_subtitle }}
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5">
+                    {% for n in 1..6 %}
+                    <div class="bg-white p-2 rounded-lg border border-neutral-200">
+                        <span data-content-preview-target="zone" data-zone-key="home_sf_{{ n }}_icon"
+                              class="text-base">{{ values['home_sf_' ~ n ~ '_icon'] }}</span>
+                        <p data-content-preview-target="zone" data-zone-key="home_sf_{{ n }}_title"
+                           class="font-semibold text-neutral-900 mt-0.5 text-[10px]">{{ values['home_sf_' ~ n ~ '_title'] }}</p>
+                        <p data-content-preview-target="zone" data-zone-key="home_sf_{{ n }}_desc"
+                           class="text-neutral-400 text-[9px] mt-0.5 line-clamp-2">{{ values['home_sf_' ~ n ~ '_desc'] }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── Produits phares ── #}
+        {% if tab == 'produits' %}
+        <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="px-4 py-2.5 bg-neutral-50 border-b border-neutral-100">
+                <p class="text-xs font-medium text-neutral-500">Section Produits phares</p>
+            </div>
+            <div class="p-4 bg-white space-y-2 text-xs">
+                <p data-content-preview-target="zone" data-zone-key="home_produits_eyebrow"
+                   class="text-amber-600 uppercase tracking-widest font-semibold text-[9px]">
+                    {{ values.home_produits_eyebrow }}
+                </p>
+                <p data-content-preview-target="zone" data-zone-key="home_produits_title"
+                   class="font-bold text-neutral-900 text-sm">
+                    {{ values.home_produits_title }}
+                </p>
+                <div class="flex gap-2 pt-1 overflow-hidden">
+                    {% for _ in 1..3 %}
+                    <div class="flex-shrink-0 w-20 bg-neutral-100 rounded-lg border border-neutral-200">
+                        <div class="h-14 bg-neutral-200 rounded-t-lg"></div>
+                        <div class="p-1.5 space-y-1">
+                            <div class="h-2 bg-neutral-300 rounded w-3/4"></div>
+                            <div class="h-1.5 bg-amber-200 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p class="text-neutral-400 text-[10px] pt-1">Produits issus du catalogue.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── Contact ── #}
+        {% if tab == 'contact' %}
+        <div class="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="px-4 py-2.5 bg-neutral-50 border-b border-neutral-100">
+                <p class="text-xs font-medium text-neutral-500">Section Contact</p>
+            </div>
+            <div class="p-4 bg-gradient-to-br from-amber-500 to-amber-600 text-white space-y-2 text-xs text-center">
+                <p data-content-preview-target="zone" data-zone-key="home_contact_title"
+                   class="font-bold text-sm">
+                    {{ values.home_contact_title }}
+                </p>
+                <p data-content-preview-target="zone" data-zone-key="home_contact_subtitle"
+                   class="text-white/80 leading-relaxed">
+                    {{ values.home_contact_subtitle }}
+                </p>
+                <div class="flex gap-2 justify-center pt-1">
+                    <div class="bg-white text-amber-700 font-semibold px-3 py-1 rounded-full text-[10px]">Envoyer un message</div>
+                    <div class="bg-white/20 border border-white/30 font-semibold px-3 py-1 rounded-full text-[10px]">Téléphone</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}

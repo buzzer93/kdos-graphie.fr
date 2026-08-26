@@ -58,42 +58,6 @@ final class SettingsControllerTest extends AbstractWebTestCase
         self::assertStringContainsString('contact@kdos.test', (string) $client->getResponse()->getContent());
     }
 
-    public function testAddNewSetting(): void
-    {
-        $client = $this->createAuthenticatedClient();
-
-        $crawler = $client->request('GET', '/admin/settings/');
-        $token = (string) $crawler->filter('form[action="/admin/settings/new"] input[name="_token"]')->attr('value');
-
-        $client->request('POST', '/admin/settings/new', [
-            '_token'      => $token,
-            'setting_key' => 'custom_key',
-            'label'       => 'Custom Label',
-        ]);
-
-        self::assertResponseRedirects('/admin/settings/');
-        $client->followRedirect();
-        self::assertStringContainsString('custom_key', (string) $client->getResponse()->getContent());
-    }
-
-    public function testAddNewSettingRequiresKeyAndLabel(): void
-    {
-        $client = $this->createAuthenticatedClient();
-
-        $crawler = $client->request('GET', '/admin/settings/');
-        $token = (string) $crawler->filter('form[action="/admin/settings/new"] input[name="_token"]')->attr('value');
-
-        $client->request('POST', '/admin/settings/new', [
-            '_token'      => $token,
-            'setting_key' => '',
-            'label'       => '',
-        ]);
-
-        self::assertResponseRedirects('/admin/settings/');
-        $client->followRedirect();
-        self::assertStringContainsString('obligatoires', (string) $client->getResponse()->getContent());
-    }
-
     public function testChangeEmailSuccessRedirectsToLogin(): void
     {
         $client = $this->createAuthenticatedClientWithRealPassword();

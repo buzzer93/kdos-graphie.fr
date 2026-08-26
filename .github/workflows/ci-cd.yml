@@ -1,0 +1,92 @@
+name: CI / CD
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  # CI — tests & quality checks
+  # ──────────────────────────────────────────────────────────────────────────
+  test:
+    name: Tests (PHP 8.4)
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0.36
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: kdos_graphie_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -uroot -proot"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+
+    env:
+      APP_ENV: test
+      APP_SECRET: ci_placeholder_secret
+      APP_SHARE_DIR: var/share
+      DEFAULT_URI: http://localhost
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/kdos_graphie?serverVersion=8.0.36&charset=utf8mb4"
+      MESSENGER_TRANSPORT_DSN: sync://
+      MAILER_DSN: "null://null"
+      MAIL_CONTACT: contact@example.com
+      STRIPE_PUBLIC_KEY: pk_test_ci
+      STRIPE_SECRET_KEY: sk_test_ci
+      STRIPE_WEBHOOK_SECRET: whsec_ci
+      RECAPTCHA_SITE_KEY: ""
+      RECAPTCHA_SECRET_KEY: ""
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: pdo_mysql, intl, zip
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Create test database schema and run migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+      - name: Run tests
+        run: php bin/phpunit
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # CD — deployment to VPS (master only, after tests pass)
+  # ──────────────────────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy to VPS
+    needs: test
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd ${{ secrets.VPS_PROJECT_PATH }}
+            bash scripts/update-vps.sh

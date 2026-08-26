@@ -44,7 +44,7 @@ final class ContactType extends AbstractType
                 'label' => 'Message',
                 'constraints' => [
                     new NotBlank(),
-                    new Length(min: 10, max: 5000),
+                    new Length(min: 10, max: 5000, minMessage: 'Ce message est trop court.'),
                 ],
             ]);
     }

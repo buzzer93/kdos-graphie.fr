@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: '`order`')]
 class Order
 {
+    public const STATUS_EN_ATTENTE_DEVIS = 'en_attente_devis';
     public const STATUS_A_CONFIRMER = 'a_confirmer';
     public const STATUS_EN_ATTENTE_PAIEMENT = 'en_attente_paiement';
     public const STATUS_A_FAIRE = 'a_faire';
@@ -69,6 +70,17 @@ class Order
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $paymentLink = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $stripePaymentIntentId = null;
+
+    /** Prix devisé par l'artisan, en centimes. Défini lors de l'envoi du devis. */
+    #[ORM\Column(nullable: true)]
+    private ?int $quotedPrice = null;
+
+    /** Description de la personnalisation rédigée par l'artisan lors de l'envoi du devis. */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $quoteDescription = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $refundNote = null;
 
@@ -100,6 +112,7 @@ class Order
     public static function getStatusLabels(): array
     {
         return [
+            self::STATUS_EN_ATTENTE_DEVIS => 'En attente de devis',
             self::STATUS_A_CONFIRMER => 'A confirmer',
             self::STATUS_EN_ATTENTE_PAIEMENT => 'En attente de paiement',
             self::STATUS_A_FAIRE => 'A faire',
@@ -297,6 +310,30 @@ class Order
         return $this;
     }
 
+    public function getQuotedPrice(): ?int
+    {
+        return $this->quotedPrice;
+    }
+
+    public function setQuotedPrice(?int $quotedPrice): static
+    {
+        $this->quotedPrice = $quotedPrice;
+
+        return $this;
+    }
+
+    public function getQuoteDescription(): ?string
+    {
+        return $this->quoteDescription;
+    }
+
+    public function setQuoteDescription(?string $quoteDescription): static
+    {
+        $this->quoteDescription = $quoteDescription;
+
+        return $this;
+    }
+
     public function getPaymentLink(): ?string
     {
         return $this->paymentLink;
@@ -305,6 +342,18 @@ class Order
     public function setPaymentLink(?string $paymentLink): static
     {
         $this->paymentLink = $paymentLink;
+
+        return $this;
+    }
+
+    public function getStripePaymentIntentId(): ?string
+    {
+        return $this->stripePaymentIntentId;
+    }
+
+    public function setStripePaymentIntentId(?string $stripePaymentIntentId): static
+    {
+        $this->stripePaymentIntentId = $stripePaymentIntentId;
 
         return $this;
     }

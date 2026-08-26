@@ -26,4 +26,14 @@ final class OrderActionResult
     {
         return new self('danger', $message);
     }
+
+    public function isSuccess(): bool
+    {
+        return $this->level === 'success';
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
 }

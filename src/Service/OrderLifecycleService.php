@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Order;
-use App\Message\AdminOrderPaidNotification;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class OrderLifecycleService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly OrderMailer $orderMailer,
-        private readonly MessageBusInterface $messageBus,
+        private readonly StripePaymentService $stripePaymentService,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -24,7 +24,16 @@ final class OrderLifecycleService
             return OrderActionResult::warning('Seules les commandes a confirmer peuvent etre acceptees.');
         }
 
+        $paymentIntent = $this->stripePaymentService->createPaymentIntent($order);
+
+        $order->setStripePaymentIntentId($paymentIntent->id);
+        $order->setPaymentLink($this->urlGenerator->generate(
+            'app_payment_form',
+            ['reference' => $order->getReference()],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        ));
         $order->setStatus(Order::STATUS_EN_ATTENTE_PAIEMENT);
+
         $this->entityManager->flush();
         $this->orderMailer->sendOrderConfirmedForPayment($order);
 
@@ -42,9 +51,36 @@ final class OrderLifecycleService
         return OrderActionResult::success('Relance de paiement envoyee.');
     }
 
+    public function sendQuote(Order $order, int $quotedPrice, string $quoteDescription): OrderActionResult
+    {
+        if ($order->getStatus() !== Order::STATUS_EN_ATTENTE_DEVIS) {
+            return OrderActionResult::warning('Seules les commandes en attente de devis peuvent recevoir un devis.');
+        }
+
+        $order->setQuotedPrice($quotedPrice);
+        $order->setTotal($quotedPrice);
+        $order->setQuoteDescription(trim($quoteDescription));
+
+        $paymentIntent = $this->stripePaymentService->createPaymentIntent($order);
+
+        $order->setStripePaymentIntentId($paymentIntent->id);
+        $order->setPaymentLink($this->urlGenerator->generate(
+            'app_payment_form',
+            ['reference' => $order->getReference()],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        ));
+        $order->setStatus(Order::STATUS_EN_ATTENTE_PAIEMENT);
+
+        $this->entityManager->flush();
+        $this->orderMailer->sendQuoteToCustomer($order);
+
+        return OrderActionResult::success('Devis envoye au client. Commande passee en attente de paiement.');
+    }
+
     public function reject(Order $order, string $reason): OrderActionResult
     {
         return $this->rejectOrCancel($order, $reason, 'refusee', [
+            Order::STATUS_EN_ATTENTE_DEVIS,
             Order::STATUS_A_CONFIRMER,
             Order::STATUS_EN_ATTENTE_PAIEMENT,
         ]);
@@ -53,6 +89,7 @@ final class OrderLifecycleService
     public function cancel(Order $order, string $reason): OrderActionResult
     {
         return $this->rejectOrCancel($order, $reason, 'annulee', [
+            Order::STATUS_EN_ATTENTE_DEVIS,
             Order::STATUS_A_CONFIRMER,
             Order::STATUS_EN_ATTENTE_PAIEMENT,
             Order::STATUS_A_FAIRE,
@@ -68,7 +105,8 @@ final class OrderLifecycleService
         $order->setStatus(Order::STATUS_A_FAIRE);
         $this->entityManager->flush();
 
-        $this->messageBus->dispatch(new AdminOrderPaidNotification((int) $order->getId()));
+        $this->orderMailer->sendAdminOrderPaidNotification($order);
+        $this->orderMailer->sendPaymentConfirmedToCustomer($order);
 
         return OrderActionResult::success('Paiement confirme. Commande passee au statut A faire.');
     }

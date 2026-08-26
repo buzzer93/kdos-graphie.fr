@@ -1,0 +1,53 @@
+{% extends 'emails/_layout.html.twig' %}
+
+{% block email_title %}Paiement confirmé — {{ order.reference }}{% endblock %}
+
+{% block email_body %}
+<h1>Votre paiement a bien été reçu</h1>
+
+<p>Bonjour {{ order.customerFirstName }},</p>
+
+<p>Nous avons bien reçu votre paiement. Votre commande est maintenant prise en charge par notre atelier.</p>
+
+<div class="reference-block">
+    <div class="label">Référence commande</div>
+    <div class="value">{{ order.reference }}</div>
+</div>
+
+{% if order.items is not empty %}
+<table class="order-table">
+    <thead>
+        <tr>
+            <th>Produit</th>
+            <th style="text-align:right">Qté</th>
+            <th style="text-align:right">Prix unit.</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td>{{ item.productName }}</td>
+            <td style="text-align:right">{{ item.quantity }}</td>
+            <td style="text-align:right">{{ (item.unitPrice / 100)|number_format(2, ',', ' ') }} €</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+            <td colspan="2">Total réglé</td>
+            <td style="text-align:right">{{ order.formattedTotal }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+<div class="info-block">
+    <strong>Coordonnées renseignées :</strong><br>
+    {{ order.customerFirstName }} {{ order.customerLastName }}<br>
+    {{ order.customerEmail }}<br>
+    {{ order.customerPhone }}<br>
+    {{ order.shippingAddress|nl2br }}
+</div>
+
+<p>Nous vous tiendrons informé de l'avancement de votre commande.</p>
+
+<p>Merci pour votre confiance,<br><strong>L'équipe Kdos-Graphie</strong></p>
+{% endblock %}

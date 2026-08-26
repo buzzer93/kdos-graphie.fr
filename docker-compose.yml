@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/Caddyfile:/etc/frankenphp/Caddyfile
+      - ./docker/php/conf.d/app.ini:/usr/local/etc/php/conf.d/app.ini
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0.36
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kdos_graphie
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mysql_data:

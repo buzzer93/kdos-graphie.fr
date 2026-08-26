@@ -24,13 +24,6 @@ class CategoryType extends AbstractType
                     new Length(max: 255),
                 ],
             ])
-            ->add('slug', TextType::class, [
-                'label' => 'Slug',
-                'required' => false,
-                'constraints' => [
-                    new Length(max: 255),
-                ],
-            ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,

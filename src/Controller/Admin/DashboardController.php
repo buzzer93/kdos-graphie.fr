@@ -18,6 +18,11 @@ class DashboardController extends AbstractController
     {
         $activeStatuses = [
             [
+                'code'  => Order::STATUS_EN_ATTENTE_DEVIS,
+                'label' => 'Devis à envoyer',
+                'color' => 'orange',
+            ],
+            [
                 'code'  => Order::STATUS_A_CONFIRMER,
                 'label' => 'À confirmer',
                 'color' => 'neutral',

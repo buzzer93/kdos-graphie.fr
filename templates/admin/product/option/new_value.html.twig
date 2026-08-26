@@ -1,0 +1,10 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle valeur — Admin{% endblock %}
+{% block page_title %}Nouvelle valeur dans "{{ group.name }}" — {{ product.name }}{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-lg bg-white border border-neutral-200 rounded-xl p-6">
+    {{ include('admin/product/option/_value_form.html.twig', {form: form, product: product, group: group}) }}
+</div>
+{% endblock %}

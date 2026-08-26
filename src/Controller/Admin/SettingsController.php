@@ -63,7 +63,8 @@ final class SettingsController extends AbstractController
 
         $contactKeys = array_keys(self::CONTACT_DEFAULTS);
         $contactSettings = array_filter($settings, static fn (SiteSetting $s) => in_array($s->getSettingKey(), $contactKeys, true));
-        $otherSettings = array_filter($settings, static fn (SiteSetting $s) => !in_array($s->getSettingKey(), $contactKeys, true));
+        $otherSettings = array_filter($settings, static fn (SiteSetting $s) => !in_array($s->getSettingKey(), $contactKeys, true)
+            && !str_starts_with($s->getSettingKey(), 'home_'));
 
         return $this->render('admin/settings/index.html.twig', [
             'contactSettings' => array_values($contactSettings),

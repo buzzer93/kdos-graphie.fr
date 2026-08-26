@@ -99,6 +99,11 @@ class OrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findOneByStripePaymentIntentId(string $paymentIntentId): ?Order
+    {
+        return $this->findOneBy(['stripePaymentIntentId' => $paymentIntentId]);
+    }
+
     public function getRevenueCentsExcludingRejected(): int
     {
         return (int) $this->createQueryBuilder('o')

@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      target: prod
+    container_name: kdos-graphie-app
+    env_file: []
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: '0'
+    volumes:
+      - .:/var/www/html
+      - ./docker/Caddyfile.prod:/etc/frankenphp/Caddyfile
+      - ./docker/php/conf.d/app.ini:/usr/local/etc/php/conf.d/app.ini
+    networks:
+      - default
+      - web
+
+networks:
+  web:
+    external: true

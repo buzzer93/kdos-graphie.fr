@@ -7,7 +7,7 @@
     <div class="w-full max-w-md">
 
         <div class="text-center mb-8">
-            <img src="{{ asset('assets/media/LOGO Kdos-graphie.svg') }}" alt="KDOS-GRAPHIE" class="h-10 mx-auto mb-5">
+            <img src="{{ asset('media/LOGO Kdos-graphie.svg') }}" alt="KDOS-GRAPHIE" class="h-10 mx-auto mb-5">
             <h1 class="font-display text-2xl font-semibold text-neutral-900 tracking-tight">Espace administrateur</h1>
             <p class="text-sm text-neutral-500 mt-1.5">Connectez-vous pour accéder au tableau de bord</p>
         </div>
@@ -25,7 +25,7 @@
                 </div>
             {% endif %}
 
-            <form method="post" class="space-y-5">
+            <form method="post" class="space-y-5" data-turbo="false">
 
                 <div>
                     <label for="inputEmail" class="block text-sm font-medium text-neutral-700 mb-1.5">

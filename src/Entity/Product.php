@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -47,10 +49,16 @@ class Product
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
+    /** @var Collection<int, ProductOptionGroup> */
+    #[ORM\OneToMany(targetEntity: ProductOptionGroup::class, mappedBy: 'product', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['sortOrder' => 'ASC', 'id' => 'ASC'])]
+    private Collection $optionGroups;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->optionGroups = new ArrayCollection();
     }
 
     public function touch(): void
@@ -155,5 +163,39 @@ class Product
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /** @return Collection<int, ProductOptionGroup> */
+    public function getOptionGroups(): Collection
+    {
+        return $this->optionGroups;
+    }
+
+    public function addOptionGroup(ProductOptionGroup $group): static
+    {
+        if (!$this->optionGroups->contains($group)) {
+            $this->optionGroups->add($group);
+            $group->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOptionGroup(ProductOptionGroup $group): static
+    {
+        $this->optionGroups->removeElement($group);
+
+        return $this;
+    }
+
+    public function hasOptions(): bool
+    {
+        foreach ($this->optionGroups as $group) {
+            if ($group->getActiveValues()->count() > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

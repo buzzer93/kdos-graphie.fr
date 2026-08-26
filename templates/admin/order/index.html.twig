@@ -16,6 +16,13 @@
 
 {% block admin_content %}
 <div class="space-y-6">
+    <div class="flex items-center gap-3 flex-wrap">
+        <a href="{{ path('app_admin_order_index', {status: 'en_attente_devis'}) }}"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 text-sm font-medium hover:bg-orange-100 transition {{ filters.status == 'en_attente_devis' ? 'ring-2 ring-orange-400' : '' }}">
+            Devis à envoyer
+        </a>
+    </div>
+
     <form method="get" class="bg-white border border-neutral-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
         <input name="q" value="{{ filters.q }}" placeholder="Référence / email / client" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
         <select name="status" class="px-4 py-2.5 border border-neutral-200 rounded-lg text-sm">
@@ -42,12 +49,15 @@
             </thead>
             <tbody>
             {% for order in orders %}
-                <tr class="border-t border-neutral-100 cursor-pointer hover:bg-neutral-50"
+                {% set isDevisRow = order.status == 'en_attente_devis' %}
+                <tr class="border-t {{ isDevisRow ? 'border-l-4 border-l-orange-400 bg-orange-50 hover:bg-orange-100' : 'border-neutral-100 hover:bg-neutral-50' }} cursor-pointer"
                     onclick="window.location='{{ path('app_admin_order_edit', {id: order.id}) }}'">
-                    <td class="px-4 py-3 font-medium text-neutral-900">{{ order.reference }}</td>
+                    <td class="px-4 py-3 font-medium {{ isDevisRow ? 'text-orange-900' : 'text-neutral-900' }}">{{ order.reference }}</td>
                     <td class="px-4 py-3 text-neutral-600">{{ order.customerFullName }}<br><span class="text-xs">{{ order.customerEmail }}</span></td>
                     <td class="px-4 py-3">{{ include('admin/partials/_status_badge.html.twig', {status: order.status, label: statusLabels[order.status] ?? order.status}) }}</td>
-                    <td class="px-4 py-3 text-neutral-600">{{ order.formattedTotal }}</td>
+                    <td class="px-4 py-3 {{ isDevisRow ? 'text-orange-700 italic' : 'text-neutral-600' }}">
+                        {%- if isDevisRow %}~{% endif %}{{ order.formattedTotal }}
+                    </td>
                     <td class="px-4 py-3 text-neutral-600">{{ order.createdAt|date('d/m/Y H:i') }}</td>
                     <td class="px-4 py-3">
                         <div class="flex justify-end items-center gap-3" onclick="event.stopPropagation();">

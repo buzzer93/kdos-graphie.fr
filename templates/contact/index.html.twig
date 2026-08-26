@@ -123,25 +123,25 @@
                             <div>
                                 {{ form_label(form.name, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
                                 {{ form_widget(form.name, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500'}}) }}
-                                {{ form_errors(form.name) }}
+                                <div class="mt-1.5 text-sm text-red-600">{{ form_errors(form.name) }}</div>
                             </div>
                             <div>
                                 {{ form_label(form.email, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
                                 {{ form_widget(form.email, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500'}}) }}
-                                {{ form_errors(form.email) }}
+                                <div class="mt-1.5 text-sm text-red-600">{{ form_errors(form.email) }}</div>
                             </div>
                         </div>
 
                         <div>
                             {{ form_label(form.subject, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
                             {{ form_widget(form.subject, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500', placeholder: 'Ex : Commande gravure, devis, information...'}}) }}
-                            {{ form_errors(form.subject) }}
+                            <div class="mt-1.5 text-sm text-red-600">{{ form_errors(form.subject) }}</div>
                         </div>
 
                         <div>
                             {{ form_label(form.message, null, {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
                             {{ form_widget(form.message, {attr: {class: 'w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-36', placeholder: 'Décrivez votre projet ou votre question...'}}) }}
-                            {{ form_errors(form.message) }}
+                            <div class="mt-1.5 text-sm text-red-600">{{ form_errors(form.message) }}</div>
                         </div>
 
                         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2">

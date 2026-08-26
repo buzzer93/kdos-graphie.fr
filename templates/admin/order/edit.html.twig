@@ -21,6 +21,13 @@
         <h2 class="text-sm font-semibold text-neutral-900 mb-3">Actions</h2>
         <div class="flex flex-wrap items-start gap-3">
 
+            {% if actions.canSendQuote %}
+                <a href="{{ path('app_admin_order_send_quote', {id: order.id}) }}"
+                   class="px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700">
+                    ✉ Envoyer le devis au client
+                </a>
+            {% endif %}
+
             {% if actions.canAccept %}
                 <form method="post" action="{{ path('app_admin_order_accept', {id: order.id}) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('order_action_accept_' ~ order.id) }}">
@@ -121,6 +128,71 @@
 
         </div>
     </div>
+
+    {# ── Informations personnalisation (devis) ── #}
+    {% set hasPersonalization = false %}
+    {% for item in order.items %}
+        {% if item.specialRequest or item.customizationFilePath or item.customizationText %}
+            {% set hasPersonalization = true %}
+        {% endif %}
+    {% endfor %}
+
+    {% if hasPersonalization or order.quotedPrice %}
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 space-y-4">
+            <h2 class="text-sm font-semibold text-amber-900">Personnalisation client</h2>
+
+            {% for item in order.items %}
+                {% if item.specialRequest or item.customizationFilePath or item.optionsSummary or item.customizationText %}
+                    <div class="bg-white border border-amber-100 rounded-lg p-4 space-y-1">
+                        <p class="font-medium text-neutral-900 text-sm">{{ item.productName }}</p>
+                        {% if item.optionsSummary %}
+                            <p class="text-sm text-neutral-600">Options : {{ item.optionsSummary }}</p>
+                        {% endif %}
+                        {% if item.customizationText %}
+                            <p class="text-sm text-neutral-700 mt-1"><span class="font-medium">Texte à graver :</span> {{ item.customizationText }}</p>
+                        {% endif %}
+                        {% if item.specialRequest %}
+                            <p class="text-sm text-amber-800 font-medium mt-1">Demande particulière :</p>
+                            <p class="text-sm text-amber-700 whitespace-pre-line">{{ item.specialRequest }}</p>
+                        {% endif %}
+                        {% if item.customizationFilePath %}
+                            {% set fileUrl = asset(fileStorage.getPublicPath(item.customizationFilePath)) %}
+                            {% set fileExt = item.customizationFilePath|split('.')|last|lower %}
+                            {% set isImage = fileExt in ['png', 'jpg', 'jpeg', 'webp'] %}
+                            <div class="mt-2">
+                                <p class="text-sm font-medium text-neutral-700 mb-1">Fichier client joint :</p>
+                                {% if isImage %}
+                                    <a href="{{ fileUrl }}" target="_blank" rel="noopener"
+                                       class="inline-block rounded-lg overflow-hidden border border-neutral-200 hover:border-orange-400 transition">
+                                        <img src="{{ fileUrl }}" alt="Fichier de personnalisation" class="w-32 h-32 object-cover" loading="lazy">
+                                    </a>
+                                {% else %}
+                                    <a href="{{ fileUrl }}" target="_blank" rel="noopener"
+                                       class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-200 text-sm text-neutral-700 hover:border-orange-400 hover:text-orange-700 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5A3.375 3.375 0 0 0 10.125 2.25H6.75A2.25 2.25 0 0 0 4.5 4.5v15A2.25 2.25 0 0 0 6.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25V14.25Z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 2.25v4.875c0 .621.504 1.125 1.125 1.125H19.5"/>
+                                        </svg>
+                                        Ouvrir le fichier
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if order.quotedPrice %}
+                <div class="border-t border-amber-200 pt-3 flex items-center justify-between">
+                    <span class="text-sm font-medium text-amber-900">Prix devisé :</span>
+                    <span class="text-lg font-bold text-amber-700">{{ (order.quotedPrice / 100)|number_format(2, ',', ' ') }} €</span>
+                </div>
+                {% if order.quoteDescription %}
+                    <p class="text-sm text-neutral-600 italic">« {{ order.quoteDescription }} »</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
 
     {# ── Formulaire commande ── #}
     <div class="bg-white border border-neutral-200 rounded-xl p-6">

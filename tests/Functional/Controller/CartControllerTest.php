@@ -16,7 +16,7 @@ final class CartControllerTest extends AbstractWebTestCase
         $client->request('GET', '/panier/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('body', 'Votre panier est vide.');
+        self::assertSelectorTextContains('body', 'Votre demande est vide.');
     }
 
     public function testAddUpdateAndRemoveLineFlow(): void
@@ -34,15 +34,18 @@ final class CartControllerTest extends AbstractWebTestCase
         $entityManager->flush();
 
         $client->request('GET', '/catalogue/' . $product->getSlug());
-        $client->submitForm('Ajouter au panier', [
+        $client->submitForm('Ajouter à ma demande', [
             'quantity' => 2,
             'customization_text' => 'Texte perso',
         ]);
 
-        self::assertResponseRedirects('/panier/');
+        // add() redirects back to the product page with a cart_added flash.
+        self::assertResponseRedirects('/catalogue/affiche-personnalisee');
         $client->followRedirect();
+
+        $client->request('GET', '/panier/');
         self::assertSelectorTextContains('body', 'Affiche Personnalisee');
-        self::assertSelectorTextContains('body', 'Articles: 2');
+        self::assertSelectorTextContains('body', 'Articles : 2');
 
         $session = $client->getRequest()->getSession();
         $cart = $session->get('cart', ['lines' => []]);
@@ -56,13 +59,13 @@ final class CartControllerTest extends AbstractWebTestCase
 
         self::assertResponseRedirects('/panier/');
         $client->followRedirect();
-        self::assertSelectorTextContains('body', 'Articles: 4');
+        self::assertSelectorTextContains('body', 'Articles : 4');
 
         $removeForm = $client->getCrawler()->filter('form[action$="/supprimer"]')->first()->form();
         $client->submit($removeForm);
 
         self::assertResponseRedirects('/panier/');
         $client->followRedirect();
-        self::assertSelectorTextContains('body', 'Votre panier est vide.');
+        self::assertSelectorTextContains('body', 'Votre demande est vide.');
     }
 }

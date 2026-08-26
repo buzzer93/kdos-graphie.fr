@@ -18,12 +18,12 @@
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
                             </svg>
-                            <span><strong>{{ message }}</strong> ajouté au panier.</span>
+                            <span><strong>{{ message }}</strong> ajouté à votre demande.</span>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
                             <a href="{{ path('app_cart_index') }}"
                                class="bg-neutral-900 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
-                                Voir le panier →
+                                Voir ma demande →
                             </a>
                         </div>
                     </div>
@@ -67,9 +67,15 @@
 
                 <h1 class="font-display text-4xl font-bold text-neutral-900 leading-tight">{{ product.name }}</h1>
 
-                <p class="text-3xl font-bold text-amber-600">
-                    {{ (product.price / 100)|number_format(2, ',', ' ') }} €
-                </p>
+                {% if optionGroupsJson is not empty %}
+                    <p class="text-3xl font-bold text-amber-600">
+                        À partir de {{ (product.price / 100)|number_format(2, ',', ' ') }} €
+                    </p>
+                {% else %}
+                    <p class="text-3xl font-bold text-amber-600">
+                        {{ (product.price / 100)|number_format(2, ',', ' ') }} €
+                    </p>
+                {% endif %}
 
                 {% if product.description %}
                     <p class="text-neutral-600 leading-relaxed whitespace-pre-line">{{ product.description }}</p>
@@ -78,9 +84,51 @@
                 {# Séparateur #}
                 <div class="border-t border-neutral-200 pt-6 space-y-4">
 
-                    <form method="post" action="{{ path('app_cart_add', {id: product.id}) }}" enctype="multipart/form-data" class="space-y-5">
+                    <form
+                        method="post"
+                        action="{{ path('app_cart_add', {id: product.id}) }}"
+                        enctype="multipart/form-data"
+                        class="space-y-5"
+                        {% if optionGroupsJson is not empty %}
+                            data-controller="product-option"
+                            data-product-option-base-price-value="{{ product.price }}"
+                            data-product-option-groups-value="{{ optionGroupsJson|json_encode }}"
+                        {% endif %}
+                    >
                         <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
                         <input type="hidden" name="product_slug" value="{{ product.slug }}">
+
+                        {# ===== SÉLECTEURS D'OPTIONS ===== #}
+                        {% if optionGroupsJson is not empty %}
+                            {% for group in optionGroupsJson %}
+                                <div>
+                                    <label for="option_group_{{ group.id }}" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                        {{ group.name }}
+                                    </label>
+                                    <select
+                                        id="option_group_{{ group.id }}"
+                                        data-option-group="{{ group.id }}"
+                                        data-action="change->product-option#onChange"
+                                        class="w-full px-3 py-2.5 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                                    >
+                                        <option value="">— Choisir {{ group.name|lower }} —</option>
+                                        {% for value in group.values %}
+                                            <option value="{{ value.id }}">
+                                                {{ value.label }}{% if value.priceAdjustment > 0 %} (+{{ (value.priceAdjustment / 100)|number_format(2, ',', ' ') }} €){% endif %}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endfor %}
+
+                            {# Conteneur pour les hidden inputs injectés par Stimulus #}
+                            <div data-product-option-target="hiddenInputs"></div>
+
+                            {# Prix dynamique #}
+                            <p class="text-2xl font-bold text-amber-600">
+                                <span data-product-option-target="price">{{ (product.price / 100)|number_format(2, ',', ' ') }} €</span>
+                            </p>
+                        {% endif %}
 
                         <div>
                             <label for="quantity" class="block text-sm font-medium text-neutral-700 mb-1.5">Quantité</label>
@@ -106,7 +154,7 @@
                         </div>
 
                         <div>
-                            <label for="customization_file" class="block text-sm font-medium text-neutral-700 mb-1.5">Fichier de personnalisation <span class="text-neutral-400 font-normal">(optionnel)</span></label>
+                            <label for="customization_file" class="block text-sm font-medium text-neutral-700 mb-1.5">Image ou fichier à graver <span class="text-neutral-400 font-normal">(optionnel)</span></label>
                             <input
                                 id="customization_file"
                                 type="file"
@@ -114,32 +162,41 @@
                                 accept=".png,.jpg,.jpeg,.webp,.pdf"
                                 class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm text-neutral-600"
                             >
-                            <p class="mt-1.5 text-xs text-neutral-400">Formats acceptés : PNG, JPG, WEBP, PDF — 15 Mo max.</p>
+                            <p class="mt-1.5 text-xs text-neutral-400">Formats acceptés : PNG, JPG, WEBP, PDF — 15 Mo max. L'ajout d'un fichier génère une demande de devis.</p>
+                        </div>
+
+                        <div>
+                            <label for="special_request" class="block text-sm font-medium text-neutral-700 mb-1.5">Demande particulière <span class="text-neutral-400 font-normal">(optionnel)</span></label>
+                            <textarea
+                                id="special_request"
+                                name="special_request"
+                                rows="3"
+                                class="w-full px-3 py-2.5 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                placeholder="Option non listée, format sur mesure, précision sur la gravure…"
+                            ></textarea>
+                            <p class="mt-1.5 text-xs text-neutral-400">Une demande particulière génère une demande de devis sur mesure.</p>
                         </div>
 
                         <button
                             type="submit"
-                            class="w-full bg-neutral-900 hover:bg-amber-600 text-white font-semibold px-6 py-3.5 rounded-xl transition duration-200 text-sm"
+                            {% if optionGroupsJson is not empty %}data-product-option-target="submit" disabled{% endif %}
+                            class="w-full bg-neutral-900 hover:bg-amber-600 disabled:bg-neutral-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl transition duration-200 text-sm"
                         >
-                            Ajouter au panier
+                            Ajouter à ma demande
                         </button>
                     </form>
                 </div>
 
-                {# Garanties / infos atelier #}
-                <div class="bg-neutral-50 rounded-xl p-5 space-y-3 text-sm text-neutral-600">
-                    <div class="flex items-start gap-3">
-                        <span class="text-amber-500 mt-0.5">✦</span>
-                        <div><strong class="text-neutral-800">Gravure artisanale</strong> — chaque pièce est réalisée à la main dans notre atelier.</div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-amber-500 mt-0.5">✦</span>
-                        <div><strong class="text-neutral-800">Commande validée manuellement</strong> — nous confirmons chaque demande avant toute facturation.</div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-amber-500 mt-0.5">✦</span>
-                        <div><strong class="text-neutral-800">Délai indicatif : 48h</strong> — selon la complexité et la charge atelier.</div>
-                    </div>
+                {# Infos atelier #}
+                <div class="flex flex-wrap gap-2 pt-1">
+                    <span class="inline-flex items-center gap-1.5 text-xs text-neutral-600 bg-neutral-100 rounded-full px-3 py-1.5">
+                        <span class="text-amber-500">✦</span>
+                        <span>Commande validée manuellement</span>
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 text-xs text-neutral-600 bg-neutral-100 rounded-full px-3 py-1.5">
+                        <span class="text-amber-500">✦</span>
+                        <span>Délai indicatif : 48h</span>
+                    </span>
                 </div>
             </div>
         </div>
