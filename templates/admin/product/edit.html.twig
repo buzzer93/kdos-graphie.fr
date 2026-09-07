@@ -10,6 +10,68 @@
         {{ include('admin/product/_form.html.twig', {form: form, imagePublicPath: imagePublicPath}) }}
     </div>
 
+    {# ===== SECTION GALERIE / SLIDER ===== #}
+    <div class="bg-white border border-neutral-200 rounded-xl p-6">
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-neutral-900">Galerie / Slider</h2>
+            <p class="text-sm text-neutral-500 mt-0.5">Images affichées dans le slider de la fiche produit, en plus de l'image de couverture. Glissez-déposez pour réordonner.</p>
+        </div>
+
+        {% if product.images is not empty %}
+            <div
+                class="mb-6"
+                data-controller="product-gallery-reorder"
+                data-product-gallery-reorder-url-value="{{ path('app_admin_product_gallery_reorder', {productId: product.id}) }}"
+                data-product-gallery-reorder-csrf-token-value="{{ csrf_token('product_gallery_reorder_' ~ product.id) }}"
+            >
+                <div class="flex items-center justify-end gap-3 mb-3">
+                    <span data-product-gallery-reorder-target="status" class="text-xs"></span>
+                    <button type="button"
+                            data-product-gallery-reorder-target="save"
+                            data-action="product-gallery-reorder#save"
+                            class="px-3 py-2 rounded-lg bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-700 disabled:opacity-50">
+                        Sauvegarder l'ordre
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap gap-4">
+                    {% for image in product.images %}
+                        <div class="relative w-28 group cursor-grab select-none"
+                             data-product-gallery-reorder-target="item"
+                             data-image-id="{{ image.id }}">
+                            <img src="{{ asset(galleryImagePaths[image.id]) }}"
+                                 alt="Image slider {{ product.name }}"
+                                 class="w-28 h-28 object-cover rounded-lg border border-neutral-200">
+                            <form method="post"
+                                  action="{{ path('app_admin_product_gallery_delete', {productId: product.id, imageId: image.id}) }}"
+                                  class="absolute top-1 right-1">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_product_image_' ~ image.id) }}">
+                                <button type="submit"
+                                        class="w-6 h-6 flex items-center justify-center rounded-full bg-white/90 text-red-500 hover:bg-red-50 shadow opacity-0 group-hover:opacity-100 transition text-xs"
+                                        onclick="return confirm('Supprimer cette image ?')">
+                                    ✕
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p class="text-sm text-neutral-400 italic mb-6">Aucune image de galerie — seule l'image de couverture sera affichée.</p>
+        {% endif %}
+
+        {{ form_start(galleryImageForm, {action: path('app_admin_product_gallery_new', {productId: product.id}), method: 'post', attr: {class: 'flex items-end gap-3 pt-4 border-t border-neutral-200'}}) }}
+            <div class="flex-1 max-w-xs">
+                {{ form_label(galleryImageForm.imageFile, 'Ajouter une image', {label_attr: {class: 'block text-sm font-medium text-neutral-700 mb-1.5'}}) }}
+                {{ form_widget(galleryImageForm.imageFile, {attr: {class: 'w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm bg-white'}}) }}
+                {{ form_errors(galleryImageForm.imageFile) }}
+            </div>
+            <button type="submit" class="bg-neutral-900 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+                Ajouter au slider
+            </button>
+        {{ form_end(galleryImageForm) }}
+    </div>
+
     {# ===== SECTION OPTIONS ===== #}
     <div class="bg-white border border-neutral-200 rounded-xl p-6">
         <div class="flex items-center justify-between mb-6">

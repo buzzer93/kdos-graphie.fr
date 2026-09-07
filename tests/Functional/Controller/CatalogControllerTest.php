@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Controller;
 
 use App\Entity\Category;
 use App\Entity\Product;
+use App\Entity\ProductImage;
 use App\Tests\Functional\AbstractWebTestCase;
 
 final class CatalogControllerTest extends AbstractWebTestCase
@@ -66,5 +67,51 @@ final class CatalogControllerTest extends AbstractWebTestCase
         $client->request('GET', '/catalogue/produit-cache');
 
         self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testProductShowDisplaysGallerySliderWhenImagesArePresent(): void
+    {
+        $client = $this->createClientWithFreshDatabase();
+        $entityManager = $this->getEntityManager();
+
+        $product = (new Product())
+            ->setName('Coffret gravé')
+            ->setSlug('coffret-grave')
+            ->setPrice(2000)
+            ->setIsVisible(true)
+            ->setCoverImage('cover.jpg');
+
+        $product->addImage((new ProductImage())->setFilename('gallery-1.jpg')->setSortOrder(0));
+        $product->addImage((new ProductImage())->setFilename('gallery-2.jpg')->setSortOrder(1));
+
+        $entityManager->persist($product);
+        $entityManager->flush();
+
+        $crawler = $client->request('GET', '/catalogue/coffret-grave');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-controller="product-gallery"]');
+        self::assertCount(3, $crawler->filter('[data-product-gallery-target="thumbnail"]'));
+    }
+
+    public function testProductShowFallsBackToPlaceholderWithoutAnyImage(): void
+    {
+        $client = $this->createClientWithFreshDatabase();
+        $entityManager = $this->getEntityManager();
+
+        $product = (new Product())
+            ->setName('Sans image')
+            ->setSlug('sans-image')
+            ->setPrice(1500)
+            ->setIsVisible(true);
+
+        $entityManager->persist($product);
+        $entityManager->flush();
+
+        $client->request('GET', '/catalogue/sans-image');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorNotExists('[data-controller="product-gallery"]');
+        self::assertSelectorTextContains('body', 'Image à venir');
     }
 }

@@ -5,6 +5,11 @@ services:
       target: dev
     ports:
       - "8080:80"
+    environment:
+      # FrankenPHP's HTTP SAPI does not populate $_SERVER from .env.local at boot
+      # (see public/index.php) — set explicitly so the web entrypoint runs in dev.
+      APP_ENV: dev
+      APP_DEBUG: "1"
     volumes:
       - .:/var/www/html
       - ./docker/Caddyfile:/etc/frankenphp/Caddyfile

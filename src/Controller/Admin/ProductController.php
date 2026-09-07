@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Product;
+use App\Entity\ProductImage;
+use App\Form\ProductImageType;
 use App\Form\ProductType;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
@@ -113,10 +115,17 @@ class ProductController extends AbstractController
             return $this->redirectToRoute('app_admin_product_index');
         }
 
+        $galleryImagePaths = [];
+        foreach ($product->getImages() as $image) {
+            $galleryImagePaths[$image->getId()] = $productImageStorage->getPublicPath($image->getFilename());
+        }
+
         return $this->render('admin/product/edit.html.twig', [
             'product' => $product,
             'form' => $form,
             'imagePublicPath' => $productImageStorage->getPublicPath($product->getCoverImage()),
+            'galleryImageForm' => $this->createForm(ProductImageType::class, new ProductImage()),
+            'galleryImagePaths' => $galleryImagePaths,
         ]);
     }
 
@@ -129,6 +138,9 @@ class ProductController extends AbstractController
     ): Response {
         if ($this->isCsrfTokenValid('delete_product_' . $product->getId(), (string) $request->request->get('_token'))) {
             $productImageStorage->remove($product->getCoverImage());
+            foreach ($product->getImages() as $image) {
+                $productImageStorage->remove($image->getFilename());
+            }
 
             $entityManager->remove($product);
             $entityManager->flush();

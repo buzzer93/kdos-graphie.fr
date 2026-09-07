@@ -34,9 +34,18 @@ class CatalogController extends AbstractController
             throw $this->createNotFoundException('Produit introuvable.');
         }
 
+        $sliderImages = [];
+        if ($product->getCoverImage() !== null) {
+            $sliderImages[] = $productImageStorage->getPublicPath($product->getCoverImage());
+        }
+        foreach ($product->getImages() as $image) {
+            $sliderImages[] = $productImageStorage->getPublicPath($image->getFilename());
+        }
+
         return $this->render('catalog/show.html.twig', [
             'product' => $product,
             'imagePublicPath' => $productImageStorage->getPublicPath($product->getCoverImage()),
+            'sliderImages' => $sliderImages,
             'optionGroupsJson' => $optionSerializer->serializeForFrontend($product),
         ]);
     }

@@ -43,21 +43,53 @@
     <main class="max-w-6xl mx-auto px-6 py-10">
         <div class="grid lg:grid-cols-2 gap-10 items-start">
 
-            {# Image #}
-            <div class="bg-neutral-100 rounded-2xl overflow-hidden min-h-[380px] flex items-center justify-center">
-                {% if imagePublicPath %}
-                    <img
-                        src="{{ asset(imagePublicPath) }}"
-                        alt="{{ product.name }}"
-                        class="w-full h-full object-cover"
-                    >
-                {% else %}
+            {# Slider images #}
+            {% if sliderImages is not empty %}
+                <div data-controller="product-gallery">
+                    <div class="relative bg-neutral-100 rounded-2xl overflow-hidden min-h-[380px] flex items-center justify-center">
+                        <img
+                            data-product-gallery-target="main"
+                            src="{{ asset(sliderImages[0]) }}"
+                            alt="{{ product.name }}"
+                            class="w-full h-full object-cover"
+                        >
+                        {% if sliderImages|length > 1 %}
+                            <button type="button" data-action="product-gallery#previous"
+                                    aria-label="Image précédente"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow text-neutral-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                            </button>
+                            <button type="button" data-action="product-gallery#next"
+                                    aria-label="Image suivante"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow text-neutral-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    {% if sliderImages|length > 1 %}
+                        <div class="flex gap-3 mt-4 overflow-x-auto pb-1">
+                            {% for image in sliderImages %}
+                                <button type="button"
+                                        data-product-gallery-target="thumbnail"
+                                        data-action="product-gallery#select"
+                                        data-index="{{ loop.index0 }}"
+                                        data-full-src="{{ asset(image) }}"
+                                        class="shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 {{ loop.first ? 'border-amber-500 is-active' : 'border-transparent' }}">
+                                    <img src="{{ asset(image) }}" alt="{{ product.name }} — miniature {{ loop.index }}" class="w-full h-full object-cover">
+                                </button>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="bg-neutral-100 rounded-2xl overflow-hidden min-h-[380px] flex items-center justify-center">
                     <div class="flex flex-col items-center gap-4 py-16 px-8 text-center">
                         <img src="{{ asset('media/LOGO Kdos-graphie.png') }}" alt="Kdos Graphie" class="h-20 w-auto opacity-20">
                         <p class="text-sm text-neutral-400">Image à venir</p>
                     </div>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
 
             {# Infos produit #}
             <div class="space-y-6">

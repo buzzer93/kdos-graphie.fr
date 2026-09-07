@@ -54,11 +54,17 @@ class Product
     #[ORM\OrderBy(['sortOrder' => 'ASC', 'id' => 'ASC'])]
     private Collection $optionGroups;
 
+    /** @var Collection<int, ProductImage> Images additionnelles affichées dans le slider produit. */
+    #[ORM\OneToMany(targetEntity: ProductImage::class, mappedBy: 'product', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['sortOrder' => 'ASC', 'id' => 'ASC'])]
+    private Collection $images;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->optionGroups = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     public function touch(): void
@@ -184,6 +190,29 @@ class Product
     public function removeOptionGroup(ProductOptionGroup $group): static
     {
         $this->optionGroups->removeElement($group);
+
+        return $this;
+    }
+
+    /** @return Collection<int, ProductImage> */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(ProductImage $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(ProductImage $image): static
+    {
+        $this->images->removeElement($image);
 
         return $this;
     }
