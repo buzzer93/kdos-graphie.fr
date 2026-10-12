@@ -109,6 +109,14 @@
                     </p>
                 {% endif %}
 
+                <div class="space-y-1">
+                    <p class="font-display text-xl font-bold text-amber-600">Prix à titre indicatif</p>
+                    <p class="text-neutral-500 text-sm">Varient selon la taille, la forme, l'essence et la personnalisation.</p>
+                    <a href="{{ path('app_contact') }}" class="inline-flex items-center gap-1 font-display text-lg font-bold text-amber-600 hover:text-amber-700 transition">
+                        Demandez votre devis →
+                    </a>
+                </div>
+
                 {% if product.description %}
                     <p class="text-neutral-600 leading-relaxed whitespace-pre-line">{{ product.description }}</p>
                 {% endif %}
@@ -227,7 +235,7 @@
                     </span>
                     <span class="inline-flex items-center gap-1.5 text-xs text-neutral-600 bg-neutral-100 rounded-full px-3 py-1.5">
                         <span class="text-amber-500">✦</span>
-                        <span>Délai indicatif : 48h</span>
+                        <span>Délai de réponse : sous 48h</span>
                     </span>
                 </div>
             </div>
