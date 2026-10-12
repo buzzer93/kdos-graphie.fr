@@ -28,8 +28,8 @@ final class ContentController extends AbstractController
         'home_hero_stat_1_label'    => 'Créations uniques',
         'home_hero_stat_2_value'    => '100%',
         'home_hero_stat_2_label'    => 'Sur mesure',
-        'home_hero_stat_3_value'    => '48h',
-        'home_hero_stat_3_label'    => 'Délai express',
+        'home_hero_stat_3_value'    => '',
+        'home_hero_stat_3_label'    => '',
 
         // Savoir-faire
         'home_sf_eyebrow'  => 'Notre savoir-faire',
@@ -58,7 +58,7 @@ final class ContentController extends AbstractController
 
         'home_sf_6_icon'  => '⚡',
         'home_sf_6_title' => 'Prototypage rapide',
-        'home_sf_6_desc'  => 'Du fichier à l\'objet unique en 48h. On travaille à votre rythme, sur votre projet, pas sur une ligne de production.',
+        'home_sf_6_desc'  => 'Du fichier à l\'objet unique, on travaille à votre rythme, sur votre projet, pas sur une ligne de production.',
 
         // Produits phares
         'home_produits_eyebrow' => 'Nos créations',
