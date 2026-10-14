@@ -150,7 +150,11 @@
                 <span class="font-display text-neutral-900">Kdos Graphie</span>
             </div>
             <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser.</p>
-            <a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a>
+            <nav class="flex items-center gap-5">
+                <a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a>
+                <a href="{{ path('app_mentions_legales') }}" class="hover:text-amber-600 transition">Mentions légales</a>
+                <a href="{{ path('app_cgv') }}" class="hover:text-amber-600 transition">CGV</a>
+            </nav>
         </div>
     </footer>
 </div>

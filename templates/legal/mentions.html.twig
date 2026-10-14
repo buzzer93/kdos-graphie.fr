@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales — Kdos Graphie{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-white text-neutral-800">
+
+    {{ include('partials/_header_public.html.twig') }}
+
+    {# ===== HERO ===== #}
+    <div class="bg-neutral-50 border-b border-neutral-100 py-12 px-6">
+        <div class="max-w-7xl mx-auto">
+            <p class="uppercase tracking-[0.25em] text-amber-600 text-xs font-semibold">Informations légales</p>
+            <h1 class="font-display text-4xl md:text-5xl font-bold text-neutral-900 mt-2">Mentions légales</h1>
+            <p class="text-neutral-500 mt-3 text-sm">En vigueur au 12/10/2026</p>
+        </div>
+    </div>
+
+    {# ===== CONTENU ===== #}
+    <main class="max-w-3xl mx-auto px-6 py-16 space-y-10">
+
+        <p class="text-neutral-600 leading-relaxed">
+            Conformément aux dispositions de la loi n° 2004-575 du 21 juin 2004 pour la Confiance en l'économie
+            numérique (LCEN), il est porté à la connaissance des utilisateurs et visiteurs (ci-après l'«&nbsp;Utilisateur&nbsp;»)
+            du site <a href="https://kdos-graphie.fr" class="text-amber-600 hover:underline">https://kdos-graphie.fr</a>
+            (ci-après le «&nbsp;Site&nbsp;») les présentes mentions légales.
+        </p>
+        <p class="text-neutral-600 leading-relaxed">
+            La connexion et la navigation sur le Site par l'Utilisateur impliquent l'acceptation intégrale et sans
+            réserve des présentes mentions légales. Ces dernières sont accessibles directement sur le Site à la rubrique
+            «&nbsp;Mentions légales&nbsp;».
+        </p>
+
+        {# 1. Édition #}
+        <section>
+            <h2 class="font-display text-2xl font-bold text-neutral-900 mb-4">1. Édition du Site</h2>
+            <p class="text-neutral-600 leading-relaxed">L'édition du Site et la direction de la publication sont assurées par :</p>
+            <ul class="mt-3 space-y-1 text-neutral-600">
+                <li><span class="font-semibold text-neutral-800">Éditrice / Directrice de la publication :</span> Madame Sonia Rodriguez</li>
+                <li><span class="font-semibold text-neutral-800">Adresse :</span> 13 Chemin sur le village, 38470 Saint Gervais</li>
+                <li><span class="font-semibold text-neutral-800">Téléphone :</span> <a href="tel:+33612098358" class="text-amber-600 hover:underline">06 12 09 83 58</a></li>
+                <li><span class="font-semibold text-neutral-800">Email :</span> <a href="mailto:kdos.graphie@gmail.com" class="text-amber-600 hover:underline">kdos.graphie@gmail.com</a></li>
+            </ul>
+        </section>
+
+        {# 2. Hébergement #}
+        <section>
+            <h2 class="font-display text-2xl font-bold text-neutral-900 mb-4">2. Hébergement</h2>
+            <p class="text-neutral-600 leading-relaxed">L'hébergement du Site est assuré par :</p>
+            <ul class="mt-3 space-y-1 text-neutral-600">
+                <li><span class="font-semibold text-neutral-800">Hébergeur :</span> Société Kdos-Graphie</li>
+                <li><span class="font-semibold text-neutral-800">Siège social :</span> 13 Chemin sur le village, 38470 Saint Gervais</li>
+                <li><span class="font-semibold text-neutral-800">Téléphone :</span> <a href="tel:+33612098358" class="text-amber-600 hover:underline">06 12 09 83 58</a></li>
+            </ul>
+        </section>
+
+        {# 3. Accès #}
+        <section>
+            <h2 class="font-display text-2xl font-bold text-neutral-900 mb-4">3. Accès au Site</h2>
+            <p class="text-neutral-600 leading-relaxed">
+                Le Site est normalement accessible à tout moment par l'Utilisateur. Toutefois, l'Éditeur pourra, à tout
+                moment, suspendre, limiter ou interrompre l'accès au Site afin de procéder notamment à des mises à jour
+                ou à des modifications de son contenu. L'Éditeur ne pourra en aucun cas être tenu responsable des
+                conséquences éventuelles de cette indisponibilité sur les activités de l'Utilisateur.
+            </p>
+        </section>
+
+        {# 4. Données personnelles #}
+        <section>
+            <h2 class="font-display text-2xl font-bold text-neutral-900 mb-4">4. Collecte et Protection des Données Personnelles</h2>
+            <p class="text-neutral-600 leading-relaxed">
+                Le Site assure à l'Utilisateur une collecte et un traitement des données personnelles dans le respect de
+                la vie privée, conformément à la loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers
+                et aux libertés, ainsi qu'au Règlement Général sur la Protection des Données (RGPD&nbsp;- Règlement
+                UE 2016/679).
+            </p>
+            <p class="text-neutral-600 leading-relaxed mt-3">
+                En vertu de cette réglementation, l'Utilisateur dispose d'un droit d'accès, de rectification, de
+                suppression et d'opposition concernant ses données personnelles. L'Utilisateur peut exercer ces droits
+                directement depuis le formulaire de contact du Site.
+            </p>
+        </section>
+
+        {# 5. Propriété intellectuelle #}
+        <section>
+            <h2 class="font-display text-2xl font-bold text-neutral-900 mb-4">5. Propriété Intellectuelle</h2>
+            <p class="text-neutral-600 leading-relaxed">
+                Toute utilisation, reproduction, diffusion, commercialisation ou modification de toute ou partie du Site
+                sans l'autorisation expresse de l'Éditeur est prohibée et pourra entraîner des actions et poursuites
+                judiciaires conformément à la réglementation en vigueur.
+            </p>
+        </section>
+
+        {# 6. CGV #}
+        <section>
+            <h2 class="font-display text-2xl font-bold text-neutral-900 mb-4">6. Conditions Générales de Vente</h2>
+            <p class="text-neutral-600 leading-relaxed">
+                Pour plus d'informations, veuillez vous reporter aux
+                <a href="{{ path('app_cgv') }}" class="text-amber-600 hover:underline font-semibold">Conditions Générales de Vente (CGV)</a>
+                du site, accessibles depuis la rubrique «&nbsp;CGV&nbsp;».
+            </p>
+        </section>
+
+    </main>
+
+    {# ===== FOOTER ===== #}
+    <footer class="bg-neutral-100 text-neutral-600 py-10 border-t border-neutral-200">
+        <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm">
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('media/LOGO Kdos-graphie.png') }}" alt="Kdos Graphie" class="h-8 w-auto">
+                <span class="font-display text-neutral-900">Kdos Graphie</span>
+            </div>
+            <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser.</p>
+            <nav class="flex items-center gap-5">
+                <a href="{{ path('app_catalog_index') }}" class="hover:text-amber-600 transition">Catalogue</a>
+                <a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a>
+                <a href="{{ path('app_mentions_legales') }}" class="hover:text-amber-600 transition">Mentions légales</a>
+                <a href="{{ path('app_cgv') }}" class="hover:text-amber-600 transition">CGV</a>
+            </nav>
+        </div>
+    </footer>
+
+</div>
+{% endblock %}
