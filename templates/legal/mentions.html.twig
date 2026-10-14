@@ -48,9 +48,10 @@
             <h2 class="font-display text-2xl font-bold text-neutral-900 mb-4">2. Hébergement</h2>
             <p class="text-neutral-600 leading-relaxed">L'hébergement du Site est assuré par :</p>
             <ul class="mt-3 space-y-1 text-neutral-600">
-                <li><span class="font-semibold text-neutral-800">Hébergeur :</span> Société Kdos-Graphie</li>
-                <li><span class="font-semibold text-neutral-800">Siège social :</span> 13 Chemin sur le village, 38470 Saint Gervais</li>
-                <li><span class="font-semibold text-neutral-800">Téléphone :</span> <a href="tel:+33612098358" class="text-amber-600 hover:underline">06 12 09 83 58</a></li>
+                <li><span class="font-semibold text-neutral-800">Hébergeur :</span> IONOS SARL</li>
+                <li><span class="font-semibold text-neutral-800">Siège social :</span> 7, place de la Gare — BP 70109 — 57201 Sarreguemines Cedex</li>
+                <li><span class="font-semibold text-neutral-800">Téléphone :</span> <a href="tel:0970808911" class="text-amber-600 hover:underline">09 70 808 911</a></li>
+                <li><span class="font-semibold text-neutral-800">Site web :</span> <a href="https://www.ionos.fr" class="text-amber-600 hover:underline">www.ionos.fr</a></li>
             </ul>
         </section>
 
@@ -103,22 +104,7 @@
 
     </main>
 
-    {# ===== FOOTER ===== #}
-    <footer class="bg-neutral-100 text-neutral-600 py-10 border-t border-neutral-200">
-        <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('media/LOGO Kdos-graphie.png') }}" alt="Kdos Graphie" class="h-8 w-auto">
-                <span class="font-display text-neutral-900">Kdos Graphie</span>
-            </div>
-            <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser.</p>
-            <nav class="flex items-center gap-5">
-                <a href="{{ path('app_catalog_index') }}" class="hover:text-amber-600 transition">Catalogue</a>
-                <a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a>
-                <a href="{{ path('app_mentions_legales') }}" class="hover:text-amber-600 transition">Mentions légales</a>
-                <a href="{{ path('app_cgv') }}" class="hover:text-amber-600 transition">CGV</a>
-            </nav>
-        </div>
-    </footer>
+    {{ include('partials/_footer_public.html.twig') }}
 
 </div>
 {% endblock %}

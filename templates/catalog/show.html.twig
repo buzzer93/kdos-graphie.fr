@@ -253,21 +253,7 @@
         </div>
     </section>
 
-    {# ===== FOOTER ===== #}
-    <footer class="bg-neutral-100 text-neutral-600 py-10 border-t border-neutral-200">
-        <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('media/LOGO Kdos-graphie.png') }}" alt="Kdos Graphie" class="h-8 w-auto">
-                <span class="font-display text-neutral-900">Kdos Graphie</span>
-            </div>
-            <p>© {{ "now"|date("Y") }} Kdos Graphie — Artisan graveur laser.</p>
-            <nav class="flex items-center gap-5">
-                <a href="{{ path('app_contact') }}" class="hover:text-amber-600 transition">Contact</a>
-                <a href="{{ path('app_mentions_legales') }}" class="hover:text-amber-600 transition">Mentions légales</a>
-                <a href="{{ path('app_cgv') }}" class="hover:text-amber-600 transition">CGV</a>
-            </nav>
-        </div>
-    </footer>
+    {{ include('partials/_footer_public.html.twig') }}
 </div>
 
 <script>
