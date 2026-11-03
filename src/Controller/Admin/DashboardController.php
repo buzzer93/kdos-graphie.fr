@@ -68,7 +68,7 @@ class DashboardController extends AbstractController
             }, $statuses);
         };
 
-        $revenueCents = $orderRepository->getRevenueCentsExcludingRejected();
+        $revenueCents = $orderRepository->getRevenueCentsPaid();
 
         return $this->render('admin/dashboard.html.twig', [
             'activeCards'   => $buildCards($activeStatuses),

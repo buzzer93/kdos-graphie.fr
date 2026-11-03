@@ -104,12 +104,12 @@ class OrderRepository extends ServiceEntityRepository
         return $this->findOneBy(['stripePaymentIntentId' => $paymentIntentId]);
     }
 
-    public function getRevenueCentsExcludingRejected(): int
+    public function getRevenueCentsPaid(): int
     {
         return (int) $this->createQueryBuilder('o')
             ->select('COALESCE(SUM(o.total), 0)')
-            ->andWhere('o.status NOT IN (:excludedStatuses)')
-            ->setParameter('excludedStatuses', [Order::STATUS_REFUSE, Order::STATUS_ANNULE])
+            ->andWhere('o.status IN (:paidStatuses)')
+            ->setParameter('paidStatuses', [Order::STATUS_A_FAIRE, Order::STATUS_TERMINE])
             ->getQuery()
             ->getSingleScalarResult();
     }
