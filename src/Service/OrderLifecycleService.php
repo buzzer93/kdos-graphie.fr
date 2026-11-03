@@ -15,6 +15,7 @@ final class OrderLifecycleService
         private readonly OrderMailer $orderMailer,
         private readonly StripePaymentService $stripePaymentService,
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly QuotePdfStorage $quotePdfStorage,
     ) {
     }
 
@@ -51,7 +52,7 @@ final class OrderLifecycleService
         return OrderActionResult::success('Relance de paiement envoyee.');
     }
 
-    public function sendQuote(Order $order, int $quotedPrice, string $quoteDescription): OrderActionResult
+    public function sendQuote(Order $order, int $quotedPrice, string $quotePdfFilename): OrderActionResult
     {
         if ($order->getStatus() !== Order::STATUS_EN_ATTENTE_DEVIS) {
             return OrderActionResult::warning('Seules les commandes en attente de devis peuvent recevoir un devis.');
@@ -59,7 +60,7 @@ final class OrderLifecycleService
 
         $order->setQuotedPrice($quotedPrice);
         $order->setTotal($quotedPrice);
-        $order->setQuoteDescription(trim($quoteDescription));
+        $order->setQuotePdfPath($quotePdfFilename);
 
         $paymentIntent = $this->stripePaymentService->createPaymentIntent($order);
 
@@ -72,7 +73,9 @@ final class OrderLifecycleService
         $order->setStatus(Order::STATUS_EN_ATTENTE_PAIEMENT);
 
         $this->entityManager->flush();
-        $this->orderMailer->sendQuoteToCustomer($order);
+
+        $pdfAbsolutePath = $this->quotePdfStorage->getAbsolutePath($quotePdfFilename);
+        $this->orderMailer->sendQuoteToCustomer($order, $pdfAbsolutePath);
 
         return OrderActionResult::success('Devis envoye au client. Commande passee en attente de paiement.');
     }

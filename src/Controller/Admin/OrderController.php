@@ -10,7 +10,9 @@ use App\Service\OrderAdminActionAvailabilityResolver;
 use App\Service\OrderArchiveService;
 use App\Service\OrderLifecycleService;
 use App\Service\OrderMailer;
+use App\Service\QuotePdfStorage;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -154,7 +156,7 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}/send-quote', name: 'send_quote', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
-    public function sendQuote(Order $order, Request $request, OrderLifecycleService $orderLifecycleService): Response
+    public function sendQuote(Order $order, Request $request, OrderLifecycleService $orderLifecycleService, QuotePdfStorage $quotePdfStorage): Response
     {
         if ($order->getStatus() !== Order::STATUS_EN_ATTENTE_DEVIS) {
             $this->addFlash('warning', 'Cette commande n\'est pas en attente de devis.');
@@ -171,7 +173,6 @@ class OrderController extends AbstractController
 
             $priceEuros = (float) str_replace(',', '.', (string) $request->request->get('quoted_price', '0'));
             $quotedPriceCents = (int) round($priceEuros * 100);
-            $quoteDescription = trim((string) $request->request->get('quote_description', ''));
 
             if ($quotedPriceCents <= 0) {
                 $this->addFlash('danger', 'Le prix devisé doit être supérieur à 0.');
@@ -179,13 +180,30 @@ class OrderController extends AbstractController
                 return $this->redirectToRoute('app_admin_order_send_quote', ['id' => $order->getId()]);
             }
 
-            if ($quoteDescription === '') {
-                $this->addFlash('danger', 'La description de la personnalisation est obligatoire.');
+            /** @var UploadedFile|null $pdfFile */
+            $pdfFile = $request->files->get('quote_pdf');
+
+            if (!$pdfFile instanceof UploadedFile) {
+                $this->addFlash('danger', 'Le fichier PDF du devis est obligatoire.');
 
                 return $this->redirectToRoute('app_admin_order_send_quote', ['id' => $order->getId()]);
             }
 
-            $result = $orderLifecycleService->sendQuote($order, $quotedPriceCents, $quoteDescription);
+            if ($pdfFile->getMimeType() !== 'application/pdf') {
+                $this->addFlash('danger', 'Le fichier doit être un PDF.');
+
+                return $this->redirectToRoute('app_admin_order_send_quote', ['id' => $order->getId()]);
+            }
+
+            if ($pdfFile->getSize() > QuotePdfStorage::MAX_FILE_SIZE_BYTES) {
+                $this->addFlash('danger', 'Le fichier PDF ne doit pas dépasser 10 Mo.');
+
+                return $this->redirectToRoute('app_admin_order_send_quote', ['id' => $order->getId()]);
+            }
+
+            $pdfFilename = $quotePdfStorage->store($pdfFile);
+
+            $result = $orderLifecycleService->sendQuote($order, $quotedPriceCents, $pdfFilename);
             $this->addFlash($result->level, $result->message);
 
             return $this->redirectToRoute('app_admin_order_edit', ['id' => $order->getId()]);

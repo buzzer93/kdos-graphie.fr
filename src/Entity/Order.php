@@ -77,9 +77,9 @@ class Order
     #[ORM\Column(nullable: true)]
     private ?int $quotedPrice = null;
 
-    /** Description de la personnalisation rédigée par l'artisan lors de l'envoi du devis. */
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $quoteDescription = null;
+    /** Nom du fichier PDF du devis, stocké dans var/uploads/quotes/. */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $quotePdfPath = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $refundNote = null;
@@ -322,14 +322,14 @@ class Order
         return $this;
     }
 
-    public function getQuoteDescription(): ?string
+    public function getQuotePdfPath(): ?string
     {
-        return $this->quoteDescription;
+        return $this->quotePdfPath;
     }
 
-    public function setQuoteDescription(?string $quoteDescription): static
+    public function setQuotePdfPath(?string $quotePdfPath): static
     {
-        $this->quoteDescription = $quoteDescription;
+        $this->quotePdfPath = $quotePdfPath;
 
         return $this;
     }

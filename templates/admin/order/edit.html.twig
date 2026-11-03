@@ -187,8 +187,8 @@
                     <span class="text-sm font-medium text-amber-900">Prix devisé :</span>
                     <span class="text-lg font-bold text-amber-700">{{ (order.quotedPrice / 100)|number_format(2, ',', ' ') }} €</span>
                 </div>
-                {% if order.quoteDescription %}
-                    <p class="text-sm text-neutral-600 italic">« {{ order.quoteDescription }} »</p>
+                {% if order.quotePdfPath %}
+                    <p class="text-sm text-neutral-500 mt-1">📎 Devis PDF joint à l'email client.</p>
                 {% endif %}
             {% endif %}
         </div>

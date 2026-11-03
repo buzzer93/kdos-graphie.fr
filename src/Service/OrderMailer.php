@@ -15,6 +15,8 @@ final class OrderMailer
         private readonly MailerInterface $mailer,
         #[Autowire('%env(string:MAIL_CONTACT)%')]
         private readonly string $contactAddress,
+        #[Autowire('%env(string:MAIL_ADMIN)%')]
+        private readonly string $adminAddress,
     ) {
     }
 
@@ -103,7 +105,7 @@ final class OrderMailer
         );
     }
 
-    public function sendQuoteToCustomer(Order $order): void
+    public function sendQuoteToCustomer(Order $order, string $pdfAbsolutePath): void
     {
         $this->send(
             (new TemplatedEmail())
@@ -112,6 +114,7 @@ final class OrderMailer
                 ->subject('Votre devis Kdos Graphie : ' . $order->getReference())
                 ->htmlTemplate('emails/order_quote.html.twig')
                 ->context(['order' => $order])
+                ->attachFromPath($pdfAbsolutePath, 'devis-' . $order->getReference() . '.pdf', 'application/pdf')
         );
     }
 
@@ -120,7 +123,7 @@ final class OrderMailer
         $this->send(
             (new TemplatedEmail())
                 ->from($this->contactAddress)
-                ->to($this->contactAddress)
+                ->to($this->adminAddress)
                 ->subject('[Admin] Nouvelle commande : ' . $order->getReference())
                 ->htmlTemplate('emails/admin_new_order.html.twig')
                 ->context(['order' => $order])
@@ -144,7 +147,7 @@ final class OrderMailer
         $this->send(
             (new TemplatedEmail())
                 ->from($this->contactAddress)
-                ->to($this->contactAddress)
+                ->to($this->adminAddress)
                 ->subject('[Admin] Paiement reçu : ' . $order->getReference())
                 ->htmlTemplate('emails/admin_order_paid.html.twig')
                 ->context(['order' => $order])
