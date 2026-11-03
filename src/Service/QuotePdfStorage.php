@@ -6,7 +6,7 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final class QuotePdfStorage
+class QuotePdfStorage
 {
     public const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
     private const DIRECTORY = 'var/uploads/quotes';
