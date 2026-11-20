@@ -14,6 +14,11 @@ services:
     networks:
       - default
       - web
+    ports: !reset []
+    restart: unless-stopped
+
+  mysql:
+    restart: unless-stopped
 
 networks:
   web:
